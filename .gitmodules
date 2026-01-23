@@ -67,3 +67,9 @@
 [submodule "apps/sc"]
 	path = apps/sc
 	url = https://github.com/nasa/SC.git
+[submodule "tools/cfs-cosmos-plugin"]
+	path = tools/cfs-cosmos-plugin
+	url = https://github.com/nasa/cfs-cosmos-plugin.git
+[submodule "tools/commandline-tools"]
+	path = tools/commandline-tools
+	url = https://github.com/nasa/cfs-commandline-tools.git
