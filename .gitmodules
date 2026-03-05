@@ -22,8 +22,8 @@
 	path = libs/sample_lib
 	url = https://github.com/GavinSil/sample_lib.git
   branch = main
-[submodule "apps/SCH"]
-	path = apps/SCH
+[submodule "apps/sch"]
+	path = apps/sch
 	url = https://github.com/GavinSil/SCH.git
   branch = master
 [submodule "apps/sch_lab"]
