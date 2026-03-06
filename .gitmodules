@@ -46,3 +46,6 @@
 	path = tools/tblCRCTool
 	url = https://github.com/GavinSil/tblCRCTool.git
   branch = main
+[submodule "apps/sbn"]
+	path = apps/sbn
+	url = https://github.com/GavinSil/SBN.git
