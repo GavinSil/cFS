@@ -1,0 +1,10 @@
+=== QA Scenario 1: Old PSP sim_stepping directory removed ===
+
+Check 1: psp/fsw/modules/sim_stepping/
+ls: cannot access 'psp/fsw/modules/sim_stepping/': No such file or directory
+
+Check 2: psp/unit-test-coverage/modules/sim_stepping/
+ls: cannot access 'psp/unit-test-coverage/modules/sim_stepping/': No such file or directory
+
+Check 3: psp/ut-stubs/src/cfe_psp_sim_stepping_shim_stubs.c
+ls: cannot access 'psp/ut-stubs/src/cfe_psp_sim_stepping_shim_stubs.c': No such file or directory
