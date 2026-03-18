@@ -58,6 +58,22 @@
 #define CFE_PSP_SIM_STEPPING_STATUS_ILLEGAL_STATE    -8   /**< Operation illegal in current stepping state */
 
 /****************************************************************************************
+                              INITIALIZATION API
+ ***************************************************************************************/
+
+/**
+ * \brief Initialize ESA stepping module (core + UDS transport)
+ *
+ * Must be called early in BSP main(), before OS_Application_Startup().
+ * Initializes the stepping core state machine and UDS control adapter.
+ * Safe to call even when CFE_SIM_STEPPING is not defined (becomes no-op).
+ *
+ * \note This function should be called exactly once during system initialization.
+ * \note When CFE_SIM_STEPPING is not defined, this is a no-op stub.
+ */
+void ESA_Init(void);
+
+/****************************************************************************************
                              STEPPING HOOK DECLARATIONS
  ***************************************************************************************/
 

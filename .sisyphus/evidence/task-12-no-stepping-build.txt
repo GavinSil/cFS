@@ -1,0 +1,25 @@
+=== Testing build without CFE_SIM_STEPPING ===
+
+Clean...
+rm -rf "build"
+
+Prep without stepping flag...
+-- Build files have been written to: /workspace/cFS/build/native/default_cpu1
+-- Configuring done (0.8s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/cFS/build
+echo "-DCMAKE_INSTALL_PREFIX=/exe -DCMAKE_BUILD_TYPE=debug" > "build/.prep"
+
+Build...
+[ 16%] Built target cfeconfig_platformdata_native_default_cpu1
+[ 33%] Built target elf2cfetbl
+[ 41%] Building C object tools/tblCRCTool/CMakeFiles/cfe_ts_crc.dir/cfe_ts_crc.c.o
+[ 50%] Linking C executable cfe_ts_crc
+[ 58%] Building C object tools/cFS-GroundSystem/Subsystems/cmdUtil/CMakeFiles/cmdUtil.dir/SendUdp.c.o
+[ 66%] Linking C executable cmdUtil
+[ 66%] Built target cfe_ts_crc
+[100%] Built target cfeconfig_platformdata_tool
+[100%] Built target cmdUtil
+Built target mission-all
+
+=== Build SUCCESS - ESA_Init compiled out by #ifdef ===
