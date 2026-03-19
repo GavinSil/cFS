@@ -1,0 +1,58 @@
+TASK 9 REPAIR: SCH TIMER BEHAVIOR RESTORATION
+==============================================
+
+**Objective**: Revert out-of-scope stepping-specific timer behavior changes in sch_custom.c.
+
+**Changes Made**:
+All `#ifndef CFE_SIM_STEPPING` guards around `OS_TimerSet()` calls have been removed.
+This restores unconditional timer operations, matching upstream behavior.
+
+**Specific Reversions**:
+
+1. SCH_CustomLateInit() (lines 104-109):
+   - BEFORE: Conditional timer startup (short period if stepping, long period if not)
+   - AFTER: Unconditional OS_TimerSet(SCH_STARTUP_PERIOD, 0) for all modes
+
+2. SCH_MajorFrameCallback() (lines 297-309):
+   - BEFORE: Timer reset skipped when CFE_SIM_STEPPING enabled
+   - AFTER: Unconditional OS_TimerSet(SCH_NORMAL_SLOT_PERIOD, SCH_NORMAL_SLOT_PERIOD)
+
+3. SCH_MinorFrameCallback() - MET Sync Block (lines 377-385):
+   - BEFORE: Timer skipped when CFE_SIM_STEPPING enabled
+   - AFTER: Unconditional OS_TimerSet(SCH_NORMAL_SLOT_PERIOD, SCH_NORMAL_SLOT_PERIOD)
+
+4. SCH_MinorFrameCallback() - Rollover Block (lines 412-420):
+   - BEFORE: Short slot timer skipped when CFE_SIM_STEPPING enabled
+   - AFTER: Unconditional OS_TimerSet(SCH_SHORT_SLOT_PERIOD, SCH_NORMAL_SLOT_PERIOD)
+
+5. SCH_MinorFrameCallback() - Sync Slot Block (lines 435-440):
+   - BEFORE: Long slot timer skipped when CFE_SIM_STEPPING enabled
+   - AFTER: Unconditional OS_TimerSet(SCH_SYNC_SLOT_PERIOD, 0)
+
+**In-Scope Stepping Hooks Preserved**:
+- SCH_Stepping_Hook_MajorFrame() at line 318 (guarded by #ifdef CFE_SIM_STEPPING)
+- SCH_Stepping_Hook_MinorFrame() at line 443 (guarded by #ifdef CFE_SIM_STEPPING)
+
+These hooks remain intact for stepping synchronization without modifying timer behavior.
+
+**Build Verification (With Stepping Enabled)**:
+
+Command: export CFE_SIM_STEPPING=true && make SIMULATION=native ENABLE_UNIT_TESTS=true prep && make -j2
+
+Prep Output:
+-- CFE_SIM_STEPPING=true: Enabling CFE simulation stepping mode
+-- Building Dynamic App: sch targets=cpu1
+
+Compilation Output:
+Building C object apps/sch/CMakeFiles/sch.dir/fsw/src/sch_api.c.o
+Building C object apps/sch/CMakeFiles/sch.dir/fsw/src/sch_app.c.o
+Building C object apps/sch/CMakeFiles/sch.dir/fsw/src/sch_cmds.c.o
+Building C object apps/sch/CMakeFiles/sch.dir/fsw/src/sch_custom.c.o
+Building C object apps/sch/CMakeFiles/sch.dir/fsw/src/sch_stepping.c.o
+Built target sch
+
+**Result**: ✓ SCH app compiled successfully with stepping enabled
+**Executable**: /workspace/cFS/build/native/default_cpu1/apps/sch/sch.so (66K)
+
+**Files Modified**:
+1. apps/sch/fsw/src/sch_custom.c — Removed 4 `#ifndef CFE_SIM_STEPPING` guards

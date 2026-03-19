@@ -1,0 +1,31 @@
+Task 8: cFE Module Compilation Verification (CORRECTED)
+========================================================
+
+Build Command:
+  make distclean && make SIMULATION=native ENABLE_UNIT_TESTS=true CFE_SIM_STEPPING=true prep && make -j2
+
+Build Result: ✓ SUCCESS
+
+All cFE stepping-related modules compiled successfully:
+Built target evs
+Built target sb
+Built target es
+Built target time
+Built target tbl
+
+Code Changes (Task 8):
+- cfe/modules/es/CMakeLists.txt: Changed from `target_include_directories(es PRIVATE ${MISSION_DEFS}/fsw/inc)` to `target_link_libraries(es PRIVATE esa_public_api)`
+- No cFE source file modifications (reverted incorrect inline typedef additions)
+
+Explanation:
+- Only ES module includes the stepping shim header (`cfe_es_task.c:48`)
+- Original ES CMakeLists pointed to old location: `${MISSION_DEFS}/fsw/inc/cfe_psp_sim_stepping_shim.h`
+- Task 5 moved shim header to: `esa/public_inc/cfe_psp_sim_stepping_shim.h`
+- Task 8 updated ES CMakeLists to use ESA's INTERFACE target for include path resolution
+- Include directive unchanged: `#include "cfe_psp_sim_stepping_shim.h"` (filename only, no path)
+- Resolves via esa_public_api INTERFACE target which exports `esa/public_inc/`
+
+Verification:
+- All cFE modules (es, evs, sb, tbl, time) built without errors
+- ES module successfully includes shim header from ESA location
+- No PSP directory path references remain in cFE sources

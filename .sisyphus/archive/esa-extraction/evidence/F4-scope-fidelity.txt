@@ -1,0 +1,56 @@
+F4 Scope Fidelity Check (current cleaned-tree audit)
+Date: 2026-03-19
+Plan: .sisyphus/plans/esa-extraction.md
+
+Method
+- Read Tasks 1-12 "What to do" and "Must NOT do" in plan.
+- Ran required live-tree git checks with GIT_MASTER=1 at root and in dirty submodules (cfe, osal, apps/sch).
+- Read currently changed product files directly: cfe mission wiring files, osal POSIX stepping files, apps/sch stepping wiring, esa/CMakeLists, esa coverage test.
+- Checked guardrails: no API rename away from CFE_PSP_SimStepping_* and no old PSP path references.
+
+Current live changes considered for scope
+- Root tracked product files:
+  - esa/CMakeLists.txt
+  - esa/ut-coverage/coveragetest-sim_stepping.c
+- Dirty submodules and scoped files:
+  - cfe: cmake/mission_build.cmake, cmake/mission_defaults.cmake, modules/es/CMakeLists.txt
+  - osal: src/os/posix/CMakeLists.txt, src/os/posix/src/os-posix-stepping.c
+  - apps/sch: CMakeLists.txt, fsw/src/sch_stepping.c (untracked)
+- .sisyphus/* files treated as orchestration artifacts (not product scope creep).
+
+Task-by-task compliance
+1) Task 1 (ESA directory scaffold): COMPLIANT
+2) Task 2 (ESA discovery/build wiring): COMPLIANT
+   - cfe/mission_defaults insertion + esa_SEARCH_PATH present
+   - cfe/mission_build stepping env propagation present
+   - no unrelated cfe hardening files currently modified
+3) Task 3 (ESA coverage/stub migration): COMPLIANT
+   - coverage file present under esa/ut-coverage
+4) Task 4 (OSAL stepping fallback/guard sufficiency): COMPLIANT
+   - os-posix-stepping remains #ifdef CFE_SIM_STEPPING guarded
+5) Task 5 (source move + ESA_Init migration): COMPLIANT
+   - ESA runtime files remain in esa/fsw and API naming preserved
+6) Task 6 (OSAL include path/hook wiring): COMPLIANT
+   - osal POSIX CMake links esa_public_api under stepping guard
+   - os-posix-stepping includes ESA headers; no function-signature drift observed
+7) Task 7 (PSP include/module-list rewiring): COMPLIANT (no active contrary drift observed)
+8) Task 8 (cFE include path wiring): COMPLIANT
+   - modules/es/CMakeLists links esa_public_api under stepping guard
+9) Task 9 (SCH + mission-config stepping updates): COMPLIANT
+   - apps/sch/CMakeLists contains stepping-gated sch_stepping.c wiring and ESA include propagation
+   - sch_stepping.c exists and is purposeful stepping hook implementation
+10) Task 10 (old PSP module cleanup): COMPLIANT (no old-path references in active source search)
+11) Task 11 (build/test verification scope): COMPLIANT for current-tree scope gate
+   - no remaining non-.sisyphus root artifact clutter observed in git status
+12) Task 12 (ESA_Init integration and minimal wiring): COMPLIANT
+   - accepted minimal integration wiring remains represented in current changed set
+
+Guardrail checks
+- API rename away from CFE_PSP_SimStepping_*: NOT FOUND
+- Old PSP sim_stepping path refs in active source/CMake: NOT FOUND
+- Functional drift beyond approved wiring: NOT FOUND in currently changed files
+
+Summary
+- Task compliance count: 12/12
+- Scope issues identified: 0
+- Current cleaned tree satisfies F4 scope fidelity gate.

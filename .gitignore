@@ -4,6 +4,9 @@ build
 .DS_Store
 .vscode
 .opencode
-.sisyphus
-AGENTS.md
 .cache
+/.cdskeyfile
+/.reservedkeyfile
+/.resetkeyfile
+/EEPROM.DAT
+/.sisyphus/boulder.json

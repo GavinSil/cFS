@@ -1,0 +1,21 @@
+TASK 9 REPAIR: PSP AUDIT FOR SCH APP
+====================================
+
+**Objective**: Verify SCH app contains no direct PSP module references (using ESA-owned stepping headers instead).
+
+**Audit Command**:
+grep -rn "psp.*sim_stepping\|modules/sim_stepping\|cfe_psp_simstep" /workspace/cFS/apps/sch/ \
+  --include="*.c" --include="*.h" --include="*.cmake"
+
+**Result**:
+/workspace/cFS/apps/sch/fsw/src/sch_stepping.c:33:#include "cfe_psp_sim_stepping_shim.h"
+
+**Analysis**:
+✓ The only PSP-related reference is to "cfe_psp_sim_stepping_shim.h"
+✓ This is the ESA-owned shim header, which is the correct in-scope integration pattern
+✓ No direct PSP module (psp/fsw/modules/sim_stepping) references found
+✓ No "modules/sim_stepping" path references found
+✓ No deprecated "cfe_psp_simstep.h" references found
+
+**Conclusion**: SCH app correctly uses ESA-provided stepping headers via the shim.
+No direct PSP stepping module dependencies exist in SCH app code.
