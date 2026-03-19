@@ -1,0 +1,81 @@
+TASK: T1B - Add CFE_SIM_STEPPING Macro Boundaries in OSAL POSIX Layer
+
+OBJECTIVE:
+Create hook function declarations and hook call sites in OSAL POSIX layer that will be
+called from TaskDelay, Queue receive, and BinSem wait paths. These establish the boundaries
+for simulation stepping integration when CFE_SIM_STEPPING is enabled.
+
+DELIVERABLES COMPLETED:
+✓ Created: osal/src/os/posix/inc/os-posix-stepping.h
+  - Hook function declarations: OS_PosixStepping_Hook_TaskDelay, OS_PosixStepping_Hook_QueueReceive, OS_PosixStepping_Hook_BinSemTake
+  - Comprehensive Doxygen documentation for each hook
+  - Uses stdint.h for uint32_t type
+  - Header guards and proper NASA licensing
+
+✓ Modified: osal/src/os/posix/src/os-impl-tasks.c
+  - Added #include "os-posix-stepping.h"
+  - Added #ifdef CFE_SIM_STEPPING guarded hook call in OS_TaskDelay_Impl (line 733)
+  - Hook call: OS_PosixStepping_Hook_TaskDelay(millisecond) - called before delay begins
+
+✓ Modified: osal/src/os/posix/src/os-impl-queues.c
+  - Added #include "os-posix-stepping.h"
+  - Added #ifdef CFE_SIM_STEPPING guarded hook call in OS_QueueGet_Impl (line 198)
+  - Hook call: OS_PosixStepping_Hook_QueueReceive() - called early in queue receive path
+
+✓ Modified: osal/src/os/posix/src/os-impl-binsem.c
+  - Added #include "os-posix-stepping.h"
+  - Added #ifdef CFE_SIM_STEPPING guarded hook call in OS_GenericBinSemTake_Impl (line 371)
+  - Hook call: OS_PosixStepping_Hook_BinSemTake() - called early in binary semaphore take path
+
+BUILD VERIFICATION:
+
+1. Build with CFE_SIM_STEPPING=OFF (non-simulation):
+   - Command: CFE_SIM_STEPPING=OFF make SIMULATION=native prep && make
+   - Result: ✓ BUILD SUCCESSFUL
+   - Output: No hook functions compiled (guarded by #ifdef)
+   - File size: Standard build without stepping overhead
+
+2. Build with CFE_SIM_STEPPING=ON (simulation with stepping):
+   - Command: CFE_SIM_STEPPING=ON make SIMULATION=native prep && make
+   - Result: EXPECTED LINKER ERRORS (hook implementations not yet provided)
+   - Output: undefined reference to OS_PosixStepping_Hook_* functions
+   - Cause: Hook calls compile correctly when CFE_SIM_STEPPING=ON but implementations come in T2
+   - This validates that:
+     a) Hook calls are properly guarded with #ifdef CFE_SIM_STEPPING
+     b) Hook calls are reachable and properly placed
+     c) Hook declaration interface matches call sites
+
+VERIFICATION DETAILS:
+
+Hook Call Locations (verified with grep):
+- /workspace/cFS/osal/src/os/posix/src/os-impl-binsem.c:371:#ifdef CFE_SIM_STEPPING
+- /workspace/cFS/osal/src/os/posix/src/os-impl-queues.c:198:#ifdef CFE_SIM_STEPPING
+- /workspace/cFS/osal/src/os/posix/src/os-impl-tasks.c:733:#ifdef CFE_SIM_STEPPING
+
+Hook Declaration File:
+- /workspace/cFS/osal/src/os/posix/inc/os-posix-stepping.h
+  - OS_PosixStepping_Hook_TaskDelay(uint32_t ms)
+  - OS_PosixStepping_Hook_QueueReceive(void)
+  - OS_PosixStepping_Hook_BinSemTake(void)
+
+ARCHITECTURE NOTES:
+
+The stepping hooks are inserted at critical synchronization boundaries:
+1. TaskDelay - allows stepping to control time progression
+2. QueueReceive - allows stepping to manage message delivery timing
+3. BinSemTake - allows stepping to manage synchronization points
+
+When CFE_SIM_STEPPING is disabled, the #ifdef guards ensure:
+- Hook calls do NOT compile into the binary
+- No performance overhead in flight build
+- No linker dependencies on hook implementations
+
+When CFE_SIM_STEPPING is enabled, the hooks:
+- Compile into the OSAL library
+- Require implementation in stepping subsystem (T2)
+- Provide deterministic control points for simulation
+
+READY FOR:
+- T2: Implement hook function stubs in stepping subsystem
+- T3-T5: Add stepping logic to hooks
+- All with no changes needed to OSAL layer after this task

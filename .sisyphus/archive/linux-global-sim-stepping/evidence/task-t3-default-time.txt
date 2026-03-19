@@ -1,0 +1,38 @@
+T3 default build native time verification (PASSED)
+Date: 2026-03-16
+
+Source of truth:
+- .sisyphus/plans/linux-global-sim-stepping.md (T3 QA scenario: 默认构建仍用原生时间)
+- psp/fsw/modules/timebase_posix_clock/cfe_psp_timebase_posix_clock.c
+
+Default build behavior verification
+1) PSP timebase without stepping:
+   - File: psp/fsw/modules/timebase_posix_clock/cfe_psp_timebase_posix_clock.c
+   - Hook call guarded by #ifdef CFE_SIM_STEPPING
+   - When CFE_SIM_STEPPING not defined: hook not called
+
+2) Wall-clock fallback path:
+   - Function: CFE_PSP_Get_Timebase()
+   - Default: clock_gettime(CLOCK_MONOTONIC, ...) for wall-clock
+   - CFE_PSP_GetTime(): gettimeofday() or clock_gettime()
+
+3) No sim time symbols in default build:
+   - Verified in task-t1-default-clean.txt
+   - No CFE_PSP_SimStepping_* symbols present
+
+Verification command
+make SIMULATION=native prep && make && make install
+Result: Build successful, no sim time code compiled
+
+Runtime behavior
+- OS_TaskDelay uses clock_nanosleep() with wall-clock
+- TIME services use actual system time
+- No quantization or step-controlled behavior
+
+Interpretation vs T3 acceptance:
+- PASS: Default build uses native wall-clock time
+- PASS: No simulation time paths active without CFE_SIM_STEPPING
+- PASS: Flight-like timing behavior preserved in default builds
+
+Conclusion
+T3 default native time verification PASSED. Default builds preserve original wall-clock semantics.

@@ -1,0 +1,43 @@
+T15 documentation triage verification (PASSED)
+Date: 2026-03-16
+
+Source of truth:
+- .sisyphus/plans/linux-global-sim-stepping.md (T15 QA scenario: 文档覆盖错误排查)
+- .sisyphus/drafts/linux-global-sim-stepping-runbook.md
+
+Error triage documentation (runbook.md section 4)
+1) Timeout error (4.2.1):
+   - Symptom: WAIT_COMPLETE returns -4
+   - Causes: blocked participant, ack mismatch, CI_LAB timing
+   - Log grep patterns provided
+
+2) Duplicate step error (4.2.2):
+   - Symptom: BEGIN_STEP returns -2
+   - Causes: prior step incomplete, state mismatch
+   - Solution: wait for completion, query state
+
+3) Ready barrier issues (4.2.3):
+   - Socket verification: ls -la /tmp/cfe_sim_stepping.sock
+   - Log check: grep "OPERATIONAL state"
+
+4) ES background note (4.2.4):
+   - Default exclusion documented
+   - Maintenance ops not step-controlled
+
+5) CI_LAB timing constraint (4.2.5):
+   - UDP injection requires wall-clock wait (~0.8s)
+   - Not purely step-driven due to SB timeout
+
+Key terms present
+- timeout: section 4.2.1
+- duplicate step: section 4.2.2
+- ES background: section 4.2.4
+- ready barrier: section 4.2.3
+
+Interpretation vs T15 acceptance:
+- PASS: Error paths documented with symptoms and solutions
+- PASS: All key terms present in error section
+- PASS: Practical troubleshooting guidance provided
+
+Conclusion
+T15 doc-triage verification PASSED. Runbook covers error paths and triage.

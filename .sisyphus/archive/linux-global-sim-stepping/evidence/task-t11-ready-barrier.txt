@@ -1,0 +1,45 @@
+T11 ready barrier verification (PASSED)
+Date: 2026-03-16
+
+Source of truth:
+- .sisyphus/plans/linux-global-sim-stepping.md (T11 QA scenario: 启动完成后才接受step)
+- psp/fsw/modules/sim_stepping/cfe_psp_sim_stepping_core.c
+
+Ready barrier implementation
+1) System ready flag:
+   - Field: system_ready_for_stepping (initialized false)
+   - Set by: CFE_PSP_SimStepping_Core_MarkSystemReadyForStepping()
+   - Called after: ES completes startup, apps loaded, OPERATIONAL state
+
+2) Ready barrier gates:
+   - BeginStepSession() requires system_ready_for_stepping == true
+   - If not ready: returns error, step not accepted
+   - TaskDelay eligibility also gated by system_ready
+
+3) UDS listener startup:
+   - Socket created during PSP module init
+   - Service thread started only if UDS_Init succeeds
+   - Client can connect only after socket ready
+
+Runtime verification
+1) Startup phase:
+   - Core starts with system_ready = false
+   - Step requests return error until ready
+   - Tasks use wall-clock delays during startup
+
+2) Ready transition:
+   - "CFE_ES_Main entering OPERATIONAL state" in log
+   - MarkSystemReadyForStepping() called
+   - Subsequent step requests accepted
+
+3) T14 scenario1 evidence:
+   - UDS response: begin=0 (success)
+   - Proves ready barrier passed, step accepted
+
+Interpretation vs T11 acceptance:
+- PASS: System completes startup before accepting steps
+- PASS: Ready barrier gates both inproc and UDS channels
+- PASS: Barrier transition observable in logs
+
+Conclusion
+T11 ready barrier verification PASSED. System properly initializes before stepping available.

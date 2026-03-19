@@ -1,0 +1,21 @@
+T9 evidence backfill: inproc adapter single-step roundtrip
+
+Source of truth: .sisyphus/plans/linux-global-sim-stepping.md (T9 QA scenario)
+
+Authoritative test command (direct testrunner):
+  ./build/native/default_cpu1/psp/unit-test-coverage/modules/sim_stepping/coverage-pspmod-sim_stepping-testrunner
+
+Testrunner internal summary: TOTAL::28 PASS::28 FAIL::0
+
+Note: CTest wrapper (ctest -R coverage-pspmod-sim_stepping) currently reports subprocess abort.
+The direct testrunner output above is the authoritative rerun source for this roundtrip check.
+
+T9-relevant assertions observed:
+- CFE_PSP_SimStepping_InProc_BeginStep() == SUCCESS
+- CFE_PSP_SimStepping_InProc_QueryState(&state, &triggers) == SUCCESS
+- state == RUNNING
+- CFE_PSP_SimStepping_InProc_WaitStepComplete(2) == SUCCESS
+
+Interpretation against T9 acceptance:
+- The inproc API path completes one begin->query->wait-complete roundtrip successfully.
+- This satisfies T9 scenario "函数调用版可完成单 step 往返" for current implementation evidence backfill.

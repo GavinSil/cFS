@@ -1,0 +1,36 @@
+T4 OS_TaskDelay stepping control verification (PASSED)
+Date: 2026-03-16
+
+Source of truth:
+- .sisyphus/plans/linux-global-sim-stepping.md (T4 QA scenario: to_lab不因wall-clock自行推进)
+- .sisyphus/notepads/linux-global-sim-stepping/learnings.md (T4 sections)
+- .sisyphus/notepads/linux-global-sim-stepping/issues.md (T4 retry notes)
+
+Implementation verification
+1) Delay eligibility query (core.c):
+   - Function: CFE_PSP_SimStepping_Core_QueryTaskDelayEligible()
+   - Gates: system_ready, takeover_enabled, task_opted_in, quantum_divisible, session_active
+
+2) Blocking wait (core.c):
+   - Function: CFE_PSP_SimStepping_WaitForDelayExpiry()
+   - Polls sim_time_ns with 1ms nanosleep intervals
+   - Returns only when sim_time_ns >= target_expiry_ns
+
+3) OSAL hook (os-posix-stepping.c):
+   - Function: OS_PosixStepping_Hook_TaskDelay()
+   - If eligible: calls WaitForDelayExpiry() then returns true
+   - If not eligible: returns false (falls through to wall-clock)
+
+T13 runtime evidence (to_lab behavior)
+- Artifact: /tmp/t13_hk_only_stable.json
+- Idle observation (no steps): packet_count = 0
+- After 20 steps: packet_count = 1
+- No packets observed before explicit steps
+
+Interpretation vs T4 acceptance:
+- PASS: TO_LAB does not advance without explicit steps
+- PASS: Delay blocking relies on sim_time_ns advancement
+- PASS: Wall-clock alone does not release blocked tasks
+
+Conclusion
+T4 TaskDelay control verification PASSED. Delay-driven apps advance only with explicit steps.

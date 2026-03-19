@@ -1,0 +1,39 @@
+T15 documentation commands verification (PASSED)
+Date: 2026-03-16
+
+Source of truth:
+- .sisyphus/plans/linux-global-sim-stepping.md (T15 QA scenario: 文档包含可执行命令与路径)
+- .sisyphus/drafts/linux-global-sim-stepping-runbook.md
+
+Documentation verification
+1) Build commands documented (runbook.md section 1):
+   - make SIMULATION=native CFE_SIM_STEPPING=ON prep
+   - make
+   - make install
+
+2) Control channel documented (runbook.md section 2-3):
+   - UDS socket path: /tmp/cfe_sim_stepping.sock
+   - Request format: struct.pack('<BxxxI', opcode, timeout_ms)
+   - Opcodes: 1=BEGIN_STEP, 2=QUERY_STATE, 3=WAIT_COMPLETE
+
+3) Evidence paths documented (runbook.md section 5):
+   - Naming: .sisyphus/evidence/task-{N}-{slug}.txt
+   - Required content: build info, verification commands, runtime state
+
+4) Key terms present:
+   - SIMULATION=native: line 20
+   - Unix domain socket: line 104
+   - step mode: line 136
+   - Evidence: line 351
+
+Source files searched
+- .sisyphus/drafts/linux-global-sim-stepping-runbook.md
+- Contains all required commands and paths
+
+Interpretation vs T15 acceptance:
+- PASS: Document contains executable commands
+- PASS: Paths specified (build paths, socket path, evidence path)
+- PASS: Control channel protocol documented
+
+Conclusion
+T15 doc-commands verification PASSED. Runbook contains required commands and paths.

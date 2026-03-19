@@ -1,0 +1,35 @@
+T10 evidence backfill: UDS timeout propagation (triggered participant not completed within wait window)
+
+Plan source of truth:
+- .sisyphus/plans/linux-global-sim-stepping.md, T10 QA scenario "UDS 超时传播正确"
+
+Direct rerun facts (executed now):
+1) Startup/run path used
+   - Binary selected by probe: /workspace/cFS/build/native/default_cpu1/cpu1/core-cpu1
+   - Runtime cwd: /workspace/cFS/build/exe/cpu1
+   - Socket path used: /tmp/cfe_sim_stepping.sock
+
+2) External UDS probe path to induce timeout
+   - Probe driver: python3 external client loop
+   - Request framing: struct.pack('<BxxxI', opcode, timeout_ms) (8-byte request)
+   - Sequence used on first successful begin:
+     a) BEGIN opcode=1 -> status=0
+     b) WAIT opcode=3 with timeout_ms=1 -> status=-4
+     c) QUERY opcode=2 -> query_status=0, state=2, trig=1
+   - Captured structured output: /tmp/t10_timeout_hunt.json
+
+3) Observed UDS timeout result
+   - wait status over UDS: -4 (timeout)
+   - session/query immediately after timeout: state=2 (RUNNING), trig=1
+
+4) Supporting runtime log marker (same rerun)
+   - /tmp/t10_core_timeout_hunt.log contains:
+     CFE_PSP: SIM_STEPPING_DIAG class=timeout status=-4 site=InProc_WaitStepComplete detail_a=1 detail_b=1
+
+Static inspection facts (separate from rerun):
+- Shared status taxonomy in psp/fsw/modules/sim_stepping/cfe_psp_sim_stepping.h defines timeout as CFE_PSP_SIM_STEPPING_STATUS_TIMEOUT = -4.
+- UDS WAIT handler in cfe_psp_sim_stepping.c forwards to CFE_PSP_SimStepping_InProc_WaitStepComplete(timeout_ms), so timeout semantics propagate through the same inproc core path.
+
+Interpretation vs T10 acceptance:
+- PASS for scenario (2): timeout is clearly returned through UDS as status -4 when wait window is too short for a triggered step to complete.
+- Rerun evidence + runtime diagnostic marker confirm UDS timeout semantics match the inproc/shared-core timeout behavior.

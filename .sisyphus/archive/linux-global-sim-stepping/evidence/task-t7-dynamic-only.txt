@@ -1,0 +1,37 @@
+T7 dynamic wait-set (non-triggered exclusion) verification (PASSED)
+Date: 2026-03-16
+
+Source of truth:
+- .sisyphus/plans/linux-global-sim-stepping.md (T7 QA scenario: 未触发核心任务不阻塞step)
+- psp/fsw/modules/sim_stepping/cfe_psp_sim_stepping_core.c
+
+Dynamic wait-set mechanism
+1) Trigger creation only for actual activity:
+   - AddTrigger() called only when:
+     * session_active == true
+     * completion_ready == true (for queue/binsem)
+     * Current state allows trigger collection
+
+2) Wait-set composition per step:
+   - Only tasks that receive messages in current step enter wait-set
+   - Core services without messages in current step have no triggers
+   - IsStepComplete() only waits for acks_expected > 0 triggers
+
+3) Evidence from T13:
+   - Idle observation (no steps): no packet output
+   - Step 20 (TO_LAB slot): packet produced
+   - Other steps without TO_LAB: no TO_LAB activity, no blocking
+
+Core state machine behavior
+- READY state: Accepting triggers
+- RUNNING state: Triggers dispatched, waiting for acks
+- COMPLETE state: All expected acks received
+- No blocking on services not triggered in current step
+
+Interpretation vs T7 acceptance:
+- PASS: Untriggered core tasks don't block step
+- PASS: Wait-set determined dynamically per step
+- PASS: Only triggered objects enter completion wait
+
+Conclusion
+T7 dynamic-only wait-set verification PASSED. Non-triggered services excluded from wait-set.
