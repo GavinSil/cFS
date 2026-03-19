@@ -47,9 +47,9 @@ void Test_sim_stepping_NotReadyPaths(void)
     uint32_t state = 1234;
     uint32_t triggers = 5678;
 
-    UtAssert_INT32_EQ(CFE_PSP_SimStepping_InProc_BeginStep(), CFE_PSP_SIM_STEPPING_STATUS_FAILURE);
-    UtAssert_INT32_EQ(CFE_PSP_SimStepping_InProc_WaitStepComplete(1), CFE_PSP_SIM_STEPPING_STATUS_FAILURE);
-    UtAssert_INT32_EQ(CFE_PSP_SimStepping_InProc_QueryState(&state, &triggers), CFE_PSP_SIM_STEPPING_STATUS_FAILURE);
+    UtAssert_INT32_EQ(CFE_PSP_SimStepping_InProc_BeginStep(), CFE_PSP_SIM_STEPPING_STATUS_NOT_READY);
+    UtAssert_INT32_EQ(CFE_PSP_SimStepping_InProc_WaitStepComplete(1), CFE_PSP_SIM_STEPPING_STATUS_ILLEGAL_STATE);
+    UtAssert_INT32_EQ(CFE_PSP_SimStepping_InProc_QueryState(&state, &triggers), CFE_PSP_SIM_STEPPING_STATUS_SUCCESS);
 }
 
 void Test_sim_stepping_InProcQueryAndIllegalState(void)
@@ -60,10 +60,10 @@ void Test_sim_stepping_InProcQueryAndIllegalState(void)
     uint32_t triggers = 0;
 
     /* not yet initialized */
-    UtAssert_INT32_EQ(CFE_PSP_SimStepping_InProc_BeginStep(), CFE_PSP_SIM_STEPPING_STATUS_FAILURE);
-    UtAssert_INT32_EQ(CFE_PSP_SimStepping_InProc_WaitStepComplete(0), CFE_PSP_SIM_STEPPING_STATUS_FAILURE);
+    UtAssert_INT32_EQ(CFE_PSP_SimStepping_InProc_BeginStep(), CFE_PSP_SIM_STEPPING_STATUS_NOT_READY);
+    UtAssert_INT32_EQ(CFE_PSP_SimStepping_InProc_WaitStepComplete(0), CFE_PSP_SIM_STEPPING_STATUS_ILLEGAL_STATE);
     UtAssert_INT32_EQ(CFE_PSP_SimStepping_InProc_QueryState(&State, &TriggerCount),
-                      CFE_PSP_SIM_STEPPING_STATUS_FAILURE);
+                      CFE_PSP_SIM_STEPPING_STATUS_SUCCESS);
 
     UtAssert_VOIDCALL(ESA_Init());
 
