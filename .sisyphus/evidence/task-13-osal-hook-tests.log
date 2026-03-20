@@ -1,0 +1,91 @@
+
+[BEGIN] UNIT TEST
+
+[BEGIN] 01 SETUP
+[  END] No test cases
+
+[BEGIN] 01 Test_OSAL_Hook_TaskDelay_ACK
+[ PASS] 01.001 coveragetest-osal-hooks.c:112 - GlobalHookContext.EventCount (1) == 1 (1)
+[ PASS] 01.002 coveragetest-osal-hooks.c:113 - GlobalHookContext.CapturedEvent.event_kind (1) == ESA_SIM_STEPPING_EVENT_TASK_DELAY_ACK (1)
+[ PASS] 01.003 coveragetest-osal-hooks.c:114 - GlobalHookContext.CapturedEvent.task_id (305419896) == 0x12345678 (305419896)
+[ PASS] 01.004 coveragetest-osal-hooks.c:115 - GlobalHookContext.CapturedEvent.optional_delay_ms (500) == TestDelayMs (500)
+[ INFO]                        ABORT::0     WARN::0     FLOW::0     DEBUG::0     N/A::0   
+[  END] 01 Test_OSAL_Hook_TaskDelay_ACK TOTAL::4     PASS::4     FAIL::0     MIR::0     TSF::0     TTF::0   
+
+[BEGIN] 02 Test_OSAL_Hook_TaskDelay_Complete
+[ PASS] 02.001 coveragetest-osal-hooks.c:134 - GlobalHookContext.EventCount (1) == 1 (1)
+[ PASS] 02.002 coveragetest-osal-hooks.c:135 - GlobalHookContext.CapturedEvent.event_kind (2) == ESA_SIM_STEPPING_EVENT_TASK_DELAY_COMPLETE (2)
+[ PASS] 02.003 coveragetest-osal-hooks.c:136 - GlobalHookContext.CapturedEvent.task_id (2882400000) == 0xABCDEF00 (2882400000)
+[ PASS] 02.004 coveragetest-osal-hooks.c:137 - GlobalHookContext.CapturedEvent.optional_delay_ms (250) == TestDelayMs (250)
+[ INFO]                        ABORT::0     WARN::0     FLOW::0     DEBUG::0     N/A::0   
+[  END] 02 Test_OSAL_Hook_TaskDelay_Complete TOTAL::4     PASS::4     FAIL::0     MIR::0     TSF::0     TTF::0   
+
+[BEGIN] 03 Test_OSAL_Hook_TaskDelay_Sequence
+[ PASS] 03.001 coveragetest-osal-hooks.c:152 - GlobalHookContext.EventCount (1) == 1 (1)
+[ PASS] 03.002 coveragetest-osal-hooks.c:153 - GlobalHookContext.CapturedEvent.event_kind (1) == ESA_SIM_STEPPING_EVENT_TASK_DELAY_ACK (1)
+[ PASS] 03.003 coveragetest-osal-hooks.c:157 - GlobalHookContext.EventCount (2) == 2 (2)
+[ PASS] 03.004 coveragetest-osal-hooks.c:158 - GlobalHookContext.CapturedEvent.event_kind (2) == ESA_SIM_STEPPING_EVENT_TASK_DELAY_COMPLETE (2)
+[ INFO]                        ABORT::0     WARN::0     FLOW::0     DEBUG::0     N/A::0   
+[  END] 03 Test_OSAL_Hook_TaskDelay_Sequence TOTAL::4     PASS::4     FAIL::0     MIR::0     TSF::0     TTF::0   
+
+[BEGIN] 04 Test_OSAL_Hook_QueueReceive_ACK
+[ PASS] 04.001 coveragetest-osal-hooks.c:185 - GlobalHookContext.EventCount (1) == 1 (1)
+[ PASS] 04.002 coveragetest-osal-hooks.c:186 - GlobalHookContext.CapturedEvent.event_kind (14) == ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_ACK (14)
+[ PASS] 04.003 coveragetest-osal-hooks.c:187 - GlobalHookContext.CapturedEvent.optional_delay_ms (1000) == (uint32_t)TestTimeout (1000)
+[ PASS] 04.004 coveragetest-osal-hooks.c:190 - GlobalHookContext.CapturedEvent.task_id (1073807361) != ZERO (0)
+[ INFO]                        ABORT::0     WARN::0     FLOW::0     DEBUG::0     N/A::0   
+[  END] 04 Test_OSAL_Hook_QueueReceive_ACK TOTAL::4     PASS::4     FAIL::0     MIR::0     TSF::0     TTF::0   
+
+[BEGIN] 05 Test_OSAL_Hook_QueueReceive_Complete
+[ PASS] 05.001 coveragetest-osal-hooks.c:212 - GlobalHookContext.EventCount (1) == 1 (1)
+[ PASS] 05.002 coveragetest-osal-hooks.c:213 - GlobalHookContext.CapturedEvent.event_kind (15) == ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_COMPLETE (15)
+[ PASS] 05.003 coveragetest-osal-hooks.c:214 - GlobalHookContext.CapturedEvent.optional_delay_ms (500) == (uint32_t)TestTimeout (500)
+[ PASS] 05.004 coveragetest-osal-hooks.c:217 - GlobalHookContext.CapturedEvent.task_id (1073807361) != ZERO (0)
+[ INFO]                        ABORT::0     WARN::0     FLOW::0     DEBUG::0     N/A::0   
+[  END] 05 Test_OSAL_Hook_QueueReceive_Complete TOTAL::4     PASS::4     FAIL::0     MIR::0     TSF::0     TTF::0   
+
+[BEGIN] 06 Test_OSAL_Hook_QueueReceive_Complete_On
+[ PASS] 06.001 coveragetest-osal-hooks.c:236 - GlobalHookContext.EventCount (1) == 1 (1)
+[ PASS] 06.002 coveragetest-osal-hooks.c:237 - GlobalHookContext.CapturedEvent.event_kind (15) == ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_COMPLETE (15)
+[ INFO]                        ABORT::0     WARN::0     FLOW::0     DEBUG::0     N/A::0   
+[  END] 06 Test_OSAL_Hook_QueueReceive_Complete_On TOTAL::2     PASS::2     FAIL::0     MIR::0     TSF::0     TTF::0   
+
+[BEGIN] 07 Test_OSAL_Hook_QueueReceive_Sequence
+[ PASS] 07.001 coveragetest-osal-hooks.c:252 - GlobalHookContext.EventCount (1) == 1 (1)
+[ PASS] 07.002 coveragetest-osal-hooks.c:253 - GlobalHookContext.CapturedEvent.event_kind (14) == ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_ACK (14)
+[ PASS] 07.003 coveragetest-osal-hooks.c:256 - GlobalHookContext.EventCount (2) == 2 (2)
+[ PASS] 07.004 coveragetest-osal-hooks.c:257 - GlobalHookContext.CapturedEvent.event_kind (15) == ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_COMPLETE (15)
+[ INFO]                        ABORT::0     WARN::0     FLOW::0     DEBUG::0     N/A::0   
+[  END] 07 Test_OSAL_Hook_QueueReceive_Sequence TOTAL::4     PASS::4     FAIL::0     MIR::0     TSF::0     TTF::0   
+
+[BEGIN] 08 Test_OSAL_Hook_BinSemTake_ACK
+[ PASS] 08.001 coveragetest-osal-hooks.c:285 - GlobalHookContext.EventCount (1) == 1 (1)
+[ PASS] 08.002 coveragetest-osal-hooks.c:286 - GlobalHookContext.CapturedEvent.event_kind (16) == ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_ACK (16)
+[ PASS] 08.003 coveragetest-osal-hooks.c:289 - GlobalHookContext.CapturedEvent.task_id (1073807361) != ZERO (0)
+[ INFO]                        ABORT::0     WARN::0     FLOW::0     DEBUG::0     N/A::0   
+[  END] 08 Test_OSAL_Hook_BinSemTake_ACK TOTAL::3     PASS::3     FAIL::0     MIR::0     TSF::0     TTF::0   
+
+[BEGIN] 09 Test_OSAL_Hook_BinSemTake_Complete
+[ PASS] 09.001 coveragetest-osal-hooks.c:313 - GlobalHookContext.EventCount (1) == 1 (1)
+[ PASS] 09.002 coveragetest-osal-hooks.c:314 - GlobalHookContext.CapturedEvent.event_kind (17) == ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_COMPLETE (17)
+[ PASS] 09.003 coveragetest-osal-hooks.c:317 - GlobalHookContext.CapturedEvent.task_id (1073807361) != ZERO (0)
+[ INFO]                        ABORT::0     WARN::0     FLOW::0     DEBUG::0     N/A::0   
+[  END] 09 Test_OSAL_Hook_BinSemTake_Complete TOTAL::3     PASS::3     FAIL::0     MIR::0     TSF::0     TTF::0   
+
+[BEGIN] 10 Test_OSAL_Hook_BinSemTake_Complete_OnTi
+[ PASS] 10.001 coveragetest-osal-hooks.c:338 - GlobalHookContext.EventCount (1) == 1 (1)
+[ PASS] 10.002 coveragetest-osal-hooks.c:339 - GlobalHookContext.CapturedEvent.event_kind (17) == ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_COMPLETE (17)
+[ INFO]                        ABORT::0     WARN::0     FLOW::0     DEBUG::0     N/A::0   
+[  END] 10 Test_OSAL_Hook_BinSemTake_Complete_OnTi TOTAL::2     PASS::2     FAIL::0     MIR::0     TSF::0     TTF::0   
+
+[BEGIN] 11 Test_OSAL_Hook_BinSemTake_Sequence
+[ PASS] 11.001 coveragetest-osal-hooks.c:357 - GlobalHookContext.EventCount (1) == 1 (1)
+[ PASS] 11.002 coveragetest-osal-hooks.c:358 - GlobalHookContext.CapturedEvent.event_kind (16) == ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_ACK (16)
+[ PASS] 11.003 coveragetest-osal-hooks.c:361 - GlobalHookContext.EventCount (2) == 2 (2)
+[ PASS] 11.004 coveragetest-osal-hooks.c:362 - GlobalHookContext.CapturedEvent.event_kind (17) == ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_COMPLETE (17)
+[ INFO]                        ABORT::0     WARN::0     FLOW::0     DEBUG::0     N/A::0   
+[  END] 11 Test_OSAL_Hook_BinSemTake_Sequence TOTAL::4     PASS::4     FAIL::0     MIR::0     TSF::0     TTF::0   
+[ INFO]                        ABORT::0     WARN::0     FLOW::0     DEBUG::0     N/A::0   
+[  END] 11 SUMMARY              TOTAL::38    PASS::38    FAIL::0     MIR::0     TSF::0     TTF::0   
+COMPLETE: 11 tests Segment(s) executed
+

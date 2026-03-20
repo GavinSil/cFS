@@ -27,8 +27,8 @@
  * progression at the PSP level, particularly for timebase module time retrieval operations.
  */
 
-#ifndef CFE_PSP_SIM_STEPPING_H
-#define CFE_PSP_SIM_STEPPING_H
+#ifndef ESA_SIM_STEPPING_H
+#define ESA_SIM_STEPPING_H
 
 /****************************************************************************************
                                      INCLUDE FILES
@@ -47,15 +47,15 @@
  * These constants are used by the stepping core and adapters so failure classes are
  * represented consistently across inproc and UDS control paths.
  */
-#define CFE_PSP_SIM_STEPPING_STATUS_SUCCESS           0   /**< Operation successful */
-#define CFE_PSP_SIM_STEPPING_STATUS_FAILURE          -1   /**< Generic failure */
-#define CFE_PSP_SIM_STEPPING_STATUS_DUPLICATE_BEGIN  -2   /**< Begin-step rejected: prior session unresolved */
-#define CFE_PSP_SIM_STEPPING_STATUS_NOT_READY        -3   /**< System/core not ready for requested operation */
-#define CFE_PSP_SIM_STEPPING_STATUS_TIMEOUT          -4   /**< Operation timed out */
-#define CFE_PSP_SIM_STEPPING_STATUS_ILLEGAL_COMPLETE -5   /**< Completion reported without matching trigger */
-#define CFE_PSP_SIM_STEPPING_STATUS_TRANSPORT_ERROR  -6   /**< UDS transport I/O/connect error */
-#define CFE_PSP_SIM_STEPPING_STATUS_PROTOCOL_ERROR   -7   /**< UDS protocol framing/opcode error */
-#define CFE_PSP_SIM_STEPPING_STATUS_ILLEGAL_STATE    -8   /**< Operation illegal in current stepping state */
+#define ESA_SIM_STEPPING_STATUS_SUCCESS           0   /**< Operation successful */
+#define ESA_SIM_STEPPING_STATUS_FAILURE          -1   /**< Generic failure */
+#define ESA_SIM_STEPPING_STATUS_DUPLICATE_BEGIN  -2   /**< Begin-step rejected: prior session unresolved */
+#define ESA_SIM_STEPPING_STATUS_NOT_READY        -3   /**< System/core not ready for requested operation */
+#define ESA_SIM_STEPPING_STATUS_TIMEOUT          -4   /**< Operation timed out */
+#define ESA_SIM_STEPPING_STATUS_ILLEGAL_COMPLETE -5   /**< Completion reported without matching trigger */
+#define ESA_SIM_STEPPING_STATUS_TRANSPORT_ERROR  -6   /**< UDS transport I/O/connect error */
+#define ESA_SIM_STEPPING_STATUS_PROTOCOL_ERROR   -7   /**< UDS protocol framing/opcode error */
+#define ESA_SIM_STEPPING_STATUS_ILLEGAL_STATE    -8   /**< Operation illegal in current stepping state */
 
 /****************************************************************************************
                               INITIALIZATION API
@@ -93,7 +93,7 @@ void ESA_Init(void);
  *       CFE_SIM_STEPPING is defined. When not defined, this becomes a no-op stub
  *       that returns false.
  */
-bool CFE_PSP_SimStepping_Hook_GetTime(uint64_t *sim_time_ns);
+bool ESA_Stepping_Hook_GetTime(uint64_t *sim_time_ns);
 
 /**
  * \brief Hook to query if a requested TaskDelay can be handled by stepping
@@ -116,13 +116,13 @@ bool CFE_PSP_SimStepping_Hook_GetTime(uint64_t *sim_time_ns);
  * \note Implementations are provided only when CFE_SIM_STEPPING is defined.
  *       When not defined, this becomes a no-op stub that returns false.
  */
-bool CFE_PSP_SimStepping_Hook_TaskDelayEligible(uint32_t task_id, uint32_t delay_ms);
+bool ESA_Stepping_Hook_TaskDelayEligible(uint32_t task_id, uint32_t delay_ms);
 
 /**
  * \brief Block current task until simulated delay satisfied by explicit step quantums
  *
  * PSP-owned blocking wait for step-controlled TaskDelay. Thin wrapper forwarding to
- * CFE_PSP_SimStepping_Core_WaitForDelayExpiry with shared stepping core instance.
+ * ESA_Stepping_Core_WaitForDelayExpiry with shared stepping core instance.
  * Polls sim_time_ns until enough explicit step quantums advanced to satisfy delay.
  * Prevents delay-driven tasks from self-advancing when no steps issued.
  *
@@ -135,7 +135,7 @@ bool CFE_PSP_SimStepping_Hook_TaskDelayEligible(uint32_t task_id, uint32_t delay
  * \note Available only when CFE_SIM_STEPPING is defined.
  *       When not defined, this becomes a no-op stub that returns -1.
  */
-int32_t CFE_PSP_SimStepping_WaitForDelayExpiry(uint32_t task_id, uint32_t delay_ms);
+int32_t ESA_Stepping_WaitForDelayExpiry(uint32_t task_id, uint32_t delay_ms);
 
 /****************************************************************************************
                      IN-PROCESS CONTROL ADAPTER API (PUBLIC)
@@ -148,15 +148,15 @@ int32_t CFE_PSP_SimStepping_WaitForDelayExpiry(uint32_t task_id, uint32_t delay_
  * and waits for step events to occur. Returns immediately without blocking.
  * This is a thin in-process control surface that forwards to the shared stepping core.
  *
- * \return  CFE_PSP_SIM_STEPPING_STATUS_SUCCESS on success
- * \return  CFE_PSP_SIM_STEPPING_STATUS_NOT_READY if stepping not initialized or pre-ready
- * \return  CFE_PSP_SIM_STEPPING_STATUS_DUPLICATE_BEGIN if prior session is unresolved
- * \return  CFE_PSP_SIM_STEPPING_STATUS_FAILURE on other failures
+ * \return  ESA_SIM_STEPPING_STATUS_SUCCESS on success
+ * \return  ESA_SIM_STEPPING_STATUS_NOT_READY if stepping not initialized or pre-ready
+ * \return  ESA_SIM_STEPPING_STATUS_DUPLICATE_BEGIN if prior session is unresolved
+ * \return  ESA_SIM_STEPPING_STATUS_FAILURE on other failures
  *
  * \note Available only when CFE_SIM_STEPPING is defined.
  *       When not defined, this becomes a no-op stub that returns -1.
  */
-int32_t CFE_PSP_SimStepping_InProc_BeginStep(void);
+int32_t ESA_Stepping_InProc_BeginStep(void);
 
 /**
  * \brief Wait for current step to complete (in-process control adapter)
@@ -167,17 +167,17 @@ int32_t CFE_PSP_SimStepping_InProc_BeginStep(void);
  *
  * \param[in]  timeout_ms  Timeout in milliseconds (0 = PEND_FOREVER, ~0U = non-blocking poll)
  *
- * \return  CFE_PSP_SIM_STEPPING_STATUS_SUCCESS if step completed successfully
- * \return  CFE_PSP_SIM_STEPPING_STATUS_TIMEOUT if finite timeout is exceeded
- * \return  CFE_PSP_SIM_STEPPING_STATUS_ILLEGAL_STATE if no active step session exists
- * \return  CFE_PSP_SIM_STEPPING_STATUS_FAILURE for non-blocking not-complete or other failures
- * \return  CFE_PSP_SIM_STEPPING_STATUS_NOT_READY if core is not initialized
+ * \return  ESA_SIM_STEPPING_STATUS_SUCCESS if step completed successfully
+ * \return  ESA_SIM_STEPPING_STATUS_TIMEOUT if finite timeout is exceeded
+ * \return  ESA_SIM_STEPPING_STATUS_ILLEGAL_STATE if no active step session exists
+ * \return  ESA_SIM_STEPPING_STATUS_FAILURE for non-blocking not-complete or other failures
+ * \return  ESA_SIM_STEPPING_STATUS_NOT_READY if core is not initialized
  *
  * \note Available only when CFE_SIM_STEPPING is defined.
  *       When not defined, this becomes a no-op stub that returns -1.
  * \note This function may block; not suitable for interrupt handlers.
  */
-int32_t CFE_PSP_SimStepping_InProc_WaitStepComplete(uint32_t timeout_ms);
+int32_t ESA_Stepping_InProc_WaitStepComplete(uint32_t timeout_ms);
 
 /**
   * \brief Query current stepping state (in-process control adapter)
@@ -196,7 +196,7 @@ int32_t CFE_PSP_SimStepping_InProc_WaitStepComplete(uint32_t timeout_ms);
   *       When not defined, this becomes a no-op stub that returns -1.
   * \note All output parameters are optional (may be NULL if not needed).
   */
-int32_t CFE_PSP_SimStepping_InProc_QueryState(uint32_t *state_out, uint32_t *trigger_count);
+int32_t ESA_Stepping_InProc_QueryState(uint32_t *state_out, uint32_t *trigger_count);
 
 /****************************************************************************************
                      UDS CONTROL ADAPTER API (PUBLIC)
@@ -224,7 +224,7 @@ int32_t CFE_PSP_SimStepping_InProc_QueryState(uint32_t *state_out, uint32_t *tri
   * \note The UDS adapter explicitly shares the same stepping core as the inproc adapter.
   * \note Socket path is /tmp/cfe_sim_stepping.sock (Linux-only, stable for this environment).
   */
-int32_t CFE_PSP_SimStepping_UDS_Init(void);
+int32_t ESA_Stepping_UDS_Init(void);
 
 /**
    * \brief Service one UDS control request (Unix domain socket adapter)
@@ -241,17 +241,17 @@ int32_t CFE_PSP_SimStepping_UDS_Init(void);
    *
    * Returns immediately whether or not a request was present (non-blocking).
    *
-   * \return  CFE_PSP_SIM_STEPPING_STATUS_SUCCESS if idle or request handled successfully
-   * \return  CFE_PSP_SIM_STEPPING_STATUS_NOT_READY if adapter/core not initialized
-   * \return  CFE_PSP_SIM_STEPPING_STATUS_TRANSPORT_ERROR on socket transport failures
-   * \return  CFE_PSP_SIM_STEPPING_STATUS_PROTOCOL_ERROR on invalid/unknown opcode framing
+   * \return  ESA_SIM_STEPPING_STATUS_SUCCESS if idle or request handled successfully
+   * \return  ESA_SIM_STEPPING_STATUS_NOT_READY if adapter/core not initialized
+   * \return  ESA_SIM_STEPPING_STATUS_TRANSPORT_ERROR on socket transport failures
+   * \return  ESA_SIM_STEPPING_STATUS_PROTOCOL_ERROR on invalid/unknown opcode framing
    *
    * \note Available only when CFE_SIM_STEPPING is defined.
    *       When not defined, this becomes a no-op stub that returns -1.
    * \note This function does not block and should be called periodically from stepping loop.
    * \note The UDS adapter explicitly shares the same stepping core as the inproc adapter.
    */
-int32_t CFE_PSP_SimStepping_UDS_Service(void);
+int32_t ESA_Stepping_UDS_Service(void);
 
 /**
    * \brief Shutdown UDS control adapter (Unix domain socket adapter)
@@ -271,12 +271,12 @@ int32_t CFE_PSP_SimStepping_UDS_Service(void);
    * \note The UDS adapter explicitly shares the same stepping core as the inproc adapter;
    *       both adapters can coexist and use the same core.
    */
-int32_t CFE_PSP_SimStepping_UDS_Shutdown(void);
+int32_t ESA_Stepping_UDS_Shutdown(void);
 
 /**
  * \brief Service UDS adapter (non-blocking, single request per call)
  *
- * Thin wrapper for calling CFE_PSP_SimStepping_UDS_Service() from periodic
+ * Thin wrapper for calling ESA_Stepping_UDS_Service() from periodic
  * hooks (e.g., stepping timer ticks or TIME task cycle boundaries).
  * Returns immediately whether a client request was present or not.
  * Non-blocking and suitable for calling from tight event loops.
@@ -288,6 +288,6 @@ int32_t CFE_PSP_SimStepping_UDS_Shutdown(void);
  *       When not defined, this becomes a no-op stub that returns -1.
  * \note Designed to be called from stepping hooks on each hook cycle.
  */
-int32_t CFE_PSP_SimStepping_UDS_RunOnce(void);
+int32_t ESA_Stepping_UDS_RunOnce(void);
 
-#endif /* CFE_PSP_SIM_STEPPING_H */
+#endif /* ESA_SIM_STEPPING_H */

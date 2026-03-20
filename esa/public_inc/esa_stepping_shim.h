@@ -51,29 +51,31 @@
  * a stepping pause or synchronization point. Event kind determines which core
  * report function is invoked.
  */
-typedef enum CFE_PSP_SimStepping_EventKind
+typedef enum ESA_Stepping_EventKind
 {
-    CFE_PSP_SIM_STEPPING_EVENT_TASK_DELAY = 0,      /**< Task delay requested (OSAL) */
-    CFE_PSP_SIM_STEPPING_EVENT_QUEUE_RECEIVE,       /**< Queue receive blocking (OSAL) - legacy single-event */
-    CFE_PSP_SIM_STEPPING_EVENT_BINSEM_TAKE,         /**< Binary semaphore take (OSAL) - legacy single-event */
-    CFE_PSP_SIM_STEPPING_EVENT_TIME_TASK_CYCLE,     /**< TIME module task cycle start */
-    CFE_PSP_SIM_STEPPING_EVENT_1HZ_BOUNDARY,        /**< 1Hz tick detected */
-    CFE_PSP_SIM_STEPPING_EVENT_TONE_SIGNAL,         /**< Tone signal raised (PSP/SCH) */
-    CFE_PSP_SIM_STEPPING_EVENT_SCH_SEMAPHORE_WAIT,  /**< SCH waiting on semaphore */
-    CFE_PSP_SIM_STEPPING_EVENT_SCH_MINOR_FRAME,     /**< SCH minor frame boundary */
-    CFE_PSP_SIM_STEPPING_EVENT_SCH_MAJOR_FRAME,     /**< SCH major frame boundary */
-    CFE_PSP_SIM_STEPPING_EVENT_SCH_SEND_TRIGGER,
-    CFE_PSP_SIM_STEPPING_EVENT_SCH_DISPATCH_COMPLETE,
-    CFE_PSP_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_RECEIVE,
-    CFE_PSP_SIM_STEPPING_EVENT_QUEUE_RECEIVE_ACK,   /**< Queue receive ack (pre-blocking, wait candidate) */
-    CFE_PSP_SIM_STEPPING_EVENT_QUEUE_RECEIVE_COMPLETE, /**< Queue receive complete (post-blocking, operation done) */
-    CFE_PSP_SIM_STEPPING_EVENT_BINSEM_TAKE_ACK,     /**< Binary semaphore take ack (pre-wait, candidate) */
-    CFE_PSP_SIM_STEPPING_EVENT_BINSEM_TAKE_COMPLETE, /**< Binary semaphore take complete (post-wait, done) */
-    CFE_PSP_SIM_STEPPING_EVENT_TIME_TONE_SEM_CONSUME,
-    CFE_PSP_SIM_STEPPING_EVENT_TIME_LOCAL_1HZ_SEM_CONSUME,
-    CFE_PSP_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_COMPLETE,
-    CFE_PSP_SIM_STEPPING_EVENT_SYSTEM_READY_FOR_STEPPING /**< System lifecycle readiness: core init complete and ready to enter stepping mode */
-} CFE_PSP_SimStepping_EventKind_t;
+    ESA_SIM_STEPPING_EVENT_TASK_DELAY = 0,      /**< Task delay requested (OSAL) */
+    ESA_SIM_STEPPING_EVENT_TASK_DELAY_ACK,
+    ESA_SIM_STEPPING_EVENT_TASK_DELAY_COMPLETE,
+    ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE,       /**< Queue receive blocking (OSAL) - legacy single-event */
+    ESA_SIM_STEPPING_EVENT_BINSEM_TAKE,         /**< Binary semaphore take (OSAL) - legacy single-event */
+    ESA_SIM_STEPPING_EVENT_TIME_TASK_CYCLE,     /**< TIME module task cycle start */
+    ESA_SIM_STEPPING_EVENT_1HZ_BOUNDARY,        /**< 1Hz tick detected */
+    ESA_SIM_STEPPING_EVENT_TONE_SIGNAL,         /**< Tone signal raised (PSP/SCH) */
+    ESA_SIM_STEPPING_EVENT_SCH_SEMAPHORE_WAIT,  /**< SCH waiting on semaphore */
+    ESA_SIM_STEPPING_EVENT_SCH_MINOR_FRAME,     /**< SCH minor frame boundary */
+    ESA_SIM_STEPPING_EVENT_SCH_MAJOR_FRAME,     /**< SCH major frame boundary */
+    ESA_SIM_STEPPING_EVENT_SCH_SEND_TRIGGER,
+    ESA_SIM_STEPPING_EVENT_SCH_DISPATCH_COMPLETE,
+    ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_RECEIVE,
+    ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_ACK,   /**< Queue receive ack (pre-blocking, wait candidate) */
+    ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_COMPLETE, /**< Queue receive complete (post-blocking, operation done) */
+    ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_ACK,     /**< Binary semaphore take ack (pre-wait, candidate) */
+    ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_COMPLETE, /**< Binary semaphore take complete (post-wait, done) */
+    ESA_SIM_STEPPING_EVENT_TIME_TONE_SEM_CONSUME,
+    ESA_SIM_STEPPING_EVENT_TIME_LOCAL_1HZ_SEM_CONSUME,
+    ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_COMPLETE,
+    ESA_SIM_STEPPING_EVENT_SYSTEM_READY_FOR_STEPPING /**< System lifecycle readiness: core init complete and ready to enter stepping mode */
+} ESA_Stepping_EventKind_t;
 
 /**
  * \brief Shim event payload (compact fact descriptor)
@@ -81,13 +83,13 @@ typedef enum CFE_PSP_SimStepping_EventKind
  * Carries event-specific fact data. Payload fields are context-dependent on event_kind.
  * Keep structure compact for efficient forwarding.
  */
-typedef struct CFE_PSP_SimStepping_ShimEvent
+typedef struct ESA_Stepping_ShimEvent
 {
-    CFE_PSP_SimStepping_EventKind_t event_kind;     /**< Event type (determines payload semantics) */
+    ESA_Stepping_EventKind_t event_kind;     /**< Event type (determines payload semantics) */
     uint32_t entity_id;                             /**< Entity ID (waited-on queue/semaphore/etc.) */
     uint32_t task_id;                               /**< Runtime task ID (current executing task) */
     uint32_t optional_delay_ms;                     /**< Optional: delay/timeout value in ms */
-} CFE_PSP_SimStepping_ShimEvent_t;
+} ESA_Stepping_ShimEvent_t;
 
 /****************************************************************************************
                                SHIM REPORT FUNCTION DECLARATION
@@ -112,6 +114,6 @@ typedef struct CFE_PSP_SimStepping_ShimEvent
  * Shim is implementation-independent. Implementation may be guarded by build flag;
  * when disabled, function becomes a no-op that returns 0.
  */
-int32_t CFE_PSP_SimStepping_Shim_ReportEvent(const CFE_PSP_SimStepping_ShimEvent_t *event);
+int32_t ESA_Stepping_Shim_ReportEvent(const ESA_Stepping_ShimEvent_t *event);
 
 #endif /* NATIVE_STEPPING_SHIM_H */

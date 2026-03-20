@@ -25,9 +25,9 @@
 #include <time.h>
 
 #include "cfe_psp.h"
-#include "cfe_psp_sim_stepping.h"
-#include "cfe_psp_sim_stepping_core.h"
-#include "cfe_psp_sim_stepping_shim.h" /* Mission-owned neutral shim ABI header from sample_defs */
+#include "esa_stepping.h"
+#include "esa_stepping_core.h"
+#include "esa_stepping_shim.h" /* Mission-owned neutral shim ABI header from sample_defs */
 
 /**
  * \brief Static stepping core instance owned by this PSP module
@@ -36,7 +36,7 @@
  * All hooks report facts into this core; the core maintains state and semantics.
  * Initialized once at module startup with simulated time = 0.
  */
-static CFE_PSP_SimStepping_Core_t stepping_core = {0};
+static ESA_Stepping_Core_t stepping_core = {0};
 static bool core_initialized = false;
 
 /**
@@ -51,9 +51,9 @@ typedef struct
     volatile bool is_running;  /* True if service loop thread is actively running */
     volatile bool should_run;  /* Signal to thread to continue; set false to exit */
     pthread_t task_id;         /* POSIX thread ID */
-} CFE_PSP_SimStepping_UDS_ServiceLoop_t;
+} ESA_Stepping_UDS_ServiceLoop_t;
 
-static CFE_PSP_SimStepping_UDS_ServiceLoop_t uds_service_loop = {
+static ESA_Stepping_UDS_ServiceLoop_t uds_service_loop = {
     .is_running = false,
     .should_run = false,
     .task_id = 0
@@ -62,7 +62,7 @@ static CFE_PSP_SimStepping_UDS_ServiceLoop_t uds_service_loop = {
 /**
  * \brief PSP-local background thread function for UDS service loop
  *
- * Runs in a separate thread and periodically calls CFE_PSP_SimStepping_UDS_Service()
+ * Runs in a separate thread and periodically calls ESA_Stepping_UDS_Service()
  * to accept and dispatch UDS client requests. Uses simple sleep-poll model with
  * 10ms sleep between service calls. Non-blocking service means no request waits
  * longer than one sleep interval for processing.
@@ -70,13 +70,13 @@ static CFE_PSP_SimStepping_UDS_ServiceLoop_t uds_service_loop = {
  * Thread runs until should_run is set to false (no explicit cancellation).
  * Sets is_running=false when exiting.
  */
-static void *CFE_PSP_SimStepping_UDS_ServiceLoop_Task(void *arg)
+static void *ESA_Stepping_UDS_ServiceLoop_Task(void *arg)
 {
     struct timespec sleep_time = {0};
 
     sleep_time.tv_nsec = 10000000; /* 10 milliseconds */
 
-    CFE_PSP_SimStepping_UDS_ServiceLoop_t *state = (CFE_PSP_SimStepping_UDS_ServiceLoop_t *)arg;
+    ESA_Stepping_UDS_ServiceLoop_t *state = (ESA_Stepping_UDS_ServiceLoop_t *)arg;
     if (state == NULL)
     {
         return NULL;
@@ -87,7 +87,7 @@ static void *CFE_PSP_SimStepping_UDS_ServiceLoop_Task(void *arg)
     while (state->should_run)
     {
         /* Call non-blocking UDS service to accept one pending client */
-        (void)CFE_PSP_SimStepping_UDS_Service();
+        (void)ESA_Stepping_UDS_Service();
 
         /* Periodically sleep to avoid busy-waiting; nanosleep tolerates EINTR */
         nanosleep(&sleep_time, NULL);
@@ -104,7 +104,7 @@ void ESA_Init(void)
 
     printf("CFE_PSP: Simulation stepping module initialized\n");
 
-    status = CFE_PSP_SimStepping_Core_Init(&stepping_core, 0, CFE_PSP_SIM_STEPPING_MAX_TRIGGERS);
+    status = ESA_Stepping_Core_Init(&stepping_core, 0, ESA_SIM_STEPPING_MAX_TRIGGERS);
     if (status == 0)
     {
         core_initialized = true;
@@ -117,7 +117,7 @@ void ESA_Init(void)
     }
 
 #ifdef CFE_SIM_STEPPING
-    status = CFE_PSP_SimStepping_UDS_Init();
+    status = ESA_Stepping_UDS_Init();
     if (status != 0)
     {
         printf("CFE_PSP: Failed to initialize UDS adapter (status=%ld)\n", (long)status);
@@ -127,7 +127,7 @@ void ESA_Init(void)
         /* Start PSP-local UDS service loop thread only if UDS init succeeded (non-fatal if thread creation fails) */
         uds_service_loop.should_run = true;
         pthread_status = pthread_create(&uds_service_loop.task_id, NULL, 
-                                         CFE_PSP_SimStepping_UDS_ServiceLoop_Task, 
+                                         ESA_Stepping_UDS_ServiceLoop_Task, 
                                          &uds_service_loop);
         if (pthread_status != 0)
         {
@@ -140,7 +140,7 @@ void ESA_Init(void)
 
 #ifdef CFE_SIM_STEPPING
 
-bool CFE_PSP_SimStepping_Hook_GetTime(uint64_t *sim_time_ns)
+bool ESA_Stepping_Hook_GetTime(uint64_t *sim_time_ns)
 {
     int32_t status;
 
@@ -157,7 +157,7 @@ bool CFE_PSP_SimStepping_Hook_GetTime(uint64_t *sim_time_ns)
     }
 
     /* Query the core for simulated time */
-    status = CFE_PSP_SimStepping_Core_QuerySimTime(&stepping_core, sim_time_ns);
+    status = ESA_Stepping_Core_QuerySimTime(&stepping_core, sim_time_ns);
 
     /* Return true only if query succeeded */
     return (status == 0);
@@ -165,7 +165,7 @@ bool CFE_PSP_SimStepping_Hook_GetTime(uint64_t *sim_time_ns)
 
 #else
 
-bool CFE_PSP_SimStepping_Hook_GetTime(uint64_t *sim_time_ns)
+bool ESA_Stepping_Hook_GetTime(uint64_t *sim_time_ns)
 {
     return false;
 }
@@ -183,117 +183,127 @@ bool CFE_PSP_SimStepping_Hook_GetTime(uint64_t *sim_time_ns)
  *
  * \return 0 on success; non-zero error code if report failed
  */
-int32_t CFE_PSP_SimStepping_Shim_ReportEvent(const CFE_PSP_SimStepping_ShimEvent_t *event)
+int32_t ESA_Stepping_Shim_ReportEvent(const ESA_Stepping_ShimEvent_t *event)
 {
-    int32_t status = CFE_PSP_SIM_STEPPING_STATUS_FAILURE;
+    int32_t status = ESA_SIM_STEPPING_STATUS_FAILURE;
 
     /* Input validation: event pointer must not be null */
     if (event == NULL)
     {
-        return CFE_PSP_SIM_STEPPING_STATUS_FAILURE;
+        return ESA_SIM_STEPPING_STATUS_FAILURE;
     }
 
     /* Gate: core must be initialized before reporting events */
     if (!core_initialized)
     {
-        return CFE_PSP_SIM_STEPPING_STATUS_NOT_READY;
+        return ESA_SIM_STEPPING_STATUS_NOT_READY;
     }
 
     /* Dispatch on event_kind and forward to appropriate core report function */
     switch (event->event_kind)
     {
-        case CFE_PSP_SIM_STEPPING_EVENT_TASK_DELAY:
-            status = CFE_PSP_SimStepping_Core_ReportTaskDelay(&stepping_core, event->task_id,
+        case ESA_SIM_STEPPING_EVENT_TASK_DELAY:
+            status = ESA_Stepping_Core_ReportTaskDelay(&stepping_core, event->task_id,
                                                               event->optional_delay_ms);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_QUEUE_RECEIVE:
-            status = CFE_PSP_SimStepping_Core_ReportQueueReceive(&stepping_core, event->entity_id,
+        case ESA_SIM_STEPPING_EVENT_TASK_DELAY_ACK:
+            status = ESA_Stepping_Core_ReportTaskDelayAck(&stepping_core, event->task_id,
+                                                                  event->optional_delay_ms);
+            break;
+
+        case ESA_SIM_STEPPING_EVENT_TASK_DELAY_COMPLETE:
+            status = ESA_Stepping_Core_ReportTaskDelayComplete(&stepping_core, event->task_id,
+                                                                       event->optional_delay_ms);
+            break;
+
+        case ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE:
+            status = ESA_Stepping_Core_ReportQueueReceive(&stepping_core, event->entity_id,
                                                                  event->optional_delay_ms);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_QUEUE_RECEIVE_ACK:
-            status = CFE_PSP_SimStepping_Core_ReportQueueReceiveAck(&stepping_core, event->task_id,
+        case ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_ACK:
+            status = ESA_Stepping_Core_ReportQueueReceiveAck(&stepping_core, event->task_id,
                                                                     event->entity_id,
                                                                     event->optional_delay_ms);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_QUEUE_RECEIVE_COMPLETE:
-            status = CFE_PSP_SimStepping_Core_ReportQueueReceiveComplete(&stepping_core, event->task_id,
+        case ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_COMPLETE:
+            status = ESA_Stepping_Core_ReportQueueReceiveComplete(&stepping_core, event->task_id,
                                                                          event->entity_id,
                                                                          event->optional_delay_ms);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_BINSEM_TAKE:
-            status = CFE_PSP_SimStepping_Core_ReportBinSemTake(&stepping_core, event->entity_id,
+        case ESA_SIM_STEPPING_EVENT_BINSEM_TAKE:
+            status = ESA_Stepping_Core_ReportBinSemTake(&stepping_core, event->entity_id,
                                                                event->optional_delay_ms);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_BINSEM_TAKE_ACK:
-            status = CFE_PSP_SimStepping_Core_ReportBinSemTakeAck(&stepping_core, event->task_id,
+        case ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_ACK:
+            status = ESA_Stepping_Core_ReportBinSemTakeAck(&stepping_core, event->task_id,
                                                                   event->entity_id,
                                                                   event->optional_delay_ms);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_BINSEM_TAKE_COMPLETE:
-            status = CFE_PSP_SimStepping_Core_ReportBinSemTakeComplete(&stepping_core, event->task_id,
+        case ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_COMPLETE:
+            status = ESA_Stepping_Core_ReportBinSemTakeComplete(&stepping_core, event->task_id,
                                                                        event->entity_id,
                                                                        event->optional_delay_ms);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_TIME_TASK_CYCLE:
-            status = CFE_PSP_SimStepping_Core_ReportTimeTaskCycle(&stepping_core);
+        case ESA_SIM_STEPPING_EVENT_TIME_TASK_CYCLE:
+            status = ESA_Stepping_Core_ReportTimeTaskCycle(&stepping_core);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_1HZ_BOUNDARY:
-            status = CFE_PSP_SimStepping_Core_Report1HzBoundary(&stepping_core);
+        case ESA_SIM_STEPPING_EVENT_1HZ_BOUNDARY:
+            status = ESA_Stepping_Core_Report1HzBoundary(&stepping_core);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_TONE_SIGNAL:
-            status = CFE_PSP_SimStepping_Core_ReportToneSignal(&stepping_core);
+        case ESA_SIM_STEPPING_EVENT_TONE_SIGNAL:
+            status = ESA_Stepping_Core_ReportToneSignal(&stepping_core);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_SCH_SEMAPHORE_WAIT:
-            status = CFE_PSP_SimStepping_Core_ReportSchSemaphoreWait(&stepping_core, event->entity_id,
+        case ESA_SIM_STEPPING_EVENT_SCH_SEMAPHORE_WAIT:
+            status = ESA_Stepping_Core_ReportSchSemaphoreWait(&stepping_core, event->entity_id,
                                                                      event->optional_delay_ms);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_SCH_MINOR_FRAME:
-            status = CFE_PSP_SimStepping_Core_ReportSchMinorFrame(&stepping_core);
+        case ESA_SIM_STEPPING_EVENT_SCH_MINOR_FRAME:
+            status = ESA_Stepping_Core_ReportSchMinorFrame(&stepping_core);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_SCH_MAJOR_FRAME:
-            status = CFE_PSP_SimStepping_Core_ReportSchMajorFrame(&stepping_core);
+        case ESA_SIM_STEPPING_EVENT_SCH_MAJOR_FRAME:
+            status = ESA_Stepping_Core_ReportSchMajorFrame(&stepping_core);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_SCH_SEND_TRIGGER:
-            status = CFE_PSP_SimStepping_Core_ReportSchSendTrigger(&stepping_core, event->entity_id);
+        case ESA_SIM_STEPPING_EVENT_SCH_SEND_TRIGGER:
+            status = ESA_Stepping_Core_ReportSchSendTrigger(&stepping_core, event->entity_id);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_SCH_DISPATCH_COMPLETE:
-            status = CFE_PSP_SimStepping_Core_ReportSchDispatchComplete(&stepping_core);
+        case ESA_SIM_STEPPING_EVENT_SCH_DISPATCH_COMPLETE:
+            status = ESA_Stepping_Core_ReportSchDispatchComplete(&stepping_core);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_RECEIVE:
-            status = CFE_PSP_SimStepping_Core_ReportCoreServiceCmdPipeReceive(&stepping_core,
+        case ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_RECEIVE:
+            status = ESA_Stepping_Core_ReportCoreServiceCmdPipeReceive(&stepping_core,
                                                                                event->entity_id);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_COMPLETE:
-            status = CFE_PSP_SimStepping_Core_ReportCoreServiceCmdPipeComplete(&stepping_core,
+        case ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_COMPLETE:
+            status = ESA_Stepping_Core_ReportCoreServiceCmdPipeComplete(&stepping_core,
                                                                                 event->entity_id);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_TIME_TONE_SEM_CONSUME:
-            status = CFE_PSP_SimStepping_Core_ReportTimeToneSemConsume(&stepping_core, event->entity_id);
+        case ESA_SIM_STEPPING_EVENT_TIME_TONE_SEM_CONSUME:
+            status = ESA_Stepping_Core_ReportTimeToneSemConsume(&stepping_core, event->entity_id);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_TIME_LOCAL_1HZ_SEM_CONSUME:
-            status = CFE_PSP_SimStepping_Core_ReportTimeLocal1HzSemConsume(&stepping_core, event->entity_id);
+        case ESA_SIM_STEPPING_EVENT_TIME_LOCAL_1HZ_SEM_CONSUME:
+            status = ESA_Stepping_Core_ReportTimeLocal1HzSemConsume(&stepping_core, event->entity_id);
             break;
 
-        case CFE_PSP_SIM_STEPPING_EVENT_SYSTEM_READY_FOR_STEPPING:
-            status = CFE_PSP_SimStepping_Core_MarkSystemReadyForStepping(&stepping_core);
+        case ESA_SIM_STEPPING_EVENT_SYSTEM_READY_FOR_STEPPING:
+            status = ESA_Stepping_Core_MarkSystemReadyForStepping(&stepping_core);
             break;
 
         default:
@@ -325,28 +335,28 @@ int32_t CFE_PSP_SimStepping_Shim_ReportEvent(const CFE_PSP_SimStepping_ShimEvent
  * \return  true if delay can be handled by stepping (skip wall-clock sleep)
  * \return  false if delay cannot be handled (proceed with normal wall-clock sleep)
  */
-bool CFE_PSP_SimStepping_Hook_TaskDelayEligible(uint32_t task_id, uint32_t delay_ms)
+bool ESA_Stepping_Hook_TaskDelayEligible(uint32_t task_id, uint32_t delay_ms)
 {
     /* Check eligibility via core query */
     if (core_initialized)
     {
-        return CFE_PSP_SimStepping_Core_QueryTaskDelayEligible(&stepping_core, task_id, delay_ms);
+        return ESA_Stepping_Core_QueryTaskDelayEligible(&stepping_core, task_id, delay_ms);
     }
 
     /* Core not initialized; delay cannot be handled */
     return false;
 }
 
-int32_t CFE_PSP_SimStepping_WaitForDelayExpiry(uint32_t task_id, uint32_t delay_ms)
+int32_t ESA_Stepping_WaitForDelayExpiry(uint32_t task_id, uint32_t delay_ms)
 {
     int32_t status;
 
     if (core_initialized)
     {
-        status = CFE_PSP_SimStepping_Core_WaitForDelayExpiry(&stepping_core, task_id, delay_ms);
+        status = ESA_Stepping_Core_WaitForDelayExpiry(&stepping_core, task_id, delay_ms);
         if (status == 0)
         {
-            status = CFE_PSP_SimStepping_Core_ReportTaskDelayReturn(&stepping_core, task_id);
+            status = ESA_Stepping_Core_ReportTaskDelayReturn(&stepping_core, task_id);
         }
 
         return status;
@@ -357,12 +367,12 @@ int32_t CFE_PSP_SimStepping_WaitForDelayExpiry(uint32_t task_id, uint32_t delay_
 
 #else
 
-bool CFE_PSP_SimStepping_Hook_TaskDelayEligible(uint32_t task_id, uint32_t delay_ms)
+bool ESA_Stepping_Hook_TaskDelayEligible(uint32_t task_id, uint32_t delay_ms)
 {
     return false;
 }
 
-int32_t CFE_PSP_SimStepping_WaitForDelayExpiry(uint32_t task_id, uint32_t delay_ms)
+int32_t ESA_Stepping_WaitForDelayExpiry(uint32_t task_id, uint32_t delay_ms)
 {
     return -1;
 }
@@ -387,7 +397,7 @@ int32_t CFE_PSP_SimStepping_WaitForDelayExpiry(uint32_t task_id, uint32_t delay_
  * \return  0 on success (step initiated)
  * \return  -1 if stepping not initialized or core invalid
  */
-int32_t CFE_PSP_SimStepping_InProc_BeginStep(void)
+int32_t ESA_Stepping_InProc_BeginStep(void)
 {
     int32_t status;
 
@@ -397,7 +407,7 @@ int32_t CFE_PSP_SimStepping_InProc_BeginStep(void)
         return -1;
     }
 
-    status = CFE_PSP_SimStepping_Core_BeginStepSession(&stepping_core);
+    status = ESA_Stepping_Core_BeginStepSession(&stepping_core);
 
     return status;
 }
@@ -430,7 +440,7 @@ int32_t CFE_PSP_SimStepping_InProc_BeginStep(void)
  *       This sleep is inside the adapter and does not modify OSAL/TIME/SCH.
  *       No threads, sockets, or second state machine are introduced.
  */
-int32_t CFE_PSP_SimStepping_InProc_WaitStepComplete(uint32_t timeout_ms)
+int32_t ESA_Stepping_InProc_WaitStepComplete(uint32_t timeout_ms)
 {
     uint32_t elapsed_ms = 0;
     bool is_infinite_wait;
@@ -445,9 +455,9 @@ int32_t CFE_PSP_SimStepping_InProc_WaitStepComplete(uint32_t timeout_ms)
 
     if (!stepping_core.session_active)
     {
-        return CFE_PSP_SimStepping_Core_RecordDiagnostic(&stepping_core,
-                                                         CFE_PSP_SIM_STEPPING_DIAG_ILLEGAL_STATE,
-                                                         CFE_PSP_SIM_STEPPING_STATUS_ILLEGAL_STATE,
+        return ESA_Stepping_Core_RecordDiagnostic(&stepping_core,
+                                                         ESA_SIM_STEPPING_DIAG_ILLEGAL_STATE,
+                                                         ESA_SIM_STEPPING_STATUS_ILLEGAL_STATE,
                                                          "InProc_WaitStepComplete_NoSession",
                                                          timeout_ms,
                                                          0);
@@ -464,7 +474,7 @@ int32_t CFE_PSP_SimStepping_InProc_WaitStepComplete(uint32_t timeout_ms)
     while (1)
     {
         /* Query core to check if step is complete */
-        if (CFE_PSP_SimStepping_Core_IsStepComplete(&stepping_core))
+        if (ESA_Stepping_Core_IsStepComplete(&stepping_core))
         {
             return 0;  /* Step complete - success */
         }
@@ -486,9 +496,9 @@ int32_t CFE_PSP_SimStepping_InProc_WaitStepComplete(uint32_t timeout_ms)
         /* Handle finite timeout: check elapsed time */
          if (elapsed_ms >= timeout_ms)
          {
-             return CFE_PSP_SimStepping_Core_RecordDiagnostic(&stepping_core,
-                                                              CFE_PSP_SIM_STEPPING_DIAG_TIMEOUT,
-                                                              CFE_PSP_SIM_STEPPING_STATUS_TIMEOUT,
+             return ESA_Stepping_Core_RecordDiagnostic(&stepping_core,
+                                                              ESA_SIM_STEPPING_DIAG_TIMEOUT,
+                                                              ESA_SIM_STEPPING_STATUS_TIMEOUT,
                                                               "InProc_WaitStepComplete",
                                                               timeout_ms,
                                                               elapsed_ms);
@@ -514,9 +524,9 @@ int32_t CFE_PSP_SimStepping_InProc_WaitStepComplete(uint32_t timeout_ms)
  * \return  0 if state query successful
  * \return  -1 if core not initialized or state_out pointer validation failed
  */
-int32_t CFE_PSP_SimStepping_InProc_QueryState(uint32_t *state_out, uint32_t *trigger_count)
+int32_t ESA_Stepping_InProc_QueryState(uint32_t *state_out, uint32_t *trigger_count)
 {
-    CFE_PSP_SimStepping_CoreState_t core_state;
+    ESA_Stepping_CoreState_t core_state;
     int32_t status;
 
     /* Gate: core must be initialized */
@@ -526,7 +536,7 @@ int32_t CFE_PSP_SimStepping_InProc_QueryState(uint32_t *state_out, uint32_t *tri
     }
 
     /* Query core state (required) */
-    status = CFE_PSP_SimStepping_Core_QueryState(&stepping_core, &core_state);
+    status = ESA_Stepping_Core_QueryState(&stepping_core, &core_state);
     if (status != 0)
     {
         return -1;
@@ -549,17 +559,17 @@ int32_t CFE_PSP_SimStepping_InProc_QueryState(uint32_t *state_out, uint32_t *tri
 
 #else
 
-int32_t CFE_PSP_SimStepping_InProc_BeginStep(void)
+int32_t ESA_Stepping_InProc_BeginStep(void)
 {
     return -1;
 }
 
-int32_t CFE_PSP_SimStepping_InProc_WaitStepComplete(uint32_t timeout_ms)
+int32_t ESA_Stepping_InProc_WaitStepComplete(uint32_t timeout_ms)
 {
     return -1;
 }
 
-int32_t CFE_PSP_SimStepping_InProc_QueryState(uint32_t *state_out, uint32_t *trigger_count)
+int32_t ESA_Stepping_InProc_QueryState(uint32_t *state_out, uint32_t *trigger_count)
 {
     return -1;
 }
@@ -599,7 +609,7 @@ static struct {
  * \return  0 on success (adapter initialized)
  * \return  -1 if stepping not initialized or adapter already initialized
  */
-int32_t CFE_PSP_SimStepping_UDS_Init(void)
+int32_t ESA_Stepping_UDS_Init(void)
 {
     struct sockaddr_un addr;
     int sock_fd;
@@ -693,14 +703,14 @@ typedef struct
   * If a client is accepted:
   * - Reads exactly UDS_REQUEST_SIZE bytes (request with opcode and optional timeout)
   * - If opcode is UDS_BEGIN_STEP_OPCODE:
-  *   - Calls CFE_PSP_SimStepping_InProc_BeginStep()
+  *   - Calls ESA_Stepping_InProc_BeginStep()
   *   - Writes back int32_t status response
   * - If opcode is UDS_QUERY_STATE_OPCODE:
-  *   - Calls CFE_PSP_SimStepping_InProc_QueryState()
+  *   - Calls ESA_Stepping_InProc_QueryState()
   *   - Writes back fixed-size UDS_QueryStateResponse_t (status, state, trigger_count)
   * - If opcode is UDS_WAIT_STEP_COMPLETE_OPCODE:
   *   - Extracts timeout_ms from request
-  *   - Calls CFE_PSP_SimStepping_InProc_WaitStepComplete(timeout_ms)
+  *   - Calls ESA_Stepping_InProc_WaitStepComplete(timeout_ms)
   *   - Writes back int32_t status response
   * - Closes client connection
   * - Returns 0 (handled successfully)
@@ -713,16 +723,16 @@ typedef struct
   * - Returns 0 (adapter idle, normal)
   *
  * If core/adapter not initialized or socket error:
- * - Returns CFE_PSP_SIM_STEPPING_STATUS_NOT_READY
+ * - Returns ESA_SIM_STEPPING_STATUS_NOT_READY
   *
   * Returns immediately (non-blocking). One command, one response per client.
   *
- * \return  CFE_PSP_SIM_STEPPING_STATUS_SUCCESS if idle or request served
- * \return  CFE_PSP_SIM_STEPPING_STATUS_NOT_READY if adapter/core is not initialized
- * \return  CFE_PSP_SIM_STEPPING_STATUS_TRANSPORT_ERROR on read/write/accept failures
- * \return  CFE_PSP_SIM_STEPPING_STATUS_PROTOCOL_ERROR on unknown opcode
+ * \return  ESA_SIM_STEPPING_STATUS_SUCCESS if idle or request served
+ * \return  ESA_SIM_STEPPING_STATUS_NOT_READY if adapter/core is not initialized
+ * \return  ESA_SIM_STEPPING_STATUS_TRANSPORT_ERROR on read/write/accept failures
+ * \return  ESA_SIM_STEPPING_STATUS_PROTOCOL_ERROR on unknown opcode
   */
-int32_t CFE_PSP_SimStepping_UDS_Service(void)
+int32_t ESA_Stepping_UDS_Service(void)
 {
     int client_fd;
     struct sockaddr_un client_addr;
@@ -734,17 +744,17 @@ int32_t CFE_PSP_SimStepping_UDS_Service(void)
 
     if (!core_initialized)
     {
-        return CFE_PSP_SIM_STEPPING_STATUS_NOT_READY;
+        return ESA_SIM_STEPPING_STATUS_NOT_READY;
     }
 
     if (!uds_adapter.initialized)
     {
-        return CFE_PSP_SIM_STEPPING_STATUS_NOT_READY;
+        return ESA_SIM_STEPPING_STATUS_NOT_READY;
     }
 
     if (uds_adapter.listener_fd < 0)
     {
-        return CFE_PSP_SIM_STEPPING_STATUS_NOT_READY;
+        return ESA_SIM_STEPPING_STATUS_NOT_READY;
     }
 
     /* Clear client address structure */
@@ -766,9 +776,9 @@ int32_t CFE_PSP_SimStepping_UDS_Service(void)
         }
 
          /* Other error (e.g., EBADF, EINVAL, system failure) */
-         return CFE_PSP_SimStepping_Core_RecordDiagnostic(&stepping_core,
-                                                          CFE_PSP_SIM_STEPPING_DIAG_TRANSPORT_ERROR,
-                                                          CFE_PSP_SIM_STEPPING_STATUS_TRANSPORT_ERROR,
+         return ESA_Stepping_Core_RecordDiagnostic(&stepping_core,
+                                                          ESA_SIM_STEPPING_DIAG_TRANSPORT_ERROR,
+                                                          ESA_SIM_STEPPING_STATUS_TRANSPORT_ERROR,
                                                           "UDS_Service_Accept",
                                                           (uint32_t)errno,
                                                           0);
@@ -782,9 +792,9 @@ int32_t CFE_PSP_SimStepping_UDS_Service(void)
      {
          /* Short read or read error */
          close(client_fd);
-        return CFE_PSP_SimStepping_Core_RecordDiagnostic(&stepping_core,
-                                                         CFE_PSP_SIM_STEPPING_DIAG_TRANSPORT_ERROR,
-                                                         CFE_PSP_SIM_STEPPING_STATUS_TRANSPORT_ERROR,
+        return ESA_Stepping_Core_RecordDiagnostic(&stepping_core,
+                                                         ESA_SIM_STEPPING_DIAG_TRANSPORT_ERROR,
+                                                         ESA_SIM_STEPPING_STATUS_TRANSPORT_ERROR,
                                                          "UDS_Service_Read",
                                                          (uint32_t)UDS_REQUEST_SIZE,
                                                          (uint32_t)bytes_read);
@@ -794,7 +804,7 @@ int32_t CFE_PSP_SimStepping_UDS_Service(void)
     if (request.opcode == UDS_BEGIN_STEP_OPCODE)
     {
         /* Call inproc begin step adapter and get status */
-        response_status = CFE_PSP_SimStepping_InProc_BeginStep();
+        response_status = ESA_Stepping_InProc_BeginStep();
         
         /* Write back int32_t status response (native byte order) */
         bytes_written = write(client_fd, &response_status, sizeof(response_status));
@@ -803,9 +813,9 @@ int32_t CFE_PSP_SimStepping_UDS_Service(void)
          {
              /* Short write or write error */
              close(client_fd);
-             return CFE_PSP_SimStepping_Core_RecordDiagnostic(&stepping_core,
-                                                              CFE_PSP_SIM_STEPPING_DIAG_TRANSPORT_ERROR,
-                                                              CFE_PSP_SIM_STEPPING_STATUS_TRANSPORT_ERROR,
+             return ESA_Stepping_Core_RecordDiagnostic(&stepping_core,
+                                                              ESA_SIM_STEPPING_DIAG_TRANSPORT_ERROR,
+                                                              ESA_SIM_STEPPING_STATUS_TRANSPORT_ERROR,
                                                               "UDS_Service_WriteBegin",
                                                               (uint32_t)sizeof(response_status),
                                                               (uint32_t)bytes_written);
@@ -819,7 +829,7 @@ int32_t CFE_PSP_SimStepping_UDS_Service(void)
         UDS_QueryStateResponse_t response = {0};
 
         /* Call inproc query adapter (fills state_value and trigger_count) */
-        response.status = CFE_PSP_SimStepping_InProc_QueryState(&state_value, &trigger_count);
+        response.status = ESA_Stepping_InProc_QueryState(&state_value, &trigger_count);
         
         /* Populate response struct with state and trigger count */
         response.state = state_value;
@@ -832,9 +842,9 @@ int32_t CFE_PSP_SimStepping_UDS_Service(void)
          {
              /* Short write or write error */
              close(client_fd);
-            return CFE_PSP_SimStepping_Core_RecordDiagnostic(&stepping_core,
-                                                             CFE_PSP_SIM_STEPPING_DIAG_TRANSPORT_ERROR,
-                                                             CFE_PSP_SIM_STEPPING_STATUS_TRANSPORT_ERROR,
+            return ESA_Stepping_Core_RecordDiagnostic(&stepping_core,
+                                                             ESA_SIM_STEPPING_DIAG_TRANSPORT_ERROR,
+                                                             ESA_SIM_STEPPING_STATUS_TRANSPORT_ERROR,
                                                              "UDS_Service_WriteQuery",
                                                              (uint32_t)sizeof(response),
                                                              (uint32_t)bytes_written);
@@ -843,7 +853,7 @@ int32_t CFE_PSP_SimStepping_UDS_Service(void)
     else if (request.opcode == UDS_WAIT_STEP_COMPLETE_OPCODE)
     {
         /* Handle WAIT_STEP_COMPLETE request: extract timeout and call inproc adapter */
-        response_status = CFE_PSP_SimStepping_InProc_WaitStepComplete(request.timeout_ms);
+        response_status = ESA_Stepping_InProc_WaitStepComplete(request.timeout_ms);
         
         /* Write back int32_t status response (native byte order) */
         bytes_written = write(client_fd, &response_status, sizeof(response_status));
@@ -852,9 +862,9 @@ int32_t CFE_PSP_SimStepping_UDS_Service(void)
          {
              /* Short write or write error */
              close(client_fd);
-            return CFE_PSP_SimStepping_Core_RecordDiagnostic(&stepping_core,
-                                                             CFE_PSP_SIM_STEPPING_DIAG_TRANSPORT_ERROR,
-                                                             CFE_PSP_SIM_STEPPING_STATUS_TRANSPORT_ERROR,
+            return ESA_Stepping_Core_RecordDiagnostic(&stepping_core,
+                                                             ESA_SIM_STEPPING_DIAG_TRANSPORT_ERROR,
+                                                             ESA_SIM_STEPPING_STATUS_TRANSPORT_ERROR,
                                                              "UDS_Service_WriteWait",
                                                              (uint32_t)sizeof(response_status),
                                                              (uint32_t)bytes_written);
@@ -863,9 +873,9 @@ int32_t CFE_PSP_SimStepping_UDS_Service(void)
     else
      {
          close(client_fd);
-         return CFE_PSP_SimStepping_Core_RecordDiagnostic(&stepping_core,
-                                                          CFE_PSP_SIM_STEPPING_DIAG_PROTOCOL_ERROR,
-                                                          CFE_PSP_SIM_STEPPING_STATUS_PROTOCOL_ERROR,
+         return ESA_Stepping_Core_RecordDiagnostic(&stepping_core,
+                                                          ESA_SIM_STEPPING_DIAG_PROTOCOL_ERROR,
+                                                          ESA_SIM_STEPPING_STATUS_PROTOCOL_ERROR,
                                                           "UDS_Service_UnknownOpcode",
                                                           request.opcode,
                                                           0);
@@ -889,7 +899,7 @@ int32_t CFE_PSP_SimStepping_UDS_Service(void)
   * \return  0 on success (adapter shut down)
   * \return  -1 if adapter not initialized or shutdown failed
   */
-int32_t CFE_PSP_SimStepping_UDS_Shutdown(void)
+int32_t ESA_Stepping_UDS_Shutdown(void)
 {
     if (!uds_adapter.initialized)
     {
@@ -916,36 +926,36 @@ int32_t CFE_PSP_SimStepping_UDS_Shutdown(void)
 /**
  * \brief Service UDS adapter (non-blocking, single request per call)
  *
- * Thin wrapper around CFE_PSP_SimStepping_UDS_Service() for use in periodic
+ * Thin wrapper around ESA_Stepping_UDS_Service() for use in periodic
  * stepping hooks. Returns immediately whether a request was present or not.
  * Suitable for calling from timer ticks, stepping hooks, or tight polling loops.
  *
  * \return  0 if no client pending or client request processed successfully
  * \return  -1 if adapter not initialized or service failed
  */
-int32_t CFE_PSP_SimStepping_UDS_RunOnce(void)
+int32_t ESA_Stepping_UDS_RunOnce(void)
 {
-    return CFE_PSP_SimStepping_UDS_Service();
+    return ESA_Stepping_UDS_Service();
 }
 
 #else
 
-int32_t CFE_PSP_SimStepping_UDS_Init(void)
+int32_t ESA_Stepping_UDS_Init(void)
 {
     return -1;
 }
 
-int32_t CFE_PSP_SimStepping_UDS_Service(void)
+int32_t ESA_Stepping_UDS_Service(void)
 {
     return -1;
 }
 
-int32_t CFE_PSP_SimStepping_UDS_Shutdown(void)
+int32_t ESA_Stepping_UDS_Shutdown(void)
 {
     return -1;
 }
 
-int32_t CFE_PSP_SimStepping_UDS_RunOnce(void)
+int32_t ESA_Stepping_UDS_RunOnce(void)
 {
     return -1;
 }

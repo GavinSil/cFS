@@ -36,8 +36,8 @@
  * the core maintains state and semantics. This separation keeps hook/shim layers thin.
  */
 
-#ifndef CFE_PSP_SIM_STEPPING_CORE_H
-#define CFE_PSP_SIM_STEPPING_CORE_H
+#ifndef ESA_SIM_STEPPING_CORE_H
+#define ESA_SIM_STEPPING_CORE_H
 
 /****************************************************************************************
                                       INCLUDE FILES
@@ -57,7 +57,7 @@
  * Fixed compile-time capacity for the skeleton stepping core.
  * Suitable for native-only simulation stepping with typical workloads.
  */
-#define CFE_PSP_SIM_STEPPING_MAX_TRIGGERS 32
+#define ESA_SIM_STEPPING_MAX_TRIGGERS 32
 
 /**
  * \brief Core-service membership-intent bitmask constants
@@ -66,11 +66,11 @@
  * Used to track which services have reported command-pipe receive facts
  * in the current step.
  */
-#define CFE_PSP_SIM_STEPPING_SERVICE_BIT_ES   (1U << 0)   /**< Executive Services */
-#define CFE_PSP_SIM_STEPPING_SERVICE_BIT_EVS  (1U << 1)   /**< Event Services */
-#define CFE_PSP_SIM_STEPPING_SERVICE_BIT_SB   (1U << 2)   /**< Software Bus */
-#define CFE_PSP_SIM_STEPPING_SERVICE_BIT_TBL  (1U << 3)   /**< Table Services */
-#define CFE_PSP_SIM_STEPPING_SERVICE_BIT_TIME (1U << 4)   /**< Time Services */
+#define ESA_SIM_STEPPING_SERVICE_BIT_ES   (1U << 0)   /**< Executive Services */
+#define ESA_SIM_STEPPING_SERVICE_BIT_EVS  (1U << 1)   /**< Event Services */
+#define ESA_SIM_STEPPING_SERVICE_BIT_SB   (1U << 2)   /**< Software Bus */
+#define ESA_SIM_STEPPING_SERVICE_BIT_TBL  (1U << 3)   /**< Table Services */
+#define ESA_SIM_STEPPING_SERVICE_BIT_TIME (1U << 4)   /**< Time Services */
 
 /**
  * \brief TIME child-path participation-intent bitmask constants
@@ -79,8 +79,8 @@
  * Used to track which TIME child paths have reported participation facts in the current step.
  * These allow explicitness about TIME subsystem structure (tone semaphore, local 1Hz semaphore).
  */
-#define CFE_PSP_SIM_STEPPING_CHILDPATH_BIT_TIME_TONE      (1U << 5)   /**< TIME tone child path */
-#define CFE_PSP_SIM_STEPPING_CHILDPATH_BIT_TIME_LOCAL_1HZ (1U << 6)   /**< TIME local-1Hz child path */
+#define ESA_SIM_STEPPING_CHILDPATH_BIT_TIME_TONE      (1U << 5)   /**< TIME tone child path */
+#define ESA_SIM_STEPPING_CHILDPATH_BIT_TIME_LOCAL_1HZ (1U << 6)   /**< TIME local-1Hz child path */
 
 /****************************************************************************************
                               CORE STATE MACHINE DEFINITIONS
@@ -96,14 +96,14 @@
  * - WAITING: Step in progress, waiting for acknowledgments/completions
  * - COMPLETE: All triggers acknowledged, all events reported, ready for next step
  */
-typedef enum CFE_PSP_SimStepping_CoreState
+typedef enum ESA_Stepping_CoreState
 {
-    CFE_PSP_SIM_STEPPING_STATE_INIT,      /**< Core not initialized */
-    CFE_PSP_SIM_STEPPING_STATE_READY,     /**< Waiting for step command */
-    CFE_PSP_SIM_STEPPING_STATE_RUNNING,   /**< Actively executing step */
-    CFE_PSP_SIM_STEPPING_STATE_WAITING,   /**< Waiting for acks/completions */
-    CFE_PSP_SIM_STEPPING_STATE_COMPLETE   /**< Step complete, ready for next */
-} CFE_PSP_SimStepping_CoreState_t;
+    ESA_SIM_STEPPING_STATE_INIT,      /**< Core not initialized */
+    ESA_SIM_STEPPING_STATE_READY,     /**< Waiting for step command */
+    ESA_SIM_STEPPING_STATE_RUNNING,   /**< Actively executing step */
+    ESA_SIM_STEPPING_STATE_WAITING,   /**< Waiting for acks/completions */
+    ESA_SIM_STEPPING_STATE_COMPLETE   /**< Step complete, ready for next */
+} ESA_Stepping_CoreState_t;
 
 /**
  * \brief Dynamic trigger descriptor
@@ -111,31 +111,31 @@ typedef enum CFE_PSP_SimStepping_CoreState
  * Represents one pending trigger event (e.g., a task delay boundary hit, queue receive,
  * 1Hz signal, etc.). Tracks whether this trigger has been acknowledged.
  */
-typedef struct CFE_PSP_SimStepping_Trigger
+typedef struct ESA_Stepping_Trigger
 {
     uint32_t trigger_id;          /**< Unique trigger identifier */
     uint32_t source_mask;         /**< Source classification (task delay, queue, etc.) */
     uint32_t entity_id;
     bool     is_acknowledged;     /**< Has this trigger been acknowledged? */
-} CFE_PSP_SimStepping_Trigger_t;
+} ESA_Stepping_Trigger_t;
 
 /**
  * \brief Diagnostic failure classes for normalized sim-stepping observability
  */
-typedef enum CFE_PSP_SimStepping_DiagnosticClass
+typedef enum ESA_Stepping_DiagnosticClass
 {
-    CFE_PSP_SIM_STEPPING_DIAG_TIMEOUT = 0,
-    CFE_PSP_SIM_STEPPING_DIAG_DUPLICATE_BEGIN,
-    CFE_PSP_SIM_STEPPING_DIAG_ILLEGAL_COMPLETE,
-    CFE_PSP_SIM_STEPPING_DIAG_ILLEGAL_STATE,
-    CFE_PSP_SIM_STEPPING_DIAG_TRANSPORT_ERROR,
-    CFE_PSP_SIM_STEPPING_DIAG_PROTOCOL_ERROR
-} CFE_PSP_SimStepping_DiagnosticClass_t;
+    ESA_SIM_STEPPING_DIAG_TIMEOUT = 0,
+    ESA_SIM_STEPPING_DIAG_DUPLICATE_BEGIN,
+    ESA_SIM_STEPPING_DIAG_ILLEGAL_COMPLETE,
+    ESA_SIM_STEPPING_DIAG_ILLEGAL_STATE,
+    ESA_SIM_STEPPING_DIAG_TRANSPORT_ERROR,
+    ESA_SIM_STEPPING_DIAG_PROTOCOL_ERROR
+} ESA_Stepping_DiagnosticClass_t;
 
 /**
  * \brief Core-owned diagnostic counters for stepping failure classes
  */
-typedef struct CFE_PSP_SimStepping_Diagnostics
+typedef struct ESA_Stepping_Diagnostics
 {
     uint32_t timeout_count;
     uint32_t duplicate_begin_count;
@@ -143,7 +143,7 @@ typedef struct CFE_PSP_SimStepping_Diagnostics
     uint32_t illegal_state_count;
     uint32_t transport_error_count;
     uint32_t protocol_error_count;
-} CFE_PSP_SimStepping_Diagnostics_t;
+} ESA_Stepping_Diagnostics_t;
 
 /**
  * \brief Stepping core state structure
@@ -153,10 +153,10 @@ typedef struct CFE_PSP_SimStepping_Diagnostics
  * 
  * Trigger storage is fixed-capacity compile-time array (not heap-backed).
  */
-typedef struct CFE_PSP_SimStepping_Core
+typedef struct ESA_Stepping_Core
 {
     /* State machine */
-    CFE_PSP_SimStepping_CoreState_t current_state;  /**< Current state */
+    ESA_Stepping_CoreState_t current_state;  /**< Current state */
 
     /* Simulated time storage */
     uint64_t sim_time_ns;                          /**< Current simulated time in nanoseconds */
@@ -166,7 +166,7 @@ typedef struct CFE_PSP_SimStepping_Core
     uint64_t step_quantum_ns;                      /**< Quantum size for one simulation step in nanoseconds */
 
     /* Trigger tracking (fixed compile-time capacity) */
-    CFE_PSP_SimStepping_Trigger_t triggers[CFE_PSP_SIM_STEPPING_MAX_TRIGGERS];  /**< Array of pending triggers */
+    ESA_Stepping_Trigger_t triggers[ESA_SIM_STEPPING_MAX_TRIGGERS];  /**< Array of pending triggers */
     uint32_t trigger_count;                        /**< Current number of triggers */
     uint32_t next_trigger_id;                      /**< Counter for unique trigger IDs */
 
@@ -178,7 +178,7 @@ typedef struct CFE_PSP_SimStepping_Core
     bool completion_ready;                         /**< All events reported and ready? */
 
     /* Core-owned diagnostic counters */
-    CFE_PSP_SimStepping_Diagnostics_t diagnostics; /**< Accumulated failure-class diagnostics */
+    ESA_Stepping_Diagnostics_t diagnostics; /**< Accumulated failure-class diagnostics */
 
     /* Timeout configuration */
     uint32_t step_timeout_ms;                      /**< Timeout for step completion (ms) */
@@ -203,7 +203,7 @@ typedef struct CFE_PSP_SimStepping_Core
     /* Persistent lifecycle readiness state (distinct from per-step completion_ready) */
     bool     system_ready_for_stepping;            /**< Persistent flag: true after system has signaled lifecycle readiness; survives step resets and session transitions */
 
-} CFE_PSP_SimStepping_Core_t;
+} ESA_Stepping_Core_t;
 
 /****************************************************************************************
                              CORE API FUNCTION DECLARATIONS
@@ -217,11 +217,11 @@ typedef struct CFE_PSP_SimStepping_Core
  *
  * \param[in]  core              Pointer to core structure to initialize
  * \param[in]  initial_time_ns   Initial simulated time in nanoseconds
- * \param[in]  trigger_capacity  Unused (kept for API compatibility); max is CFE_PSP_SIM_STEPPING_MAX_TRIGGERS
+ * \param[in]  trigger_capacity  Unused (kept for API compatibility); max is ESA_SIM_STEPPING_MAX_TRIGGERS
  *
  * \return 0 if initialization successful; non-zero error code if initialization failed
  */
-int32_t CFE_PSP_SimStepping_Core_Init(CFE_PSP_SimStepping_Core_t *core,
+int32_t ESA_Stepping_Core_Init(ESA_Stepping_Core_t *core,
                                       uint64_t                   initial_time_ns,
                                       uint32_t                   trigger_capacity);
 
@@ -234,7 +234,7 @@ int32_t CFE_PSP_SimStepping_Core_Init(CFE_PSP_SimStepping_Core_t *core,
  *
  * \return 0 on success
  */
-int32_t CFE_PSP_SimStepping_Core_Reset(CFE_PSP_SimStepping_Core_t *core);
+int32_t ESA_Stepping_Core_Reset(ESA_Stepping_Core_t *core);
 
 /**
  * \brief Report a task delay boundary event
@@ -248,12 +248,20 @@ int32_t CFE_PSP_SimStepping_Core_Reset(CFE_PSP_SimStepping_Core_t *core);
  *
  * \return 0 on success
  */
-int32_t CFE_PSP_SimStepping_Core_ReportTaskDelay(CFE_PSP_SimStepping_Core_t *core,
-                                                  uint32_t                   task_id,
-                                                  uint32_t                   delay_ms);
+int32_t ESA_Stepping_Core_ReportTaskDelay(ESA_Stepping_Core_t *core,
+                                                   uint32_t                   task_id,
+                                                   uint32_t                   delay_ms);
 
-int32_t CFE_PSP_SimStepping_Core_ReportTaskDelayReturn(CFE_PSP_SimStepping_Core_t *core,
-                                                        uint32_t                   task_id);
+int32_t ESA_Stepping_Core_ReportTaskDelayAck(ESA_Stepping_Core_t *core,
+                                                     uint32_t                   task_id,
+                                                     uint32_t                   delay_ms);
+
+int32_t ESA_Stepping_Core_ReportTaskDelayComplete(ESA_Stepping_Core_t *core,
+                                                          uint32_t                   task_id,
+                                                          uint32_t                   delay_ms);
+
+int32_t ESA_Stepping_Core_ReportTaskDelayReturn(ESA_Stepping_Core_t *core,
+                                                         uint32_t                   task_id);
 
 /**
  * \brief Report a queue receive boundary event
@@ -267,7 +275,7 @@ int32_t CFE_PSP_SimStepping_Core_ReportTaskDelayReturn(CFE_PSP_SimStepping_Core_
  *
  * \return 0 on success
  */
-int32_t CFE_PSP_SimStepping_Core_ReportQueueReceive(CFE_PSP_SimStepping_Core_t *core,
+int32_t ESA_Stepping_Core_ReportQueueReceive(ESA_Stepping_Core_t *core,
                                                     uint32_t                   queue_id,
                                                     uint32_t                   timeout_ms);
 
@@ -283,7 +291,7 @@ int32_t CFE_PSP_SimStepping_Core_ReportQueueReceive(CFE_PSP_SimStepping_Core_t *
  *
  * \return 0 on success
  */
-int32_t CFE_PSP_SimStepping_Core_ReportBinSemTake(CFE_PSP_SimStepping_Core_t *core,
+int32_t ESA_Stepping_Core_ReportBinSemTake(ESA_Stepping_Core_t *core,
                                                   uint32_t                   sem_id,
                                                   uint32_t                   timeout_ms);
 
@@ -297,7 +305,7 @@ int32_t CFE_PSP_SimStepping_Core_ReportBinSemTake(CFE_PSP_SimStepping_Core_t *co
  *
  * \return 0 on success
  */
-int32_t CFE_PSP_SimStepping_Core_ReportTimeTaskCycle(CFE_PSP_SimStepping_Core_t *core);
+int32_t ESA_Stepping_Core_ReportTimeTaskCycle(ESA_Stepping_Core_t *core);
 
 /**
  * \brief Report a 1Hz boundary event
@@ -309,7 +317,7 @@ int32_t CFE_PSP_SimStepping_Core_ReportTimeTaskCycle(CFE_PSP_SimStepping_Core_t 
  *
  * \return 0 on success
  */
-int32_t CFE_PSP_SimStepping_Core_Report1HzBoundary(CFE_PSP_SimStepping_Core_t *core);
+int32_t ESA_Stepping_Core_Report1HzBoundary(ESA_Stepping_Core_t *core);
 
 /**
  * \brief Report a tone signal event
@@ -321,7 +329,7 @@ int32_t CFE_PSP_SimStepping_Core_Report1HzBoundary(CFE_PSP_SimStepping_Core_t *c
  *
  * \return 0 on success
  */
-int32_t CFE_PSP_SimStepping_Core_ReportToneSignal(CFE_PSP_SimStepping_Core_t *core);
+int32_t ESA_Stepping_Core_ReportToneSignal(ESA_Stepping_Core_t *core);
 
 /**
  * \brief Report a scheduler semaphore wait boundary event
@@ -336,7 +344,7 @@ int32_t CFE_PSP_SimStepping_Core_ReportToneSignal(CFE_PSP_SimStepping_Core_t *co
  *
  * \return 0 on success
  */
-int32_t CFE_PSP_SimStepping_Core_ReportSchSemaphoreWait(CFE_PSP_SimStepping_Core_t *core,
+int32_t ESA_Stepping_Core_ReportSchSemaphoreWait(ESA_Stepping_Core_t *core,
                                                         uint32_t                   sem_id,
                                                         uint32_t                   timeout_ms);
 
@@ -351,7 +359,7 @@ int32_t CFE_PSP_SimStepping_Core_ReportSchSemaphoreWait(CFE_PSP_SimStepping_Core
  *
  * \return 0 on success
  */
-int32_t CFE_PSP_SimStepping_Core_ReportSchMinorFrame(CFE_PSP_SimStepping_Core_t *core);
+int32_t ESA_Stepping_Core_ReportSchMinorFrame(ESA_Stepping_Core_t *core);
 
 /**
  * \brief Report a scheduler major frame boundary event
@@ -364,23 +372,23 @@ int32_t CFE_PSP_SimStepping_Core_ReportSchMinorFrame(CFE_PSP_SimStepping_Core_t 
  *
  * \return 0 on success
  */
-int32_t CFE_PSP_SimStepping_Core_ReportSchMajorFrame(CFE_PSP_SimStepping_Core_t *core);
+int32_t ESA_Stepping_Core_ReportSchMajorFrame(ESA_Stepping_Core_t *core);
 
-int32_t CFE_PSP_SimStepping_Core_ReportSchSendTrigger(CFE_PSP_SimStepping_Core_t *core,
+int32_t ESA_Stepping_Core_ReportSchSendTrigger(ESA_Stepping_Core_t *core,
                                                          uint32_t                   target_id);
 
-int32_t CFE_PSP_SimStepping_Core_ReportSchDispatchComplete(CFE_PSP_SimStepping_Core_t *core);
+int32_t ESA_Stepping_Core_ReportSchDispatchComplete(ESA_Stepping_Core_t *core);
 
- int32_t CFE_PSP_SimStepping_Core_ReportCoreServiceCmdPipeReceive(CFE_PSP_SimStepping_Core_t *core,
+ int32_t ESA_Stepping_Core_ReportCoreServiceCmdPipeReceive(ESA_Stepping_Core_t *core,
                                                                    uint32_t                   service_id);
 
- int32_t CFE_PSP_SimStepping_Core_ReportCoreServiceCmdPipeComplete(CFE_PSP_SimStepping_Core_t *core,
+ int32_t ESA_Stepping_Core_ReportCoreServiceCmdPipeComplete(ESA_Stepping_Core_t *core,
                                                                     uint32_t                   service_id);
 
- int32_t CFE_PSP_SimStepping_Core_ReportTimeToneSemConsume(CFE_PSP_SimStepping_Core_t *core,
+ int32_t ESA_Stepping_Core_ReportTimeToneSemConsume(ESA_Stepping_Core_t *core,
                                                             uint32_t                   sem_id);
 
-int32_t CFE_PSP_SimStepping_Core_ReportTimeLocal1HzSemConsume(CFE_PSP_SimStepping_Core_t *core,
+int32_t ESA_Stepping_Core_ReportTimeLocal1HzSemConsume(ESA_Stepping_Core_t *core,
                                                                uint32_t                   sem_id);
 
 /**
@@ -394,7 +402,7 @@ int32_t CFE_PSP_SimStepping_Core_ReportTimeLocal1HzSemConsume(CFE_PSP_SimSteppin
  *
  * \return 0 if time retrieved successfully; non-zero error code if query failed
  */
-int32_t CFE_PSP_SimStepping_Core_QuerySimTime(CFE_PSP_SimStepping_Core_t *core,
+int32_t ESA_Stepping_Core_QuerySimTime(ESA_Stepping_Core_t *core,
                                                 uint64_t                   *sim_time_ns);
 
 /**
@@ -418,7 +426,7 @@ int32_t CFE_PSP_SimStepping_Core_QuerySimTime(CFE_PSP_SimStepping_Core_t *core,
  * \return true if delay can be handled (core initialized, gate ON, task opted-in, delay is exact quantum multiple);
  *         false if delay cannot be handled or core not initialized
  */
-bool CFE_PSP_SimStepping_Core_QueryTaskDelayEligible(CFE_PSP_SimStepping_Core_t *core,
+bool ESA_Stepping_Core_QueryTaskDelayEligible(ESA_Stepping_Core_t *core,
                                                       uint32_t                   task_id,
                                                       uint32_t                   delay_ms);
 
@@ -437,7 +445,7 @@ bool CFE_PSP_SimStepping_Core_QueryTaskDelayEligible(CFE_PSP_SimStepping_Core_t 
  *
  * \return 0 on success (delay satisfied); negative on error
  */
-int32_t CFE_PSP_SimStepping_Core_WaitForDelayExpiry(CFE_PSP_SimStepping_Core_t *core,
+int32_t ESA_Stepping_Core_WaitForDelayExpiry(ESA_Stepping_Core_t *core,
                                                      uint32_t                   task_id,
                                                      uint32_t                   delay_ms);
 
@@ -455,7 +463,7 @@ int32_t CFE_PSP_SimStepping_Core_WaitForDelayExpiry(CFE_PSP_SimStepping_Core_t *
  *
  * \return 0 on success
  */
-int32_t CFE_PSP_SimStepping_Core_ReportQueueReceiveAck(CFE_PSP_SimStepping_Core_t *core,
+int32_t ESA_Stepping_Core_ReportQueueReceiveAck(ESA_Stepping_Core_t *core,
                                                         uint32_t                   task_id,
                                                         uint32_t                   queue_id,
                                                         uint32_t                   timeout_ms);
@@ -474,7 +482,7 @@ int32_t CFE_PSP_SimStepping_Core_ReportQueueReceiveAck(CFE_PSP_SimStepping_Core_
  *
  * \return 0 on success
  */
-int32_t CFE_PSP_SimStepping_Core_ReportQueueReceiveComplete(CFE_PSP_SimStepping_Core_t *core,
+int32_t ESA_Stepping_Core_ReportQueueReceiveComplete(ESA_Stepping_Core_t *core,
                                                              uint32_t                   task_id,
                                                              uint32_t                   queue_id,
                                                              uint32_t                   timeout_ms);
@@ -487,7 +495,7 @@ int32_t CFE_PSP_SimStepping_Core_ReportQueueReceiveComplete(CFE_PSP_SimStepping_
  * time by the step quantum value.
  *
  * This is the sole write-path for sim_time_ns and next_sim_time_ns; all other
- * read-side queries use CFE_PSP_SimStepping_Core_QuerySimTime().
+ * read-side queries use ESA_Stepping_Core_QuerySimTime().
  *
  * \param[in]  core  Pointer to core structure
  *
@@ -497,7 +505,7 @@ int32_t CFE_PSP_SimStepping_Core_ReportQueueReceiveComplete(CFE_PSP_SimStepping_
  * \note This function is PRIVATE to the PSP stepping core and is not exposed
  *       to external callers. It is intended for future control-channel integration.
  */
-int32_t CFE_PSP_SimStepping_Core_AdvanceOneQuantum(CFE_PSP_SimStepping_Core_t *core);
+int32_t ESA_Stepping_Core_AdvanceOneQuantum(ESA_Stepping_Core_t *core);
 
 /**
  * \brief Report a binary semaphore take ack boundary event (pre-wait)
@@ -513,7 +521,7 @@ int32_t CFE_PSP_SimStepping_Core_AdvanceOneQuantum(CFE_PSP_SimStepping_Core_t *c
  *
  * \return 0 on success
  */
-int32_t CFE_PSP_SimStepping_Core_ReportBinSemTakeAck(CFE_PSP_SimStepping_Core_t *core,
+int32_t ESA_Stepping_Core_ReportBinSemTakeAck(ESA_Stepping_Core_t *core,
                                                      uint32_t                   task_id,
                                                      uint32_t                   sem_id,
                                                      uint32_t                   timeout_ms);
@@ -532,7 +540,7 @@ int32_t CFE_PSP_SimStepping_Core_ReportBinSemTakeAck(CFE_PSP_SimStepping_Core_t 
  *
  * \return 0 on success
  */
-int32_t CFE_PSP_SimStepping_Core_ReportBinSemTakeComplete(CFE_PSP_SimStepping_Core_t *core,
+int32_t ESA_Stepping_Core_ReportBinSemTakeComplete(ESA_Stepping_Core_t *core,
                                                            uint32_t                   task_id,
                                                            uint32_t                   sem_id,
                                                            uint32_t                   timeout_ms);
@@ -550,10 +558,10 @@ int32_t CFE_PSP_SimStepping_Core_ReportBinSemTakeComplete(CFE_PSP_SimStepping_Co
  * \return 0 on success; -1 if core null or state query failed
  *
  * \note This is an internal API for the PSP stepping module's in-process adapter.
- *       External callers should use the public adapter API (CFE_PSP_SimStepping_InProc_*).
+ *       External callers should use the public adapter API (ESA_Stepping_InProc_*).
  */
-int32_t CFE_PSP_SimStepping_Core_QueryState(CFE_PSP_SimStepping_Core_t *core,
-                                            CFE_PSP_SimStepping_CoreState_t *state_out);
+int32_t ESA_Stepping_Core_QueryState(ESA_Stepping_Core_t *core,
+                                            ESA_Stepping_CoreState_t *state_out);
 
 /**
  * \brief Check if the current step cycle is complete (internal API for in-process adapter)
@@ -568,9 +576,9 @@ int32_t CFE_PSP_SimStepping_Core_QueryState(CFE_PSP_SimStepping_Core_t *core,
  * \return true if step is complete; false if still running, waiting, or core null
  *
  * \note This is an internal API for the PSP stepping module's in-process adapter.
- *       External callers should use the public adapter API (CFE_PSP_SimStepping_InProc_*).
+ *       External callers should use the public adapter API (ESA_Stepping_InProc_*).
  */
-bool CFE_PSP_SimStepping_Core_IsStepComplete(CFE_PSP_SimStepping_Core_t *core);
+bool ESA_Stepping_Core_IsStepComplete(ESA_Stepping_Core_t *core);
 
 /**
  * \brief Begin a new step session with explicit bookkeeping
@@ -582,12 +590,12 @@ bool CFE_PSP_SimStepping_Core_IsStepComplete(CFE_PSP_SimStepping_Core_t *core);
  *
  * \param[in]  core  Pointer to core structure
  *
- * \return CFE_PSP_SIM_STEPPING_STATUS_SUCCESS on success
- * \return CFE_PSP_SIM_STEPPING_STATUS_FAILURE if core is null
- * \return CFE_PSP_SIM_STEPPING_STATUS_NOT_READY if lifecycle readiness not reached
- * \return CFE_PSP_SIM_STEPPING_STATUS_DUPLICATE_BEGIN if prior session is unresolved
+ * \return ESA_SIM_STEPPING_STATUS_SUCCESS on success
+ * \return ESA_SIM_STEPPING_STATUS_FAILURE if core is null
+ * \return ESA_SIM_STEPPING_STATUS_NOT_READY if lifecycle readiness not reached
+ * \return ESA_SIM_STEPPING_STATUS_DUPLICATE_BEGIN if prior session is unresolved
  */
-int32_t CFE_PSP_SimStepping_Core_BeginStepSession(CFE_PSP_SimStepping_Core_t *core);
+int32_t ESA_Stepping_Core_BeginStepSession(ESA_Stepping_Core_t *core);
 
 /**
  * \brief Mark the system as ready for simulation stepping
@@ -603,7 +611,7 @@ int32_t CFE_PSP_SimStepping_Core_BeginStepSession(CFE_PSP_SimStepping_Core_t *co
  *
  * \return 0 on success; -1 if core null
  */
-int32_t CFE_PSP_SimStepping_Core_MarkSystemReadyForStepping(CFE_PSP_SimStepping_Core_t *core);
+int32_t ESA_Stepping_Core_MarkSystemReadyForStepping(ESA_Stepping_Core_t *core);
 
 /**
  * \brief Record one diagnostic event with normalized class/status logging
@@ -618,13 +626,13 @@ int32_t CFE_PSP_SimStepping_Core_MarkSystemReadyForStepping(CFE_PSP_SimStepping_
  * \param[in] detail_a    Optional numeric detail A
  * \param[in] detail_b    Optional numeric detail B
  *
- * \return status value passed in, or CFE_PSP_SIM_STEPPING_STATUS_FAILURE if core/site invalid
+ * \return status value passed in, or ESA_SIM_STEPPING_STATUS_FAILURE if core/site invalid
  */
-int32_t CFE_PSP_SimStepping_Core_RecordDiagnostic(CFE_PSP_SimStepping_Core_t *core,
-                                                   CFE_PSP_SimStepping_DiagnosticClass_t diag_class,
+int32_t ESA_Stepping_Core_RecordDiagnostic(ESA_Stepping_Core_t *core,
+                                                   ESA_Stepping_DiagnosticClass_t diag_class,
                                                    int32_t status,
                                                    const char *site,
                                                    uint32_t detail_a,
                                                    uint32_t detail_b);
 
-#endif /* CFE_PSP_SIM_STEPPING_CORE_H */
+#endif /* ESA_SIM_STEPPING_CORE_H */

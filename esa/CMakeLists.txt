@@ -16,8 +16,8 @@ target_link_libraries(esa_public_api INTERFACE
 if (CFE_SIM_STEPPING)
     set(ESA_SIM_STEPPING_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/fsw/src")
     add_library(esa STATIC
-        "${ESA_SIM_STEPPING_SRC_DIR}/cfe_psp_sim_stepping.c"
-        "${ESA_SIM_STEPPING_SRC_DIR}/cfe_psp_sim_stepping_core.c"
+        "${ESA_SIM_STEPPING_SRC_DIR}/esa_stepping.c"
+        "${ESA_SIM_STEPPING_SRC_DIR}/esa_stepping_core.c"
     )
 
     target_include_directories(esa PRIVATE
@@ -54,18 +54,18 @@ if (CFE_SIM_STEPPING)
         file(WRITE "${ESA_UT_COVERAGE_SHIM_STUB_SRC}"
             "#include <stdint.h>\n"
             "#include <stdbool.h>\n"
-            "__attribute__((weak)) int32_t CFE_PSP_SimStepping_Shim_ReportEvent(const void *event)\n"
+            "__attribute__((weak)) int32_t ESA_Stepping_Shim_ReportEvent(const void *event)\n"
             "{\n"
             "    (void)event;\n"
             "    return 0;\n"
             "}\n"
-            "__attribute__((weak)) bool CFE_PSP_SimStepping_Hook_TaskDelayEligible(uint32_t task_id, uint32_t delay_ms)\n"
+            "__attribute__((weak)) bool ESA_Stepping_Hook_TaskDelayEligible(uint32_t task_id, uint32_t delay_ms)\n"
             "{\n"
             "    (void)task_id;\n"
             "    (void)delay_ms;\n"
             "    return false;\n"
             "}\n"
-            "__attribute__((weak)) int32_t CFE_PSP_SimStepping_WaitForDelayExpiry(uint32_t task_id, uint32_t delay_ms)\n"
+            "__attribute__((weak)) int32_t ESA_Stepping_WaitForDelayExpiry(uint32_t task_id, uint32_t delay_ms)\n"
             "{\n"
             "    (void)task_id;\n"
             "    (void)delay_ms;\n"
