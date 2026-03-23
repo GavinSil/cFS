@@ -1046,7 +1046,7 @@ Wave FINAL（所有任务后 — 4 个并行审查 + 用户确认）:
   **Commit**: YES
   - Message: `refactor: rename CFE_PSP_SimStepping to ESA_Stepping across codebase`
 
-- [ ] 12. 删除兼容性别名 + 最终清理
+- [x] 12. 删除兼容性别名 + 最终清理
 
   **做什么**:
   1. 删除 `esa/public_inc/cfe_psp_sim_stepping_compat.h`
@@ -1111,7 +1111,7 @@ Wave FINAL（所有任务后 — 4 个并行审查 + 用户确认）:
   **Commit**: YES
   - Message: `refactor(esa): remove compatibility aliases, complete API rename`
 
-- [ ] 13. OSAL Hook 单元测试（3 个 Hook × 双阶段）
+- [x] 13. OSAL Hook 单元测试（3 个 Hook × 双阶段）
 
   **做什么**:
   1. 创建测试文件 `esa/ut-coverage/coveragetest-osal-hooks.c`（放在 ESA 测试套件下而非 OSAL，因为 OSAL 的 `add_osal_ut_exe` 只链接 `ut_assert + osal`，不链接 ESA shim stubs，而 hook 测试需要验证 hook→shim 的交互）
@@ -1204,7 +1204,7 @@ Wave FINAL（所有任务后 — 4 个并行审查 + 用户确认）:
   **Commit**: YES（与 T14, T15 合并）
   - Message: `test(esa): add TDD unit tests for all stepping hooks`
 
-- [ ] 14. cFE 模块 Stepping 集成测试（ES/EVS/SB/TBL）
+- [x] 14. cFE 模块 Stepping 集成测试（ES/EVS/SB/TBL）
 
   **做什么**:
   1. 扩展 `esa/ut-coverage/coveragetest-sim_stepping.c` 或创建新测试文件
@@ -1264,7 +1264,7 @@ Wave FINAL（所有任务后 — 4 个并行审查 + 用户确认）:
 
   **Commit**: YES（与 T13, T15 合并）
 
-- [ ] 15. TIME Stepping Hook 测试
+- [x] 15. TIME Stepping Hook 测试
 
   **做什么**:
   1. 为 TIME 的 3 个 stepping hook 编写 TDD 测试:
@@ -1310,7 +1310,7 @@ Wave FINAL（所有任务后 — 4 个并行审查 + 用户确认）:
 
   **Commit**: YES（与 T13, T14 合并）
 
-- [ ] 16. ESA README 文档
+- [x] 16. ESA README 文档
 
   **做什么**:
   1. 创建 `esa/README.md`，内容包含:
@@ -1375,7 +1375,7 @@ Wave FINAL（所有任务后 — 4 个并行审查 + 用户确认）:
   - Message: `docs(esa): add ESA stepping engine README`
   - Files: `esa/README.md`
 
-- [ ] 17. 端到端集成验证
+- [x] 17. 端到端集成验证
 
   **做什么**:
   1. 执行完整的 stepping 构建 + 测试验证:
@@ -1467,19 +1467,19 @@ Wave FINAL（所有任务后 — 4 个并行审查 + 用户确认）:
 >
 > 在验证后不要自动继续。等待用户明确批准后才标记工作完成。
 
-- [ ] F1. **计划合规审计** — `oracle`
+- [x] F1. **计划合规审计** — `oracle`
   逐条阅读计划。对每个"必须有"：验证实现存在（读取文件、运行命令）。对每个"必须没有"：搜索代码库中的禁止模式 — 发现则拒绝并给出 file:line。检查 `.sisyphus/evidence/` 中的证据文件。对比交付物与计划。
   输出: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
 
-- [ ] F2. **代码质量审查** — `unspecified-high`
+- [x] F2. **代码质量审查** — `unspecified-high`
   运行 `make SIMULATION=native CFE_SIM_STEPPING=1 ENABLE_UNIT_TESTS=true prep && make` + `make test`。审查所有变更文件：检查 `as any`/注释掉的代码、未使用的 include、空 catch。检查 AI 风格问题：过度注释、过度抽象、泛型命名。验证所有变更在 `#ifdef CFE_SIM_STEPPING` 保护下。
   输出: `Build [PASS/FAIL] | Tests [N pass/N fail] | Files [N clean/N issues] | VERDICT`
 
-- [ ] F3. **真实 QA 验证** — `unspecified-high`
+- [x] F3. **真实 QA 验证** — `unspecified-high`
   从干净状态开始。执行每个任务的每个 QA 场景 — 按照精确步骤，捕获证据。测试跨任务集成（功能协同工作）。测试边界情况：stepping 禁用时零副作用、stepping 启用但无控制器连接时的行为。保存到 `.sisyphus/evidence/final-qa/`。
   输出: `Scenarios [N/N pass] | Integration [N/N] | Edge Cases [N tested] | VERDICT`
 
-- [ ] F4. **范围保真度检查** — `deep`
+- [x] F4. **范围保真度检查** — `deep`
   对每个任务：阅读"做什么"，阅读实际 diff。验证 1:1 — spec 中的所有内容都已构建（无遗漏），spec 之外的内容未被构建（无蔓延）。检查"必须没有"合规性。检测跨任务污染：任务 N 触及任务 M 的文件。标记未计入的变更。
   输出: `Tasks [N/N compliant] | Contamination [CLEAN/N issues] | Unaccounted [CLEAN/N files] | VERDICT`
 
@@ -1526,9 +1526,9 @@ grep -r "CFE_PSP_SimStepping" --include="*.c" --include="*.h" /workspace/cFS/  #
 ```
 
 ### 最终检查清单
-- [ ] 所有"必须有"存在
-- [ ] 所有"必须没有"不存在
-- [ ] 所有测试通过
-- [ ] API 重命名完整
-- [ ] 非 stepping 构建不受影响
-- [ ] 文档完整
+- [x] 所有"必须有"存在
+- [x] 所有"必须没有"不存在
+- [x] 所有测试通过
+- [x] API 重命名完整
+- [x] 非 stepping 构建不受影响
+- [x] 文档完整
