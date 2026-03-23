@@ -46,6 +46,8 @@
 #include "esa_stepping_shim.h"
 #include "os-posix-stepping.h"
 #include "os-shared-idmap.h"
+#include "osapi-idmap.h"
+#include "osapi-task.h"
 
 /*
  * Hook context: captures the event passed to ESA_Stepping_Shim_ReportEvent
@@ -175,19 +177,23 @@ void Test_OSAL_Hook_TaskDelay_Sequence(void)
 void Test_OSAL_Hook_QueueReceive_ACK(void)
 {
     OS_object_token_t TestToken;
+    osal_id_t TestQueueId = OS_ObjectIdFromInteger(0x00020033UL);
     int32 TestTimeout = 1000;
+    uint32 ExpectedTaskId;
 
     memset(&TestToken, 0, sizeof(TestToken));
-    TestToken.obj_idx = 99;
+    TestToken.obj_id = TestQueueId;
+
+    UT_SetDefaultReturnValue(UT_KEY(OS_TaskGetId), 0x100AA);
+    ExpectedTaskId = (uint32)OS_ObjectIdToInteger(OS_TaskGetId());
 
     OS_PosixStepping_Hook_QueueReceive(&TestToken, TestTimeout);
 
     UtAssert_UINT32_EQ(GlobalHookContext.EventCount, 1);
     UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.event_kind, ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_ACK);
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.entity_id, (uint32)OS_ObjectIdToInteger(TestQueueId));
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.task_id, ExpectedTaskId);
     UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.optional_delay_ms, (uint32_t)TestTimeout);
-    /* entity_id is set from token (may be 0 if token not fully initialized in unit test) */
-    /* task_id is set from current task and should be non-zero */
-    UtAssert_NONZERO(GlobalHookContext.CapturedEvent.task_id);
 }
 
 /**
@@ -202,19 +208,23 @@ void Test_OSAL_Hook_QueueReceive_ACK(void)
 void Test_OSAL_Hook_QueueReceive_Complete(void)
 {
     OS_object_token_t TestToken;
+    osal_id_t TestQueueId = OS_ObjectIdFromInteger(0x00020044UL);
     int32 TestTimeout = 500;
+    uint32 ExpectedTaskId;
 
     memset(&TestToken, 0, sizeof(TestToken));
-    TestToken.obj_idx = 99;
+    TestToken.obj_id = TestQueueId;
+
+    UT_SetDefaultReturnValue(UT_KEY(OS_TaskGetId), 0x100AB);
+    ExpectedTaskId = (uint32)OS_ObjectIdToInteger(OS_TaskGetId());
 
     OS_PosixStepping_Hook_QueueReceive_Complete(&TestToken, TestTimeout, OS_SUCCESS);
 
     UtAssert_UINT32_EQ(GlobalHookContext.EventCount, 1);
     UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.event_kind, ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_COMPLETE);
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.entity_id, (uint32)OS_ObjectIdToInteger(TestQueueId));
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.task_id, ExpectedTaskId);
     UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.optional_delay_ms, (uint32_t)TestTimeout);
-    /* entity_id is set from token (may be 0 if token not fully initialized in unit test) */
-    /* task_id is set from current task and should be non-zero */
-    UtAssert_NONZERO(GlobalHookContext.CapturedEvent.task_id);
 }
 
 /**
@@ -225,16 +235,24 @@ void Test_OSAL_Hook_QueueReceive_Complete(void)
 void Test_OSAL_Hook_QueueReceive_Complete_OnError(void)
 {
     OS_object_token_t TestToken;
+    osal_id_t TestQueueId = OS_ObjectIdFromInteger(0x00020055UL);
     int32 TestTimeout = 100;
     int32 TestReturnCode = -1;  /* Error code */
+    uint32 ExpectedTaskId;
 
     memset(&TestToken, 0, sizeof(TestToken));
-    TestToken.obj_idx = 7;
+    TestToken.obj_id = TestQueueId;
+
+    UT_SetDefaultReturnValue(UT_KEY(OS_TaskGetId), 0x100AC);
+    ExpectedTaskId = (uint32)OS_ObjectIdToInteger(OS_TaskGetId());
 
     OS_PosixStepping_Hook_QueueReceive_Complete(&TestToken, TestTimeout, TestReturnCode);
 
     UtAssert_UINT32_EQ(GlobalHookContext.EventCount, 1);
     UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.event_kind, ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_COMPLETE);
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.entity_id, (uint32)OS_ObjectIdToInteger(TestQueueId));
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.task_id, ExpectedTaskId);
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.optional_delay_ms, (uint32_t)TestTimeout);
 }
 
 /**
@@ -243,18 +261,29 @@ void Test_OSAL_Hook_QueueReceive_Complete_OnError(void)
 void Test_OSAL_Hook_QueueReceive_Sequence(void)
 {
     OS_object_token_t TestToken;
+    osal_id_t TestQueueId = OS_ObjectIdFromInteger(0x00020066UL);
     int32 TestTimeout = 2000;
+    uint32 ExpectedTaskId;
 
     memset(&TestToken, 0, sizeof(TestToken));
-    TestToken.obj_idx = 55;
+    TestToken.obj_id = TestQueueId;
+
+    UT_SetDefaultReturnValue(UT_KEY(OS_TaskGetId), 0x100AD);
+    ExpectedTaskId = (uint32)OS_ObjectIdToInteger(OS_TaskGetId());
 
     OS_PosixStepping_Hook_QueueReceive(&TestToken, TestTimeout);
     UtAssert_UINT32_EQ(GlobalHookContext.EventCount, 1);
     UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.event_kind, ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_ACK);
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.entity_id, (uint32)OS_ObjectIdToInteger(TestQueueId));
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.task_id, ExpectedTaskId);
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.optional_delay_ms, (uint32_t)TestTimeout);
 
     OS_PosixStepping_Hook_QueueReceive_Complete(&TestToken, TestTimeout, 0);
     UtAssert_UINT32_EQ(GlobalHookContext.EventCount, 2);
     UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.event_kind, ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_COMPLETE);
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.entity_id, (uint32)OS_ObjectIdToInteger(TestQueueId));
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.task_id, ExpectedTaskId);
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.optional_delay_ms, (uint32_t)TestTimeout);
 }
 
 /* ============================================================================
@@ -273,20 +302,24 @@ void Test_OSAL_Hook_QueueReceive_Sequence(void)
 void Test_OSAL_Hook_BinSemTake_ACK(void)
 {
     OS_object_token_t TestToken;
+    osal_id_t TestBinSemId = OS_ObjectIdFromInteger(0x00040044UL);
     struct timespec TestTimeout;
+    uint32 ExpectedTaskId;
 
     memset(&TestToken, 0, sizeof(TestToken));
-    TestToken.obj_idx = 99;
+    TestToken.obj_id = TestBinSemId;
     TestTimeout.tv_sec = 1;
     TestTimeout.tv_nsec = 500000000;
+
+    UT_SetDefaultReturnValue(UT_KEY(OS_TaskGetId), 0x100BA);
+    ExpectedTaskId = (uint32)OS_ObjectIdToInteger(OS_TaskGetId());
 
     OS_PosixStepping_Hook_BinSemTake(&TestToken, &TestTimeout);
 
     UtAssert_UINT32_EQ(GlobalHookContext.EventCount, 1);
     UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.event_kind, ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_ACK);
-    /* entity_id is set from token (may be 0 if token not fully initialized in unit test) */
-    /* task_id is set from current task and should be non-zero */
-    UtAssert_NONZERO(GlobalHookContext.CapturedEvent.task_id);
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.entity_id, (uint32)OS_ObjectIdToInteger(TestBinSemId));
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.task_id, ExpectedTaskId);
 }
 
 /**
@@ -301,20 +334,24 @@ void Test_OSAL_Hook_BinSemTake_ACK(void)
 void Test_OSAL_Hook_BinSemTake_Complete(void)
 {
     OS_object_token_t TestToken;
+    osal_id_t TestBinSemId = OS_ObjectIdFromInteger(0x00040055UL);
     struct timespec TestTimeout;
+    uint32 ExpectedTaskId;
 
     memset(&TestToken, 0, sizeof(TestToken));
-    TestToken.obj_idx = 99;
+    TestToken.obj_id = TestBinSemId;
     TestTimeout.tv_sec = 0;
     TestTimeout.tv_nsec = 0;
+
+    UT_SetDefaultReturnValue(UT_KEY(OS_TaskGetId), 0x100BB);
+    ExpectedTaskId = (uint32)OS_ObjectIdToInteger(OS_TaskGetId());
 
     OS_PosixStepping_Hook_BinSemTake_Complete(&TestToken, &TestTimeout, OS_SUCCESS);
 
     UtAssert_UINT32_EQ(GlobalHookContext.EventCount, 1);
     UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.event_kind, ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_COMPLETE);
-    /* entity_id is set from token (may be 0 if token not fully initialized in unit test) */
-    /* task_id is set from current task and should be non-zero */
-    UtAssert_NONZERO(GlobalHookContext.CapturedEvent.task_id);
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.entity_id, (uint32)OS_ObjectIdToInteger(TestBinSemId));
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.task_id, ExpectedTaskId);
 }
 
 /**
@@ -326,17 +363,24 @@ void Test_OSAL_Hook_BinSemTake_Complete(void)
 void Test_OSAL_Hook_BinSemTake_Complete_OnTimeout(void)
 {
     OS_object_token_t TestToken;
+    osal_id_t TestBinSemId = OS_ObjectIdFromInteger(0x00040066UL);
     struct timespec TestTimeout;
     int32 TestReturnCode = -3;  /* OS_SEM_TIMEOUT analog */
+    uint32 ExpectedTaskId;
 
     memset(&TestToken, 0, sizeof(TestToken));
-    TestToken.obj_idx = 66;
+    TestToken.obj_id = TestBinSemId;
     memset(&TestTimeout, 0, sizeof(TestTimeout));
+
+    UT_SetDefaultReturnValue(UT_KEY(OS_TaskGetId), 0x100BC);
+    ExpectedTaskId = (uint32)OS_ObjectIdToInteger(OS_TaskGetId());
 
     OS_PosixStepping_Hook_BinSemTake_Complete(&TestToken, &TestTimeout, TestReturnCode);
 
     UtAssert_UINT32_EQ(GlobalHookContext.EventCount, 1);
     UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.event_kind, ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_COMPLETE);
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.entity_id, (uint32)OS_ObjectIdToInteger(TestBinSemId));
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.task_id, ExpectedTaskId);
 }
 
 /**
@@ -345,21 +389,30 @@ void Test_OSAL_Hook_BinSemTake_Complete_OnTimeout(void)
 void Test_OSAL_Hook_BinSemTake_Sequence(void)
 {
     OS_object_token_t TestToken;
+    osal_id_t TestBinSemId = OS_ObjectIdFromInteger(0x00040077UL);
     struct timespec TestTimeout;
+    uint32 ExpectedTaskId;
 
     memset(&TestToken, 0, sizeof(TestToken));
-    TestToken.obj_idx = 77;
+    TestToken.obj_id = TestBinSemId;
     memset(&TestTimeout, 0, sizeof(TestTimeout));
     TestTimeout.tv_sec = 0;
     TestTimeout.tv_nsec = 100000000;
 
+    UT_SetDefaultReturnValue(UT_KEY(OS_TaskGetId), 0x100BD);
+    ExpectedTaskId = (uint32)OS_ObjectIdToInteger(OS_TaskGetId());
+
     OS_PosixStepping_Hook_BinSemTake(&TestToken, &TestTimeout);
     UtAssert_UINT32_EQ(GlobalHookContext.EventCount, 1);
     UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.event_kind, ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_ACK);
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.entity_id, (uint32)OS_ObjectIdToInteger(TestBinSemId));
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.task_id, ExpectedTaskId);
 
     OS_PosixStepping_Hook_BinSemTake_Complete(&TestToken, &TestTimeout, 0);
     UtAssert_UINT32_EQ(GlobalHookContext.EventCount, 2);
     UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.event_kind, ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_COMPLETE);
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.entity_id, (uint32)OS_ObjectIdToInteger(TestBinSemId));
+    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.task_id, ExpectedTaskId);
 }
 
 /* ============================================================================
