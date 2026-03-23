@@ -1,0 +1,44 @@
+task-17 hook integration evidence
+
+[count breakdown]
+osal/src/os/posix/src/os-posix-stepping.c = 6
+cfe/modules/es/fsw/src/cfe_es_task.c = 2
+cfe/modules/evs/fsw/src/cfe_evs_task.c = 2
+cfe/modules/sb/fsw/src/cfe_sb_task.c = 2
+cfe/modules/tbl/fsw/src/cfe_tbl_task.c = 2
+cfe/modules/time/fsw/src/cfe_time_stepping.c = 3
+
+OSAL total = 6
+cFE core-service total = 8
+TIME total = 3
+overall total = 17
+
+[exact matching lines]
+/workspace/cFS/osal/src/os/posix/src/os-posix-stepping.c
+  64: ESA_Stepping_Shim_ReportEvent(&event);
+  78: ESA_Stepping_Shim_ReportEvent(&event);
+  101: ESA_Stepping_Shim_ReportEvent(&event);
+  118: ESA_Stepping_Shim_ReportEvent(&event);
+  140: ESA_Stepping_Shim_ReportEvent(&event);
+  157: ESA_Stepping_Shim_ReportEvent(&event);
+
+/workspace/cFS/cfe/modules/es/fsw/src/cfe_es_task.c
+  178: ESA_Stepping_Shim_ReportEvent(&stepping_event);
+  186: ESA_Stepping_Shim_ReportEvent(&stepping_event);
+
+/workspace/cFS/cfe/modules/evs/fsw/src/cfe_evs_task.c
+  246: ESA_Stepping_Shim_ReportEvent(&stepping_event);
+  255: ESA_Stepping_Shim_ReportEvent(&stepping_event);
+
+/workspace/cFS/cfe/modules/sb/fsw/src/cfe_sb_task.c
+  122: ESA_Stepping_Shim_ReportEvent(&stepping_event);
+  131: ESA_Stepping_Shim_ReportEvent(&stepping_event);
+
+/workspace/cFS/cfe/modules/tbl/fsw/src/cfe_tbl_task.c
+  103: ESA_Stepping_Shim_ReportEvent(&stepping_event);
+  112: ESA_Stepping_Shim_ReportEvent(&stepping_event);
+
+/workspace/cFS/cfe/modules/time/fsw/src/cfe_time_stepping.c
+  53: ESA_Stepping_Shim_ReportEvent(&event);
+  70: ESA_Stepping_Shim_ReportEvent(&event);
+  87: ESA_Stepping_Shim_ReportEvent(&event);

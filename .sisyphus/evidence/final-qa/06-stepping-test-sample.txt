@@ -1,0 +1,17 @@
+Test project /workspace/cFS/build/native/default_cpu1
+(Sample excerpt showing test registration range - full list in 08-stepping-test-list.txt)
+
+Test #1-85: OSAL coverage and integration tests
+Test #86: coverage-es-ALL
+Test #87: coverage-evs-ALL
+Test #88: coverage-fs-ALL
+Test #89: coverage-sb-ALL
+Test #90: coverage-tbl-ALL
+Test #91: coverage-time-ALL
+Test #92: coverage-esa-sim_stepping
+Test #93: coverage-esa-time_hooks
+Test #94: coverage-esa-core_services
+Test #95: coverage-esa-osal_hooks
+Test #96-121: PSP, MSG/SBR, config, sample_app/lib tests
+
+Total Tests: 121
