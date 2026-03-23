@@ -483,19 +483,3 @@ static int dispatch_command(EST_ReplContext_t *ctx, char *line)
     fprintf(stderr, "未知命令: '%s'。输入 'help' 查看可用命令。\n", argv[0]);
     return -1;
 }
-
-/**
- * @brief 在主程序入口尚未接入 REPL 时自动运行 REPL
- * @note 该函数通过构造器在 main() 前执行，仅用于 REPL 层独立验证。
- */
-__attribute__((constructor)) static void est_repl_autorun(void)
-{
-    EST_ReplContext_t ctx;
-
-    memset(&ctx, 0, sizeof(ctx));
-    strncpy(ctx.socket_path, EST_DEFAULT_SOCKET_PATH, sizeof(ctx.socket_path) - 1);
-    ctx.socket_path[sizeof(ctx.socket_path) - 1] = '\0';
-    ctx.interrupted = 0;
-
-    (void)est_repl_run(&ctx);
-}
