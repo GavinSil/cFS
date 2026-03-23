@@ -440,3 +440,30 @@ End of automated findings.
 - 无外部调用需要进一步迁移（T11 已处理）
 - 不再需要在构建时提供 compat 别名或弱符号转发
 
+
+## 术语统一修正返工（本次追加）
+
+### 修正文件列表
+- `esa/fsw/inc/esa_stepping.h`
+  - Line 27: "at the ESA level" → "within the External Simulation Adapter"
+  - Line 65: "Initialize ESA stepping module" → "Initialize the External Simulation Adapter (ESA) stepping module"
+  - Line 124: "PSP-owned" → "ESA-owned"
+- `esa/fsw/inc/esa_stepping_core.h`
+  - Line 51: "PSP-LOCAL" → "ESA-LOCAL"
+  - Line 436: "PSP-owned" → "ESA-owned"
+  - Line 553, 572: "internal PSP API" → "internal ESA API"
+- `osal/src/bsp/generic-linux/src/bsp_start.c`
+  - Line 234: "Initialize ESA stepping module" → "Initialize the External Simulation Adapter (ESA) stepping module"
+
+### 统一口径
+- 中文场景：`外部仿真适配器（ESA）`
+- 英文场景：`External Simulation Adapter (ESA)` 或简称 `ESA`
+- 模块归属描述：`ESA-owned`, `ESA-LOCAL`, `internal ESA API`
+
+### 验证结果
+`grep -nE "PSP-LOCAL|PSP-owned|internal PSP API|ESA level|Initialize ESA stepping module|Event-Step-Advance"` 在目标文件中无命中。
+
+## T13 entity_id 精确断言修复（追加）
+- QueueReceive/BinSemTake 测试采用确定性 ID 策略：直接设置 `OS_object_token_t token` 的 `token.obj_id = OS_ObjectIdFromInteger(<固定值>)`，使 `OS_ObjectIdToInteger(OS_ObjectIdFromToken(token))` 返回可预测对象 ID。
+- task_id 采用确定性桩返回：`UT_SetDefaultReturnValue(UT_KEY(OS_TaskGetId), <固定值>)`，并以 `ExpectedTaskId = (uint32)OS_ObjectIdToInteger(OS_TaskGetId())` 计算期望值后做精确断言。
+- 结果：Queue/BinSem 的 ACK/COMPLETE 相关测试均改为显式断言 `entity_id` 精确值，同时保留 `event_kind`、`task_id` 与调用计数断言。
