@@ -1,6 +1,0 @@
-ESA Stepping Terminal v1.0
-默认 Socket: /tmp/custom.sock
-输入 'help' 查看可用命令
-
-est> 当前 Socket 路径: /tmp/custom.sock
-est> 再见

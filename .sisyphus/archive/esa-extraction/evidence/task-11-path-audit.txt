@@ -1,7 +1,0 @@
-COMMAND: grep -rn psp/fsw/modules/sim_stepping . --include=*.c --include=*.h --include=*.cmake --exclude-dir=.git --exclude-dir=.sisyphus --exclude-dir=build --exclude-dir=build-*
-SCOPE: active source trees only (excluding .git/, .sisyphus/, build/, and build-* scratch/build directories)
-STDOUT_BEGIN
-STDOUT_END
-STDERR_BEGIN
-STDERR_END
-PATH_AUDIT_EXIT_CODE= 1

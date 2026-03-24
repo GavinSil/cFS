@@ -9,4 +9,4 @@ build
 /.reservedkeyfile
 /.resetkeyfile
 /EEPROM.DAT
-/.sisyphus/boulder.json
+/.sisyphus/boulder.json.sisyphus/

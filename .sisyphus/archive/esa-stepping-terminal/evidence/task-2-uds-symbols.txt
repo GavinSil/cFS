@@ -1,5 +1,0 @@
-0000000000001659 T est_state_to_string
-00000000000015c6 T est_status_to_string
-00000000000015aa T est_uds_close
-00000000000013c1 T est_uds_connect
-00000000000014ba T est_uds_transact

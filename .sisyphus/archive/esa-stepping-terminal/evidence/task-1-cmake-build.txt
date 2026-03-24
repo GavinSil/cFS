@@ -1,7 +1,0 @@
-[ 25%] Building C object CMakeFiles/esa_stepping_terminal.dir/src/main.c.o
-[ 50%] Building C object CMakeFiles/esa_stepping_terminal.dir/src/repl.c.o
-/workspace/cFS/tools/esa_stepping_terminal/src/repl.c:2: warning: ISO C forbids an empty translation unit [-Wpedantic]
-[ 75%] Building C object CMakeFiles/esa_stepping_terminal.dir/src/uds_client.c.o
-/workspace/cFS/tools/esa_stepping_terminal/src/uds_client.c:2: warning: ISO C forbids an empty translation unit [-Wpedantic]
-[100%] Linking C executable esa_stepping_terminal
-[100%] Built target esa_stepping_terminal

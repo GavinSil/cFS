@@ -1,6 +1,0 @@
-ESA Stepping Terminal v1.0
-默认 Socket: /tmp/cfe_sim_stepping.sock
-输入 'help' 查看可用命令
-
-est> 用法: wait <timeout_ms>
-est> 再见
