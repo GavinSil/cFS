@@ -1,0 +1,6 @@
+ESA Stepping Terminal v1.0
+默认 Socket: /tmp/cfe_sim_stepping.sock
+输入 'help' 查看可用命令
+
+est> 未知命令: 'foobar'。输入 'help' 查看可用命令。
+est> 再见

@@ -108,6 +108,14 @@ void ESA_Init(void)
     if (status == 0)
     {
         core_initialized = true;
+        
+        /**
+         * @brief 系统初始化完成，通知步进状态机可以进入步进就绪状态
+         * 
+         * ESA_Init 在 CFE_ES_Main 返回后被调用，此时 cFS 已进入 OPERATIONAL 状态，
+         * 直接标记系统就绪，无需通过 Shim 事件中转。
+         */
+        ESA_Stepping_Core_MarkSystemReadyForStepping(&stepping_core);
     }
     else
     {
@@ -409,6 +417,19 @@ int32_t ESA_Stepping_InProc_BeginStep(void)
 
     status = ESA_Stepping_Core_BeginStepSession(&stepping_core);
 
+    /* 步进模式下主动唤醒 SCH（Scheduler）应用的定时信号量
+     * SCH 的时基定时器在步进模式被禁用，wall-clock 定时器不触发
+     * 主动 Give 信号量等效于一次 Minor Frame 定时器触发，让 SCH 运行一次调度周期
+     * 发送所有到期的消息（包括 SAMPLE_APP_SEND_HK_MID）*/
+    if (status == 0)
+    {
+        osal_id_t sch_sem_id;
+        if (OS_BinSemGetIdByName(&sch_sem_id, "SCH_TIME_SEM") == OS_SUCCESS)
+        {
+            OS_BinSemGive(sch_sem_id);
+        }
+    }
+
     return status;
 }
 
@@ -477,6 +498,18 @@ int32_t ESA_Stepping_InProc_WaitStepComplete(uint32_t timeout_ms)
         if (ESA_Stepping_Core_IsStepComplete(&stepping_core))
         {
             return 0;  /* Step complete - success */
+        }
+
+        /**
+         * @brief 步进模式下主动推进一次 SCH minor frame
+         *
+         * wall-clock 定时器在步进模式会被禁用，TIME->SCH 的自动链路不会触发。
+         * 当会话仍活跃且 completion_ready 未置位时，主动调用 ReportSchMinorFrame
+         * 以推进一个量子并设置 completion_ready，从而使 wait 能按设计完成。
+         */
+        if (stepping_core.session_active && !stepping_core.completion_ready)
+        {
+            ESA_Stepping_Core_ReportSchMinorFrame(&stepping_core);
         }
 
         /* Handle non-blocking poll: return immediately if not complete */

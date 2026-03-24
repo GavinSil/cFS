@@ -1,0 +1,4 @@
+81:        perror("socket");
+91:        perror("connect");
+111:        fprintf(stderr, "写入请求失败\n");
+118:        fprintf(stderr, "读取响应失败\n");

@@ -1,0 +1,7 @@
+ESA Stepping Terminal v1.0
+默认 Socket: /tmp/cfe_sim_stepping.sock
+输入 'help' 查看可用命令
+
+est> Socket 路径已更新为: /tmp/test.sock
+est> 当前 Socket 路径: /tmp/test.sock
+est> 再见
