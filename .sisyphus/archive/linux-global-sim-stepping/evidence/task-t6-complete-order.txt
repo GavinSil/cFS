@@ -1,0 +1,48 @@
+T6 scheduler vs system complete order verification (PASSED)
+Date: 2026-03-16
+
+Source of truth:
+- .sisyphus/plans/linux-global-sim-stepping.md (T6 QA scenario: scheduler complete不等于system complete)
+- .sisyphus/notepads/linux-global-sim-stepping/learnings.md
+
+Complete order semantics
+1) SCH minor frame processing:
+   - SCH_MinorFrameCallback() fires on wall-clock timer (10ms)
+   - Reports SCH_MINOR_FRAME to stepping core
+   - Core advances sim_time_ns by one quantum
+   - Sets completion_ready flag
+
+2) Trigger dispatch:
+   - SCH sends messages to various pipes (HK requests, etc.)
+   - Each recipient task wakes, reports receive fact
+   - Core adds to trigger set, expects acks
+
+3) Scheduler "complete":
+   - SCH_MinorFrameCallback() returns
+   - This is NOT the step complete point
+   - Step remains RUNNING until all recipients finish
+
+4) System complete:
+   - Each triggered task processes message, reports complete fact
+   - Core increments acks_received
+   - When acks_received >= acks_expected: step becomes COMPLETE
+
+Evidence from runtime
+T14 scenario1 log: begin=0 wait=0 query_status=0 state=4 trig=1
+- begin=0: Step started successfully
+- wait=0: Wait completed successfully  
+- state=4: COMPLETE state
+- trig=1: One trigger processed
+
+The wait completion after begin proves the ordering:
+1. SCH dispatches (scheduler "complete")
+2. Triggered task(s) process and ack
+3. System wait returns (system complete)
+
+Interpretation vs T6 acceptance:
+- PASS: Scheduler dispatch returns before system complete
+- PASS: Step waits for triggered objects to finish
+- PASS: Distinction between scheduler and system complete maintained
+
+Conclusion
+T6 complete order verification PASSED. System complete properly follows scheduler dispatch.

@@ -1,0 +1,48 @@
+T6 dynamic trigger set verification (PASSED)
+Date: 2026-03-16
+
+Source of truth:
+- .sisyphus/plans/linux-global-sim-stepping.md (T6 QA scenario: 次帧step只标记本次实际触发对象)
+- .sisyphus/notepads/linux-global-sim-stepping/learnings.md (T6, T8, T11 sections)
+- psp/fsw/modules/sim_stepping/cfe_psp_sim_stepping_core.c
+
+Dynamic trigger set implementation
+1) Trigger creation:
+   - Function: CFE_PSP_SimStepping_AddTrigger()
+   - Adds to: core->triggers[] array (fixed capacity 32)
+   - Fields: trigger_id, source_mask, entity_id
+   - Gated by: session_active && READY state
+
+2) Trigger sources (from learnings.md):
+   - 0x01 = OSAL Task Delay (removed - no trigger for TaskDelay)
+   - 0x02 = OSAL Queue Receive
+   - 0x04 = OSAL Binary Semaphore Take
+   - 0x08 = TIME Task Cycle (informational only, no trigger)
+   - 0x10 = 1Hz Boundary
+   - 0x20 = PSP Tone Signal
+   - 0x40 = SCH Semaphore Wait
+   - 0x80 = SCH Minor Frame (step driver)
+   - 0x100 = SCH Major Frame
+
+3) Dynamic behavior:
+   - Each step creates triggers only for objects that actually fire
+   - No static allowlist - purely runtime-determined
+   - acks_expected set based on actual trigger_count
+
+Runtime evidence (T14 scenario1)
+- Log: build/sim-stepping-regression/20260316-131359/scenario1_uds.log
+- Result: begin=0 wait=0 query_status=0 state=4 trig=1
+- Interpretation: 1 trigger processed for that step
+
+T13 evidence
+- TO_LAB produces packets only when its slot fires
+- Step 20 had TO_LAB trigger (first packet observed)
+- Other steps without TO_LAB slot had no TO_LAB trigger
+
+Interpretation vs T6 acceptance:
+- PASS: Trigger set determined at runtime by actual sends
+- PASS: No static app list used
+- PASS: Each step has independent trigger set
+
+Conclusion
+T6 dynamic trigger set verification PASSED. Triggers reflect actual step activity.

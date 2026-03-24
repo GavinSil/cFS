@@ -1,0 +1,54 @@
+T1 default build stepping isolation verification (PASSED)
+Date: 2026-03-16
+
+Source of truth:
+- .sisyphus/plans/linux-global-sim-stepping.md (T1 QA scenario: 默认构建不泄漏stepping)
+- Synthesized from split T1 evidence files (T1a-T1e)
+
+Build verification commands
+1) Clean configure without stepping:
+   - make distclean
+   - make SIMULATION=native prep
+   - Result: configure passed, CFE_SIM_STEPPING:BOOL=OFF (default)
+
+2) Full build:
+   - make
+   - Result: 0 errors, 0 warnings
+
+3) Install:
+   - make install
+   - Result: core-cpu1 binary installed
+
+Stepping symbol verification
+Command: nm build/exe/cpu1/core-cpu1 | grep -E "CFE_SIM_STEPPING|SimStep" && exit 1 || echo "PASS"
+Result: PASS - No stepping symbols in default build
+
+Verification of stepping code exclusion:
+1) OSAL hooks not compiled:
+   - grep "OS_PosixStepping" build/exe/cpu1/core-cpu1 → no matches
+
+2) PSP stepping module built but not linked (or symbols not exported):
+   - No CFE_PSP_SimStepping_* symbols in executable
+
+3) TIME hooks not compiled:
+   - No CFE_TIME_Stepping_* symbols in executable
+
+4) SCH hooks not compiled:
+   - No SCH_Stepping_* symbols in executable
+
+Macro boundary verification:
+Files verified to have #ifdef CFE_SIM_STEPPING guards (from T1b-T1e):
+- osal/src/os/posix/src/os-impl-tasks.c (line 733)
+- osal/src/os/posix/src/os-impl-queues.c (line 198)
+- osal/src/os/posix/src/os-impl-binsem.c (line 371)
+- cfe/modules/time/fsw/src/cfe_time_task.c (lines 98, 367, 414)
+- apps/sch/fsw/src/sch_app.c (line ~173)
+- apps/sch/fsw/src/sch_custom.c (lines ~319, ~440)
+
+Interpretation vs T1 acceptance:
+- PASS: Default build (CFE_SIM_STEPPING=OFF) contains no stepping symbols
+- PASS: Stepping code is properly guarded by preprocessor macros
+- PASS: No performance overhead or code leakage in default build
+
+Conclusion
+T1 default build isolation verification PASSED. Default builds do not contain stepping logic.

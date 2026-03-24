@@ -1,0 +1,26 @@
+F4 Scope Creep Findings (current cleaned tree)
+Date: 2026-03-19
+
+Scope basis
+- `.sisyphus/*` treated as orchestration/review artifact space (not product scope creep).
+- Product-scope files were evaluated against Tasks 1-12 plan allowances.
+
+Current live product changes reviewed
+- `esa/CMakeLists.txt`
+- `esa/ut-coverage/coveragetest-sim_stepping.c`
+- `cfe/cmake/mission_build.cmake`
+- `cfe/cmake/mission_defaults.cmake`
+- `cfe/modules/es/CMakeLists.txt`
+- `osal/src/os/posix/CMakeLists.txt`
+- `osal/src/os/posix/src/os-posix-stepping.c`
+- `apps/sch/CMakeLists.txt`
+- `apps/sch/fsw/src/sch_stepping.c` (untracked in submodule, but explicitly part of accepted SCH stepping wiring)
+
+Checks performed
+- No active references to old PSP sim_stepping path in source/CMake (`psp/fsw/modules/sim_stepping`): none found.
+- No API rename away from `CFE_PSP_SimStepping_*`: none found.
+- No unrelated root-level artifact clutter currently present in git status.
+
+Result
+- Unaccounted scope-creep files outside accepted Task 1-12 scope: NONE.
+- Scope status: CLEAN.

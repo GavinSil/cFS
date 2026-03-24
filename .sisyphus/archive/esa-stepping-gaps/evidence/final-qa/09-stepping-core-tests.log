@@ -1,0 +1,23 @@
+Test project /workspace/cFS/build/native/default_cpu1
+    Start 86: coverage-es-ALL
+1/9 Test #86: coverage-es-ALL ..................   Passed    0.02 sec
+    Start 87: coverage-evs-ALL
+2/9 Test #87: coverage-evs-ALL .................   Passed    0.01 sec
+    Start 89: coverage-sb-ALL
+3/9 Test #89: coverage-sb-ALL ..................   Passed    0.01 sec
+    Start 90: coverage-tbl-ALL
+4/9 Test #90: coverage-tbl-ALL .................   Passed    0.02 sec
+    Start 91: coverage-time-ALL
+5/9 Test #91: coverage-time-ALL ................   Passed    0.00 sec
+    Start 92: coverage-esa-sim_stepping
+6/9 Test #92: coverage-esa-sim_stepping ........   Passed    0.00 sec
+    Start 93: coverage-esa-time_hooks
+7/9 Test #93: coverage-esa-time_hooks ..........   Passed    0.00 sec
+    Start 94: coverage-esa-core_services
+8/9 Test #94: coverage-esa-core_services .......   Passed    0.00 sec
+    Start 95: coverage-esa-osal_hooks
+9/9 Test #95: coverage-esa-osal_hooks ..........   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Total Test time (real) =   0.09 sec

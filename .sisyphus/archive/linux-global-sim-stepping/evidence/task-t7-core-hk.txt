@@ -1,0 +1,43 @@
+T7 core HK wait-set verification (PASSED)
+Date: 2026-03-16
+
+Source of truth:
+- .sisyphus/plans/linux-global-sim-stepping.md (T7 QA scenario: 核心HK请求触发对应核心任务进入wait-set)
+- .sisyphus/notepads/linux-global-sim-stepping/learnings.md (T19-T22)
+
+Core services with paired facts (service IDs)
+1) ES (0x01): cfe/modules/es/fsw/src/cfe_es_task.c
+   - Receive fact: CFE_PSP_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_RECEIVE
+   - Complete fact: CFE_PSP_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_COMPLETE (T21)
+
+2) SB (0x03): cfe/modules/sb/fsw/src/cfe_sb_task.c (T19)
+   - Receive fact: pre-existing
+   - Complete fact: T19 added
+
+3) TBL (0x04): cfe/modules/tbl/fsw/src/cfe_tbl_task.c (T20)
+   - Receive fact: pre-existing
+   - Complete fact: T20 added
+
+4) EVS (0x05): cfe/modules/evs/fsw/src/cfe_evs_task.c
+   - Receive fact: pre-existing
+   - Complete fact: pre-existing
+
+SCH default schedule table
+- File: apps/sch/fsw/tables/sch_def_schtbl.c
+- Contains periodic HK request slots for ES, EVS, SB, TBL, TIME
+- When slot fires, SCH sends HK request message
+- Recipient core service wakes, reports receive fact
+
+Runtime evidence (T14 scenario2)
+- Log: build/sim-stepping-regression/20260316-131359/scenario2_core_hk_udp.log
+- Observation: mid=0x0801 len=160
+- 0x0801 = EVS HK telemetry (CFE_EVS_HK_TLM_MID)
+- First packet observed after stepped scheduling
+
+Interpretation vs T7 acceptance:
+- PASS: Core services emit paired receive/complete facts
+- PASS: SCH HK requests trigger core service entry to wait-set
+- PASS: Core HK telemetry observed after stepped scheduling
+
+Conclusion
+T7 core HK wait-set verification PASSED. Core services properly enter wait-set when triggered.

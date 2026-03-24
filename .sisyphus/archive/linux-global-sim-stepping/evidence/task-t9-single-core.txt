@@ -1,0 +1,20 @@
+T9 evidence backfill: inproc adapter uses a single shared core state machine
+
+Source of truth: .sisyphus/plans/linux-global-sim-stepping.md (T9 QA scenario)
+
+Symbols/files inspected:
+1) psp/fsw/modules/sim_stepping/cfe_psp_sim_stepping.c
+   - static CFE_PSP_SimStepping_Core_t stepping_core = {0};
+   - CFE_PSP_SimStepping_InProc_BeginStep() -> CFE_PSP_SimStepping_Core_BeginStepSession(&stepping_core)
+   - CFE_PSP_SimStepping_InProc_WaitStepComplete() -> polls CFE_PSP_SimStepping_Core_IsStepComplete(&stepping_core)
+   - CFE_PSP_SimStepping_InProc_QueryState() -> CFE_PSP_SimStepping_Core_QueryState(&stepping_core, ...)
+   - UDS dispatch also calls the same InProc_* functions (BEGIN/QUERY/WAIT opcodes), so transport adapters converge on same core
+2) psp/fsw/modules/sim_stepping/cfe_psp_sim_stepping_core.c
+   - single core state machine implementation (BeginStepSession / IsStepComplete / QueryState)
+
+Concise proof:
+- There is one module-static core instance (stepping_core) and both inproc and UDS adapter entrypoints forward into Core_* APIs using &stepping_core.
+- No second adapter-local state machine/counter set exists in inproc path; adapter logic is thin forwarding + polling wrapper.
+
+Interpretation against T9 acceptance:
+- Adapter/core layering is single-core: inproc control channel does not implement an independent state machine and shares the same core used by UDS.

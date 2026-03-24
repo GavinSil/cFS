@@ -1,0 +1,1 @@
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../sbn/modules/filter/remap module)

@@ -1,0 +1,63 @@
+F2 BUILD AND TEST VERIFICATION
+================================
+
+SCOPE: Clean build/test scenario from distclean state
+
+COMMAND SEQUENCE EXECUTED:
+  make distclean
+  make SIMULATION=native ENABLE_UNIT_TESTS=true prep
+  make -j2
+  make install
+  make test
+
+BUILD RESULTS:
+--------------
+CMake Prep: ✓ PASS
+  - All core modules configured successfully
+  - No fatal errors in configuration
+  - Build files generated to build/native/default_cpu1
+
+Compilation: ✓ PASS  
+  - All targets built successfully with -j2
+  - No compilation errors
+  - No warnings in ESA/OSAL/cFE/PSP stepping-related files
+  - Final target: [100%] Built target mission-all
+
+Installation: ✓ PASS
+  - All artifacts installed to build/exe/cpu1/
+  - core-cpu1 executable installed
+  - All shared objects (.so files) installed
+  - Table files (.tbl) installed
+
+TEST RESULTS:
+-------------
+Total Tests: 117
+Passed: 117
+Failed: 0
+Pass Rate: 100%
+
+Test Execution Time: 182.33 seconds
+
+ALL 117 TESTS PASSED:
+  - OSAL coverage tests (vxworks): 36/36 pass
+  - OSAL coverage tests (shared): 23/23 pass  
+  - OSAL functional tests: 20/20 pass
+  - OSAL unit tests: 6/6 pass
+  - cFE module tests (es/evs/fs/sb/tbl/time): 6/6 pass
+  - PSP module coverage tests: 10/10 pass
+  - PSP platform tests: 2/2 pass
+  - MSG/SBR/resourceid/config tests: 5/5 pass
+  - Sample app/lib tests: 5/5 pass
+  - cFE functional test suite: 4/4 pass
+
+CRITICAL PATHS VERIFIED:
+- OSAL POSIX stepping hooks compile cleanly (no ESA header errors)
+- PSP timebase stepping hooks compile cleanly
+- cFE module stepping integration compiles cleanly
+- SCH app stepping hooks compile cleanly
+- ESA runtime sources build and link successfully
+- ESA coverage test (coverage-esa-sim_stepping) NOT run in this configuration
+  (test registration requires CFE_SIM_STEPPING=true, which was not set)
+
+BUILD/TEST VERDICT: ✓ PASS
+All compilation and tests completed successfully with zero failures.

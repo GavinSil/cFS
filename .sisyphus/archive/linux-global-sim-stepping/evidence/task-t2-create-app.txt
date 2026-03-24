@@ -1,0 +1,61 @@
+/workspace/cFS/apps/cfe_simstep_app
+├── CMakeLists.txt
+├── config
+│   ├── cfe_simstep_app_fcncodes.h
+│   ├── cfe_simstep_app_interface_cfg.h
+│   ├── cfe_simstep_app_internal_cfg.h
+│   ├── cfe_simstep_app_topicids.h
+│   ├── default_cfe_simstep_app_fcncode_values.h
+│   ├── default_cfe_simstep_app_interface_cfg_values.h
+│   ├── default_cfe_simstep_app_internal_cfg_values.h
+│   ├── default_cfe_simstep_app_mission_cfg.h
+│   ├── default_cfe_simstep_app_msg.h
+│   ├── default_cfe_simstep_app_msgdefs.h
+│   ├── default_cfe_simstep_app_msgid_values.h
+│   ├── default_cfe_simstep_app_msgids.h
+│   ├── default_cfe_simstep_app_msgstruct.h
+│   ├── default_cfe_simstep_app_perfids.h
+│   ├── default_cfe_simstep_app_platform_cfg.h
+│   └── default_cfe_simstep_app_topicid_values.h
+└── fsw
+    └── src
+        ├── cfe_simstep_app.c
+        ├── cfe_simstep_app.h
+        ├── cfe_simstep_app_eventids.h
+        └── cfe_simstep_app_version.h
+
+3 directories, 21 files
+
+## Summary
+
+Created minimal cFS application "cfe_simstep_app" at apps/cfe_simstep_app/
+
+### Key Features:
+- App name: cfe_simstep_app
+- Prefix: CFE_SIMSTEP_APP_
+- Main function: CFE_SIMSTEP_APP_Main
+- Wrapped in #ifdef CFE_SIM_STEPPING preprocessor guard
+- Minimal implementation with NOOP and RESET_COUNTERS commands
+- Following sample_app patterns exactly
+
+### Commands Implemented:
+- NOOP (fcncode 0)
+- RESET_COUNTERS (fcncode 1)
+
+### Message IDs:
+- CMD_MID topic: 0x62
+- SEND_HK_MID topic: 0x63
+- HK_TLM_MID topic: 0x62
+
+### Performance ID:
+- CFE_SIMSTEP_APP_PERF_ID: 92
+
+### Files Created:
+1. CMakeLists.txt - Build configuration
+2. fsw/src/cfe_simstep_app.c - Main app entry point with all handlers
+3. fsw/src/cfe_simstep_app.h - Main header with data structures
+4. fsw/src/cfe_simstep_app_eventids.h - Event ID definitions  
+5. fsw/src/cfe_simstep_app_version.h - Version information
+6. config/*.h - Complete configuration header chain
+
+All files wrapped in #ifdef CFE_SIM_STEPPING as required.

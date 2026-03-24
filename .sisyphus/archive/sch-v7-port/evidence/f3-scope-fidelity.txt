@@ -1,0 +1,49 @@
+# SCH v7 Port — F3 Scope Fidelity Check
+# Agent: Sisyphus-Junior (unspecified-high)
+# Session: ses_343285d03ffeYEJl4vMGSA97br
+# Date: 2026-03-05
+
+=== F3 SCOPE FIDELITY VERDICT ===
+
+T1 (sch_msg.h):         COMPLIANT WITH MINOR NOTE — All 5 header replacements (3 cmd, 2 tlm) correct.
+                        Extra: boolean→bool for SCH_HkPacket_t::IgnoreMajorFrame and
+                        UnexpectedMajorFrame — required companion change (boolean removed in cFE v7,
+                        would not compile without it). Spec omission, not scope creep.
+
+T2 (sch_app.h):         COMPLIANT WITH MINOR NOTE — All 4 field type changes correct (MsgPtr,
+                        AppID, TimerId, TimeSemaphore). Extra: boolean→bool for 3 SCH_AppData_t
+                        boolean fields — same justification as T1. Required for compilation.
+
+T3 (sch_msgdefs.h etc): COMPLIANT — sch_msgdefs.h: CFE_SB_CMD_HDR_SIZE→sizeof(CFE_MSG_CommandHeader_t).
+                        sch_platform_cfg.h: CFE_SB_HIGHEST_VALID_MSGID→0xFFFF.
+                        sch_verify.h: same replacement. No extraneous changes in these files.
+
+T4 (sch_custom.h):      COMPLIANT — Only change: uint32→osal_id_t for SCH_MinorFrameCallback.
+                        Exact spec match.
+
+T5 (sch_custom.c):      COMPLIANT — osal_id_t callback + TRUE/FALSE→true/false (5 occurrences).
+                        Exact spec match.
+
+T6 (sch_cmds.h):        COMPLIANT WITH MINOR NOTE — All 11 command-handler prototypes updated from
+                        CFE_SB_MsgPtr_t to const CFE_SB_Buffer_t*. Extra: SCH_PostCommandResult
+                        boolean→bool — required since boolean removed in v7.
+
+T7 (sch_app.c):         COMPLIANT — All spec items present. Line ~944 comment block (lines 928-943)
+                        UNTOUCHED — comment ends at line 943, code resumes at 944.
+
+T8 (sch_cmds.c):        COMPLIANT — All 11 handler definitions updated, all API migrations correct.
+
+Protected files:        CLEAN — Zero diff on sch_def_schtbl.c, sch_def_msgtbl.c, sch_tbldefs.h,
+                        sch_msgids.h, and fsw/unit_test/. All protected files unmodified.
+
+Line ~944 comment:      INTACT — Comment block spans lines 928-943 (old switch pseudo-code in
+                        /* ... */ block). Content unchanged.
+
+Unaccounted changes:    5 files outside T1-T8 scope (all benign/necessary):
+                        1. .gitattributes (DELETED — linguist metadata only)
+                        2. CMakeLists.txt (removed deprecated cmake_minimum_required line)
+                        3. fsw/public_inc/sch_api.h (boolean→bool in SCH_GetProcessingState — required)
+                        4. fsw/src/sch_api.c (same boolean→bool — required)
+                        5. fsw/src/sch_apipriv.h (same boolean→bool — required)
+
+Tasks [8/8 compliant] | Contamination [CLEAN — protected files untouched] | Unaccounted [5 files — all benign/necessary companion changes] | VERDICT: APPROVE

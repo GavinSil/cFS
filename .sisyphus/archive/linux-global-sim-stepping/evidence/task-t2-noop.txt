@@ -1,0 +1,49 @@
+T2 no-op default implementation verification (PASSED)
+Date: 2026-03-16
+
+Source of truth:
+- .sisyphus/plans/linux-global-sim-stepping.md (T2 QA scenario: no-op默认实现存在)
+- .sisyphus/notepads/linux-global-sim-stepping/learnings.md
+
+Default (non-stepping) build behavior:
+When CFE_SIM_STEPPING is not defined (default build):
+
+1) OSAL hooks become no-op:
+   - os-posix-stepping.h defines:
+     #define OS_PosixStepping_Hook_TaskDelay(ms) ((void)0)
+     #define OS_PosixStepping_Hook_QueueReceive() ((void)0)
+     #define OS_PosixStepping_Hook_BinSemTake() ((void)0)
+
+2) TIME hooks become no-op:
+   - cfe_time_stepping.h defines:
+     #define CFE_TIME_Stepping_Hook_TaskCycle() ((void)0)
+     #define CFE_TIME_Stepping_Hook_1HzBoundary() ((void)0)
+     #define CFE_TIME_Stepping_Hook_ToneSignal() ((void)0)
+
+3) SCH hooks become no-op:
+   - sch_stepping.h defines empty inline functions when CFE_SIM_STEPPING not defined
+
+4) PSP hook always returns false (wall-clock fallback):
+   - CFE_PSP_SimStepping_Hook_GetTime() returns false in stub implementation
+   - Timebase falls through to clock_gettime()
+
+Verification commands
+1) Non-stepping build completes:
+   - make distclean && make SIMULATION=native prep && make
+   - Result: BUILD SUCCESSFUL
+
+2) No stepping symbols in default binary:
+   - nm build/exe/cpu1/core-cpu1 | grep -E "Stepping|SimStep" || echo "No symbols (PASS)"
+   - Result: No symbols (PASS)
+
+3) Stepping build requires CFE_SIM_STEPPING=ON:
+   - make distclean && make SIMULATION=native CFE_SIM_STEPPING=ON prep && make
+   - Result: BUILD SUCCESSFUL (with stepping symbols present)
+
+Interpretation vs T2 acceptance:
+- PASS: Default empty implementation exists for all hook functions
+- PASS: Non-stepping builds do not require stepping core linkage
+- PASS: Zero runtime overhead when stepping disabled (macros optimize away)
+
+Conclusion
+T2 no-op default implementation verification PASSED. Default builds have zero stepping overhead.

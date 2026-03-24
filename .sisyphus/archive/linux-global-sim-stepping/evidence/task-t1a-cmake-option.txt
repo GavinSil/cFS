@@ -1,0 +1,49 @@
+TASK: T1A - Add CFE_SIM_STEPPING CMake Option to sample_defs/targets.cmake
+COMPLETED: 2026-03-09
+
+OBJECTIVE:
+Add the CFE_SIM_STEPPING CMake option that gates native simulation stepping mode,
+enabling the preprocessor macro when the option is set to ON.
+
+CHANGES MADE:
+File: /workspace/cFS/sample_defs/global_build_options.cmake
+
+Added at lines 46-53:
+- CMake option: set(CFE_SIM_STEPPING $ENV{CFE_SIM_STEPPING} CACHE BOOL "Enable CFE simulation stepping mode")
+- Conditional macro definition: add_definitions(-DCFE_SIM_STEPPING) when enabled
+- Status messages for ON/OFF states
+
+IMPLEMENTATION DETAILS:
+- Option reads from environment variable CFE_SIM_STEPPING (defaults to OFF/FALSE)
+- Placed in global_build_options.cmake (consistent with other global toggles like OMIT_DEPRECATED, ENABLE_ASAN)
+- Uses add_definitions() to propagate macro globally to all compilation units
+- Follows existing pattern: set option → check value → add_definitions conditionally
+
+VERIFICATION:
+✓ Build with CFE_SIM_STEPPING=OFF: cmake cache shows CFE_SIM_STEPPING:BOOL=OFF
+✓ Build with CFE_SIM_STEPPING=ON: cmake cache shows CFE_SIM_STEPPING:BOOL=ON
+✓ CMake status messages appear correctly:
+  - With ON: "-- CFE_SIM_STEPPING=true: Enabling CFE simulation stepping mode"
+  - With OFF: "-- CFE_SIM_STEPPING=false: CFE simulation stepping mode disabled"
+✓ Full build completes successfully with option enabled
+✓ All compiler targets receive the macro definition
+✓ No LSP/syntax errors in CMake code
+
+USAGE:
+To build with simulation stepping enabled:
+  make distclean
+  CFE_SIM_STEPPING=ON make SIMULATION=native prep
+  make
+  make install
+
+To build without stepping (default):
+  make distclean
+  make SIMULATION=native prep
+  make
+  make install
+
+NOTES:
+- Option is only meaningful when SIMULATION=native is set
+- Macro is available globally to all C/C++ compilation units
+- Does not require changes to targets.cmake (as per task)
+- Ready for stepping implementation code to use #ifdef CFE_SIM_STEPPING guard

@@ -1,0 +1,36 @@
+=== Task 5: Clean Build Evidence ===
+Timestamp: $(date)
+
+=== Build Output ===
+CMake Deprecation Warning at CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <...max> syntax
+  to tell CMake that this project requires policies introduced by <max> or
+  later, but has been updated to work with policies introduced by <min> or
+  later.
+
+-- The C compiler identification is GNU 11.4.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/cFS/tools/esa_stepping_terminal/build
+[ 25%] Building C object CMakeFiles/esa_stepping_terminal.dir/src/main.c.o
+[ 50%] Building C object CMakeFiles/esa_stepping_terminal.dir/src/repl.c.o
+[ 75%] Building C object CMakeFiles/esa_stepping_terminal.dir/src/uds_client.c.o
+[100%] Linking C executable esa_stepping_terminal
+[100%] Built target esa_stepping_terminal
+
+=== Build Status ===
+BUILD_EXIT=0
+
+=== File Info ===
+File: esa_stepping_terminal
+Type: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked
+
+RESULT: PASS

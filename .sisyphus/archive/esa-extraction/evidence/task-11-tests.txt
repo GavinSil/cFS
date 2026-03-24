@@ -1,0 +1,431 @@
+lcov --capture --initial --directory build/native/default_cpu1 --output-file build/native/default_cpu1/coverage_base.info
+Capturing coverage data from build/native/default_cpu1
+Subroutine read_intermediate_text redefined at /usr/bin/geninfo line 2623.
+Subroutine read_intermediate_json redefined at /usr/bin/geninfo line 2655.
+Subroutine intermediate_text_to_info redefined at /usr/bin/geninfo line 2703.
+Subroutine intermediate_json_to_info redefined at /usr/bin/geninfo line 2792.
+Subroutine get_output_fd redefined at /usr/bin/geninfo line 2872.
+Subroutine print_gcov_warnings redefined at /usr/bin/geninfo line 2900.
+Subroutine process_intermediate redefined at /usr/bin/geninfo line 2930.
+Found gcov version: 11.4.0
+Using intermediate gcov format
+Scanning build/native/default_cpu1 for .gcno files ...
+Found 175 graph files in build/native/default_cpu1
+Processing sb/ut-coverage/CMakeFiles/coverage-sb-ALL-object.dir/__/fsw/src/cfe_sb_msg_id_util.c.gcno
+Processing sb/ut-coverage/CMakeFiles/coverage-sb-ALL-object.dir/__/fsw/src/cfe_sb_priv.c.gcno
+Processing sb/ut-coverage/CMakeFiles/coverage-sb-ALL-object.dir/__/fsw/src/cfe_sb_dispatch.c.gcno
+Processing sb/ut-coverage/CMakeFiles/coverage-sb-ALL-object.dir/__/fsw/src/cfe_sb_api.c.gcno
+Processing sb/ut-coverage/CMakeFiles/coverage-sb-ALL-object.dir/__/fsw/src/cfe_sb_util.c.gcno
+Processing sb/ut-coverage/CMakeFiles/coverage-sb-ALL-object.dir/__/fsw/src/cfe_sb_task.c.gcno
+Processing sb/ut-coverage/CMakeFiles/coverage-sb-ALL-object.dir/__/fsw/src/cfe_sb_init.c.gcno
+Processing sb/ut-coverage/CMakeFiles/coverage-sb-ALL-object.dir/__/fsw/src/cfe_sb_buf.c.gcno
+Processing evs/ut-coverage/CMakeFiles/coverage-evs-ALL-object.dir/__/fsw/src/cfe_evs_dispatch.c.gcno
+Processing evs/ut-coverage/CMakeFiles/coverage-evs-ALL-object.dir/__/fsw/src/cfe_evs_utils.c.gcno
+Processing evs/ut-coverage/CMakeFiles/coverage-evs-ALL-object.dir/__/fsw/src/cfe_evs_task.c.gcno
+Processing evs/ut-coverage/CMakeFiles/coverage-evs-ALL-object.dir/__/fsw/src/cfe_evs.c.gcno
+Processing evs/ut-coverage/CMakeFiles/coverage-evs-ALL-object.dir/__/fsw/src/cfe_evs_log.c.gcno
+Processing tbl/ut-coverage/CMakeFiles/coverage-tbl-ALL-object.dir/__/fsw/src/cfe_tbl_regrec.c.gcno
+Processing tbl/ut-coverage/CMakeFiles/coverage-tbl-ALL-object.dir/__/fsw/src/cfe_tbl_registry.c.gcno
+Processing tbl/ut-coverage/CMakeFiles/coverage-tbl-ALL-object.dir/__/fsw/src/cfe_tbl_passthru_codec.c.gcno
+Processing tbl/ut-coverage/CMakeFiles/coverage-tbl-ALL-object.dir/__/fsw/src/cfe_tbl_load.c.gcno
+Processing tbl/ut-coverage/CMakeFiles/coverage-tbl-ALL-object.dir/__/fsw/src/cfe_tbl_dispatch.c.gcno
+Processing tbl/ut-coverage/CMakeFiles/coverage-tbl-ALL-object.dir/__/fsw/src/cfe_tbl_internal.c.gcno
+Processing tbl/ut-coverage/CMakeFiles/coverage-tbl-ALL-object.dir/__/fsw/src/cfe_tbl_task_cmds.c.gcno
+Processing tbl/ut-coverage/CMakeFiles/coverage-tbl-ALL-object.dir/__/fsw/src/cfe_tbl_valresult.c.gcno
+Processing tbl/ut-coverage/CMakeFiles/coverage-tbl-ALL-object.dir/__/fsw/src/cfe_tbl_api.c.gcno
+Processing tbl/ut-coverage/CMakeFiles/coverage-tbl-ALL-object.dir/__/fsw/src/cfe_tbl_task.c.gcno
+Processing tbl/ut-coverage/CMakeFiles/coverage-tbl-ALL-object.dir/__/fsw/src/cfe_tbl_loadbuff.c.gcno
+Processing tbl/ut-coverage/CMakeFiles/coverage-tbl-ALL-object.dir/__/fsw/src/cfe_tbl_transaction.c.gcno
+Processing tbl/ut-coverage/CMakeFiles/coverage-tbl-ALL-object.dir/__/fsw/src/cfe_tbl_dumpctl.c.gcno
+Processing tbl/ut-coverage/CMakeFiles/coverage-tbl-ALL-object.dir/__/fsw/src/cfe_tbl_handlelink.c.gcno
+Processing tbl/ut-coverage/CMakeFiles/coverage-tbl-ALL-object.dir/__/fsw/src/cfe_tbl_dump.c.gcno
+Processing tbl/ut-coverage/CMakeFiles/coverage-tbl-ALL-object.dir/__/fsw/src/cfe_tbl_accdesc.c.gcno
+Processing psp/unit-test-coverage/mcp750-vxworks/ut-mcp750-vxworks-impl/CMakeFiles/psp-ut-mcp750-vxworks-impl.dir/src/cfe_psp_exception.c.gcno
+Processing psp/unit-test-coverage/mcp750-vxworks/ut-mcp750-vxworks-impl/CMakeFiles/psp-ut-mcp750-vxworks-impl.dir/src/cfe_psp_start.c.gcno
+Processing psp/unit-test-coverage/mcp750-vxworks/ut-mcp750-vxworks-impl/CMakeFiles/psp-ut-mcp750-vxworks-impl.dir/src/cfe_psp_watchdog.c.gcno
+Processing psp/unit-test-coverage/mcp750-vxworks/ut-mcp750-vxworks-impl/CMakeFiles/psp-ut-mcp750-vxworks-impl.dir/src/cfe_psp_memory.c.gcno
+Processing psp/unit-test-coverage/mcp750-vxworks/ut-mcp750-vxworks-impl/CMakeFiles/psp-ut-mcp750-vxworks-impl.dir/src/cfe_psp_ssr.c.gcno
+Processing psp/unit-test-coverage/mcp750-vxworks/ut-mcp750-vxworks-impl/CMakeFiles/psp-ut-mcp750-vxworks-impl.dir/src/cfe_psp_support.c.gcno
+Processing psp/unit-test-coverage/mcp750-vxworks/ut-mcp750-vxworks-shared/CMakeFiles/psp-ut-mcp750-vxworks-shared.dir/src/cfe_psp_module.c.gcno
+Processing psp/unit-test-coverage/mcp750-vxworks/ut-mcp750-vxworks-shared/CMakeFiles/psp-ut-mcp750-vxworks-shared.dir/src/cfe_psp_exceptionstorage.c.gcno
+Processing psp/unit-test-coverage/mcp750-vxworks/ut-mcp750-vxworks-shared/CMakeFiles/psp-ut-mcp750-vxworks-shared.dir/src/cfe_psp_error.c.gcno
+Processing psp/unit-test-coverage/mcp750-vxworks/ut-mcp750-vxworks-shared/CMakeFiles/psp-ut-mcp750-vxworks-shared.dir/src/cfe_psp_memutils.c.gcno
+Processing psp/unit-test-coverage/mcp750-vxworks/ut-mcp750-vxworks-shared/CMakeFiles/psp-ut-mcp750-vxworks-shared.dir/src/cfe_psp_version.c.gcno
+Processing psp/unit-test-coverage/mcp750-vxworks/ut-mcp750-vxworks-shared/CMakeFiles/psp-ut-mcp750-vxworks-shared.dir/src/cfe_psp_memrange.c.gcno
+Processing psp/unit-test-coverage/modules/iodriver/CMakeFiles/coverage-pspmod-iodriver-object.dir/workspace/cFS/psp/fsw/modules/iodriver/src/iodriver.c.gcno
+Processing psp/unit-test-coverage/modules/vxworks_sysmon/CMakeFiles/coverage-pspmod-vxworks_sysmon-object.dir/workspace/cFS/psp/fsw/modules/vxworks_sysmon/vxworks_sysmon.c.gcno
+Processing psp/unit-test-coverage/modules/eeprom_direct/CMakeFiles/coverage-pspmod-eeprom_direct-object.dir/workspace/cFS/psp/fsw/modules/eeprom_direct/cfe_psp_eeprom_direct.c.gcno
+Processing psp/unit-test-coverage/modules/port_notimpl/CMakeFiles/coverage-pspmod-port_notimpl-object.dir/workspace/cFS/psp/fsw/modules/port_notimpl/cfe_psp_port_notimpl.c.gcno
+Processing psp/unit-test-coverage/modules/ram_direct/CMakeFiles/coverage-pspmod-ram_direct-object.dir/workspace/cFS/psp/fsw/modules/ram_direct/cfe_psp_ram_direct.c.gcno
+Processing psp/unit-test-coverage/modules/network_pc686_rtems/CMakeFiles/coverage-pspmod-network_pc686_rtems-object.dir/workspace/cFS/psp/fsw/modules/network_pc686_rtems/cfe_psp_network_pc686_rtems.c.gcno
+Processing psp/unit-test-coverage/modules/endian_api/CMakeFiles/coverage-pspmod-endian_api-object.dir/workspace/cFS/psp/fsw/modules/endian_api/cfe_psp_endian_wrappers.c.gcno
+Processing psp/unit-test-coverage/modules/endian_api/CMakeFiles/coverage-pspmod-endian_api-object.dir/workspace/cFS/psp/fsw/modules/endian_api/cfe_psp_endian_generic.c.gcno
+Processing psp/unit-test-coverage/modules/endian_api/CMakeFiles/coverage-pspmod-endian_api-object.dir/workspace/cFS/psp/fsw/modules/endian_api/cfe_psp_endian_common.c.gcno
+Processing psp/unit-test-coverage/modules/port_direct/CMakeFiles/coverage-pspmod-port_direct-object.dir/workspace/cFS/psp/fsw/modules/port_direct/cfe_psp_port_direct.c.gcno
+Processing psp/unit-test-coverage/modules/ram_notimpl/CMakeFiles/coverage-pspmod-ram_notimpl-object.dir/workspace/cFS/psp/fsw/modules/ram_notimpl/cfe_psp_ram_notimpl.c.gcno
+Processing psp/unit-test-coverage/modules/eeprom_mmap_file/CMakeFiles/coverage-pspmod-eeprom_mmap_file-object.dir/workspace/cFS/psp/fsw/modules/eeprom_mmap_file/cfe_psp_eeprom_mmap_file.c.gcno
+Processing psp/unit-test-coverage/modules/timebase_vxworks/CMakeFiles/coverage-pspmod-timebase_vxworks-object.dir/workspace/cFS/psp/fsw/modules/timebase_vxworks/cfe_psp_timebase_vxworks.c.gcno
+Processing psp/unit-test-coverage/modules/eeprom_notimpl/CMakeFiles/coverage-pspmod-eeprom_notimpl-object.dir/workspace/cFS/psp/fsw/modules/eeprom_notimpl/cfe_psp_eeprom_notimpl.c.gcno
+Processing psp/unit-test-coverage/modules/soft_timebase/CMakeFiles/coverage-pspmod-soft_timebase-object.dir/workspace/cFS/psp/fsw/modules/soft_timebase/cfe_psp_soft_timebase.c.gcno
+Processing psp/unit-test-coverage/pc-rtems/ut-pc-rtems-impl/CMakeFiles/psp-ut-pc-rtems-impl.dir/src/cfe_psp_exception.c.gcno
+Processing psp/unit-test-coverage/pc-rtems/ut-pc-rtems-impl/CMakeFiles/psp-ut-pc-rtems-impl.dir/src/cfe_psp_start.c.gcno
+Processing psp/unit-test-coverage/pc-rtems/ut-pc-rtems-impl/CMakeFiles/psp-ut-pc-rtems-impl.dir/src/cfe_psp_watchdog.c.gcno
+Processing psp/unit-test-coverage/pc-rtems/ut-pc-rtems-impl/CMakeFiles/psp-ut-pc-rtems-impl.dir/src/cfe_psp_memory.c.gcno
+Processing psp/unit-test-coverage/pc-rtems/ut-pc-rtems-impl/CMakeFiles/psp-ut-pc-rtems-impl.dir/src/cfe_psp_ssr.c.gcno
+Processing psp/unit-test-coverage/pc-rtems/ut-pc-rtems-impl/CMakeFiles/psp-ut-pc-rtems-impl.dir/src/cfe_psp_support.c.gcno
+Processing psp/unit-test-coverage/pc-rtems/ut-pc-rtems-shared/CMakeFiles/psp-ut-pc-rtems-shared.dir/src/cfe_psp_module.c.gcno
+Processing psp/unit-test-coverage/pc-rtems/ut-pc-rtems-shared/CMakeFiles/psp-ut-pc-rtems-shared.dir/src/cfe_psp_exceptionstorage.c.gcno
+Processing psp/unit-test-coverage/pc-rtems/ut-pc-rtems-shared/CMakeFiles/psp-ut-pc-rtems-shared.dir/src/cfe_psp_error.c.gcno
+Processing psp/unit-test-coverage/pc-rtems/ut-pc-rtems-shared/CMakeFiles/psp-ut-pc-rtems-shared.dir/src/cfe_psp_memutils.c.gcno
+Processing psp/unit-test-coverage/pc-rtems/ut-pc-rtems-shared/CMakeFiles/psp-ut-pc-rtems-shared.dir/src/cfe_psp_version.c.gcno
+Processing psp/unit-test-coverage/pc-rtems/ut-pc-rtems-shared/CMakeFiles/psp-ut-pc-rtems-shared.dir/src/cfe_psp_memrange.c.gcno
+Processing sbr/ut-coverage/CMakeFiles/ut_sbr_route_unsorted_objs.dir/__/fsw/src/cfe_sbr_map_hash.c.gcno
+Processing sbr/ut-coverage/CMakeFiles/ut_sbr_route_unsorted_objs.dir/__/fsw/src/cfe_sbr_route_unsorted.c.gcno
+Processing sbr/ut-coverage/CMakeFiles/ut_sbr_map_hash_objs.dir/__/fsw/src/cfe_sbr_map_hash.c.gcno
+Processing sbr/ut-coverage/CMakeFiles/ut_sbr_map_hash_objs.dir/__/fsw/src/cfe_sbr_route_unsorted.c.gcno
+Processing sbr/ut-coverage/CMakeFiles/ut_sbr_map_direct_objs.dir/__/fsw/src/cfe_sbr_map_direct.c.gcno
+Processing msg/ut-coverage/CMakeFiles/coverage-msg-ALL-object.dir/__/fsw/src/cfe_msg_sechdr_checksum.c.gcno
+Processing msg/ut-coverage/CMakeFiles/coverage-msg-ALL-object.dir/__/fsw/src/cfe_msg_msgid_shared.c.gcno
+Processing msg/ut-coverage/CMakeFiles/coverage-msg-ALL-object.dir/__/fsw/src/cfe_msg_integrity.c.gcno
+Processing msg/ut-coverage/CMakeFiles/coverage-msg-ALL-object.dir/__/fsw/src/cfe_msg_msgid_v1.c.gcno
+Processing msg/ut-coverage/CMakeFiles/coverage-msg-ALL-object.dir/__/fsw/src/cfe_msg_initdefaulthdr_pri.c.gcno
+Processing msg/ut-coverage/CMakeFiles/coverage-msg-ALL-object.dir/__/fsw/src/cfe_msg_init.c.gcno
+Processing msg/ut-coverage/CMakeFiles/coverage-msg-ALL-object.dir/__/fsw/src/cfe_msg_sechdr_time.c.gcno
+Processing msg/ut-coverage/CMakeFiles/coverage-msg-ALL-object.dir/__/fsw/src/cfe_msg_ccsdspri.c.gcno
+Processing msg/ut-coverage/CMakeFiles/coverage-msg-ALL-object.dir/__/fsw/src/cfe_msg_sechdr_fc.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-common.dir/workspace/cFS/osal/src/os/shared/src/osapi-common.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-network.dir/workspace/cFS/osal/src/os/shared/src/osapi-network.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-time.dir/workspace/cFS/osal/src/os/shared/src/osapi-time.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-rwlock.dir/workspace/cFS/osal/src/os/shared/src/osapi-rwlock.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-condvar.dir/workspace/cFS/osal/src/os/shared/src/osapi-condvar.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-printf.dir/workspace/cFS/osal/src/os/shared/src/osapi-printf.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-sockets.dir/workspace/cFS/osal/src/os/shared/src/osapi-sockets.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-dir.dir/workspace/cFS/osal/src/os/shared/src/osapi-dir.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-task.dir/workspace/cFS/osal/src/os/shared/src/osapi-task.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-version.dir/workspace/cFS/osal/src/os/shared/src/osapi-version.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-filesys.dir/workspace/cFS/osal/src/os/shared/src/osapi-filesys.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-file.dir/workspace/cFS/osal/src/os/shared/src/osapi-file.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-errors.dir/workspace/cFS/osal/src/os/shared/src/osapi-errors.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-idmap.dir/workspace/cFS/osal/src/os/shared/src/osapi-idmap.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-clock.dir/workspace/cFS/osal/src/os/shared/src/osapi-clock.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-mutex.dir/workspace/cFS/osal/src/os/shared/src/osapi-mutex.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-timebase.dir/workspace/cFS/osal/src/os/shared/src/osapi-timebase.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-module.dir/workspace/cFS/osal/src/os/shared/src/osapi-module.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-binsem.dir/workspace/cFS/osal/src/os/shared/src/osapi-binsem.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-heap.dir/workspace/cFS/osal/src/os/shared/src/osapi-heap.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-select.dir/workspace/cFS/osal/src/os/shared/src/osapi-select.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-queue.dir/workspace/cFS/osal/src/os/shared/src/osapi-queue.c.gcno
+Processing osal/unit-test-coverage/shared/CMakeFiles/utobj_coverage-shared-countsem.dir/workspace/cFS/osal/src/os/shared/src/osapi-countsem.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-mutex.dir/workspace/cFS/osal/src/os/vxworks/src/os-impl-mutex.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-no-loader.dir/workspace/cFS/osal/src/os/portable/os-impl-no-loader.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-no-shell.dir/workspace/cFS/osal/src/os/portable/os-impl-no-shell.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-countsem.dir/workspace/cFS/osal/src/os/vxworks/src/os-impl-countsem.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-bsd-sockets.dir/workspace/cFS/osal/src/os/portable/os-impl-bsd-sockets.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-console.dir/workspace/cFS/osal/src/os/vxworks/src/os-impl-console.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-timebase.dir/workspace/cFS/osal/src/os/vxworks/src/os-impl-timebase.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-no-symtab.dir/workspace/cFS/osal/src/os/portable/os-impl-no-symtab.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-bsd-sockets-dns.dir/workspace/cFS/osal/src/os/portable/os-impl-bsd-sockets-dns.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-posix-io.dir/workspace/cFS/osal/src/os/portable/os-impl-posix-io.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-posix-gettime.dir/workspace/cFS/osal/src/os/portable/os-impl-posix-gettime.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-no-network-gethostname.dir/workspace/cFS/osal/src/os/portable/os-impl-no-network-gethostname.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-tasks.dir/workspace/cFS/osal/src/os/vxworks/src/os-impl-tasks.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-common.dir/workspace/cFS/osal/src/os/vxworks/src/os-impl-common.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-posix-file-allocate.dir/workspace/cFS/osal/src/os/portable/os-impl-posix-file-allocate.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-no-network-gethostid.dir/workspace/cFS/osal/src/os/portable/os-impl-no-network-gethostid.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-bsd-sockets-no-dns.dir/workspace/cFS/osal/src/os/portable/os-impl-bsd-sockets-no-dns.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-dirs-globals.dir/workspace/cFS/osal/src/os/vxworks/src/os-impl-dirs-globals.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-binsem.dir/workspace/cFS/osal/src/os/vxworks/src/os-impl-binsem.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-network.dir/workspace/cFS/osal/src/os/vxworks/src/os-impl-network.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-no-sockets.dir/workspace/cFS/osal/src/os/portable/os-impl-no-sockets.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-posix-files.dir/workspace/cFS/osal/src/os/portable/os-impl-posix-files.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-files.dir/workspace/cFS/osal/src/os/vxworks/src/os-impl-files.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-loader.dir/workspace/cFS/osal/src/os/vxworks/src/os-impl-loader.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-posix-dirs.dir/workspace/cFS/osal/src/os/portable/os-impl-posix-dirs.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-console-bsp.dir/workspace/cFS/osal/src/os/portable/os-impl-console-bsp.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-filesys.dir/workspace/cFS/osal/src/os/vxworks/src/os-impl-filesys.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-sockets.dir/workspace/cFS/osal/src/os/vxworks/src/os-impl-sockets.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-idmap.dir/workspace/cFS/osal/src/os/vxworks/src/os-impl-idmap.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-bsd-select.dir/workspace/cFS/osal/src/os/portable/os-impl-bsd-select.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-no-condvar.dir/workspace/cFS/osal/src/os/portable/os-impl-no-condvar.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-no-file-allocate.dir/workspace/cFS/osal/src/os/portable/os-impl-no-file-allocate.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-heap.dir/workspace/cFS/osal/src/os/vxworks/src/os-impl-heap.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-shell.dir/workspace/cFS/osal/src/os/vxworks/src/os-impl-shell.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-queues.dir/workspace/cFS/osal/src/os/vxworks/src/os-impl-queues.c.gcno
+Processing osal/unit-test-coverage/vxworks/CMakeFiles/utobj_coverage-vxworks-symtab.dir/workspace/cFS/osal/src/os/vxworks/src/os-impl-symtab.c.gcno
+Processing fs/ut-coverage/CMakeFiles/coverage-fs-ALL-object.dir/__/fsw/src/cfe_fs_priv.c.gcno
+Processing fs/ut-coverage/CMakeFiles/coverage-fs-ALL-object.dir/__/fsw/src/cfe_fs_api.c.gcno
+Processing time/ut-coverage/CMakeFiles/coverage-time-ALL-object.dir/__/fsw/src/cfe_time_utils.c.gcno
+Processing time/ut-coverage/CMakeFiles/coverage-time-ALL-object.dir/__/fsw/src/cfe_time_tone.c.gcno
+Processing time/ut-coverage/CMakeFiles/coverage-time-ALL-object.dir/__/fsw/src/cfe_time_api.c.gcno
+Processing time/ut-coverage/CMakeFiles/coverage-time-ALL-object.dir/__/fsw/src/cfe_time_dispatch.c.gcno
+Processing time/ut-coverage/CMakeFiles/coverage-time-ALL-object.dir/__/fsw/src/cfe_time_task.c.gcno
+Processing config/ut-coverage/CMakeFiles/coverage-config-ALL-object.dir/__/fsw/src/cfe_config_set.c.gcno
+Processing config/ut-coverage/CMakeFiles/coverage-config-ALL-object.dir/__/fsw/src/cfe_config_eds_disabled.c.gcno
+Processing config/ut-coverage/CMakeFiles/coverage-config-ALL-object.dir/__/fsw/src/cfe_config_init.c.gcno
+Processing config/ut-coverage/CMakeFiles/coverage-config-ALL-object.dir/__/fsw/src/cfe_config_lookup.c.gcno
+Processing config/ut-coverage/CMakeFiles/coverage-config-ALL-object.dir/__/fsw/src/cfe_config_get.c.gcno
+Processing apps/sample_lib/unit-test/CMakeFiles/coverage-sample_lib-ALL-object.dir/workspace/cFS/libs/sample_lib/fsw/src/sample_lib.c.gcno
+Processing apps/sample_app/unit-test/CMakeFiles/coverage-sample_app-sample_app_dispatch-object.dir/workspace/cFS/apps/sample_app/fsw/src/sample_app_dispatch.c.gcno
+Processing apps/sample_app/unit-test/CMakeFiles/coverage-sample_app-sample_app_cmds-object.dir/workspace/cFS/apps/sample_app/fsw/src/sample_app_cmds.c.gcno
+Processing apps/sample_app/unit-test/CMakeFiles/coverage-sample_app-sample_app-object.dir/workspace/cFS/apps/sample_app/fsw/src/sample_app.c.gcno
+Processing apps/sample_app/unit-test/CMakeFiles/coverage-sample_app-sample_app_utils-object.dir/workspace/cFS/apps/sample_app/fsw/src/sample_app_utils.c.gcno
+Processing es/ut-coverage/CMakeFiles/coverage-es-ALL-object.dir/__/fsw/src/cfe_es_backgroundtask.c.gcno
+Processing es/ut-coverage/CMakeFiles/coverage-es-ALL-object.dir/__/fsw/src/cfe_es_task.c.gcno
+Processing es/ut-coverage/CMakeFiles/coverage-es-ALL-object.dir/__/fsw/src/cfe_es_cds.c.gcno
+Processing es/ut-coverage/CMakeFiles/coverage-es-ALL-object.dir/__/fsw/src/cfe_es_resource.c.gcno
+Processing es/ut-coverage/CMakeFiles/coverage-es-ALL-object.dir/__/fsw/src/cfe_es_objtab.c.gcno
+/workspace/cFS/build/native/default_cpu1/es/ut-coverage/CMakeFiles/coverage-es-ALL-object.dir/__/fsw/src/cfe_es_objtab.c.gcno:no functions found
+geninfo: WARNING: GCOV did not produce any data for /workspace/cFS/build/native/default_cpu1/es/ut-coverage/CMakeFiles/coverage-es-ALL-object.dir/__/fsw/src/cfe_es_objtab.c.gcno
+Processing es/ut-coverage/CMakeFiles/coverage-es-ALL-object.dir/__/fsw/src/cfe_es_dispatch.c.gcno
+Processing es/ut-coverage/CMakeFiles/coverage-es-ALL-object.dir/__/fsw/src/cfe_es_syslog.c.gcno
+Processing es/ut-coverage/CMakeFiles/coverage-es-ALL-object.dir/__/fsw/src/cfe_es_apps.c.gcno
+Processing es/ut-coverage/CMakeFiles/coverage-es-ALL-object.dir/__/fsw/src/cfe_es_mempool.c.gcno
+Processing es/ut-coverage/CMakeFiles/coverage-es-ALL-object.dir/__/fsw/src/cfe_es_cds_mempool.c.gcno
+Processing es/ut-coverage/CMakeFiles/coverage-es-ALL-object.dir/__/fsw/src/cfe_es_api.c.gcno
+Processing es/ut-coverage/CMakeFiles/coverage-es-ALL-object.dir/__/fsw/src/cfe_es_erlog.c.gcno
+Processing es/ut-coverage/CMakeFiles/coverage-es-ALL-object.dir/__/fsw/src/cfe_es_start.c.gcno
+Processing es/ut-coverage/CMakeFiles/coverage-es-ALL-object.dir/__/fsw/src/cfe_es_generic_pool.c.gcno
+Processing es/ut-coverage/CMakeFiles/coverage-es-ALL-object.dir/__/fsw/src/cfe_es_perf.c.gcno
+Processing es/ut-coverage/CMakeFiles/coverage-es-ALL-object.dir/__/fsw/src/cfe_es_crc.c.gcno
+Processing resourceid/ut-coverage/CMakeFiles/ut_resourceid_OBJS.dir/__/fsw/src/cfe_resourceid_api.c.gcno
+Finished .info-file creation
+(cd build/native/default_cpu1 && ctest  -O ctest.log)
+Test project /workspace/cFS/build/native/default_cpu1
+        Start   1: coverage-vxworks-binsem
+  1/117 Test   #1: coverage-vxworks-binsem ...................   Passed    0.00 sec
+        Start   2: coverage-vxworks-common
+  2/117 Test   #2: coverage-vxworks-common ...................   Passed    0.00 sec
+        Start   3: coverage-vxworks-console
+  3/117 Test   #3: coverage-vxworks-console ..................   Passed    0.00 sec
+        Start   4: coverage-vxworks-countsem
+  4/117 Test   #4: coverage-vxworks-countsem .................   Passed    0.00 sec
+        Start   5: coverage-vxworks-dirs-globals
+  5/117 Test   #5: coverage-vxworks-dirs-globals .............   Passed    0.00 sec
+        Start   6: coverage-vxworks-files
+  6/117 Test   #6: coverage-vxworks-files ....................   Passed    0.00 sec
+        Start   7: coverage-vxworks-filesys
+  7/117 Test   #7: coverage-vxworks-filesys ..................   Passed    0.00 sec
+        Start   8: coverage-vxworks-idmap
+  8/117 Test   #8: coverage-vxworks-idmap ....................   Passed    0.00 sec
+        Start   9: coverage-vxworks-heap
+  9/117 Test   #9: coverage-vxworks-heap .....................   Passed    0.00 sec
+        Start  10: coverage-vxworks-loader
+ 10/117 Test  #10: coverage-vxworks-loader ...................   Passed    0.00 sec
+        Start  11: coverage-vxworks-mutex
+ 11/117 Test  #11: coverage-vxworks-mutex ....................   Passed    0.00 sec
+        Start  12: coverage-vxworks-network
+ 12/117 Test  #12: coverage-vxworks-network ..................   Passed    0.00 sec
+        Start  13: coverage-vxworks-queues
+ 13/117 Test  #13: coverage-vxworks-queues ...................   Passed    0.00 sec
+        Start  14: coverage-vxworks-shell
+ 14/117 Test  #14: coverage-vxworks-shell ....................   Passed    0.00 sec
+        Start  15: coverage-vxworks-sockets
+ 15/117 Test  #15: coverage-vxworks-sockets ..................   Passed    0.00 sec
+        Start  16: coverage-vxworks-symtab
+ 16/117 Test  #16: coverage-vxworks-symtab ...................   Passed    0.00 sec
+        Start  17: coverage-vxworks-tasks
+ 17/117 Test  #17: coverage-vxworks-tasks ....................   Passed    0.00 sec
+        Start  18: coverage-vxworks-timebase
+ 18/117 Test  #18: coverage-vxworks-timebase .................   Passed    0.00 sec
+        Start  19: coverage-vxworks-posix-gettime
+ 19/117 Test  #19: coverage-vxworks-posix-gettime ............   Passed    0.00 sec
+        Start  20: coverage-vxworks-posix-io
+ 20/117 Test  #20: coverage-vxworks-posix-io .................   Passed    0.00 sec
+        Start  21: coverage-vxworks-posix-files
+ 21/117 Test  #21: coverage-vxworks-posix-files ..............   Passed    0.00 sec
+        Start  22: coverage-vxworks-posix-file-allocate
+ 22/117 Test  #22: coverage-vxworks-posix-file-allocate ......   Passed    0.00 sec
+        Start  23: coverage-vxworks-posix-dirs
+ 23/117 Test  #23: coverage-vxworks-posix-dirs ...............   Passed    0.00 sec
+        Start  24: coverage-vxworks-console-bsp
+ 24/117 Test  #24: coverage-vxworks-console-bsp ..............   Passed    0.00 sec
+        Start  25: coverage-vxworks-bsd-select
+ 25/117 Test  #25: coverage-vxworks-bsd-select ...............   Passed    0.00 sec
+        Start  26: coverage-vxworks-bsd-sockets
+ 26/117 Test  #26: coverage-vxworks-bsd-sockets ..............   Passed    0.00 sec
+        Start  27: coverage-vxworks-bsd-sockets-dns
+ 27/117 Test  #27: coverage-vxworks-bsd-sockets-dns ..........   Passed    0.00 sec
+        Start  28: coverage-vxworks-bsd-sockets-no-dns
+ 28/117 Test  #28: coverage-vxworks-bsd-sockets-no-dns .......   Passed    0.00 sec
+        Start  29: coverage-vxworks-no-loader
+ 29/117 Test  #29: coverage-vxworks-no-loader ................   Passed    0.00 sec
+        Start  30: coverage-vxworks-no-shell
+ 30/117 Test  #30: coverage-vxworks-no-shell .................   Passed    0.00 sec
+        Start  31: coverage-vxworks-no-symtab
+ 31/117 Test  #31: coverage-vxworks-no-symtab ................   Passed    0.00 sec
+        Start  32: coverage-vxworks-no-network-gethostname
+ 32/117 Test  #32: coverage-vxworks-no-network-gethostname ...   Passed    0.00 sec
+        Start  33: coverage-vxworks-no-network-gethostid
+ 33/117 Test  #33: coverage-vxworks-no-network-gethostid .....   Passed    0.00 sec
+        Start  34: coverage-vxworks-no-sockets
+ 34/117 Test  #34: coverage-vxworks-no-sockets ...............   Passed    0.00 sec
+        Start  35: coverage-vxworks-no-condvar
+ 35/117 Test  #35: coverage-vxworks-no-condvar ...............   Passed    0.00 sec
+        Start  36: coverage-vxworks-no-file-allocate
+ 36/117 Test  #36: coverage-vxworks-no-file-allocate .........   Passed    0.00 sec
+        Start  37: coverage-shared-binsem
+ 37/117 Test  #37: coverage-shared-binsem ....................   Passed    0.00 sec
+        Start  38: coverage-shared-clock
+ 38/117 Test  #38: coverage-shared-clock .....................   Passed    0.00 sec
+        Start  39: coverage-shared-common
+ 39/117 Test  #39: coverage-shared-common ....................   Passed    0.00 sec
+        Start  40: coverage-shared-condvar
+ 40/117 Test  #40: coverage-shared-condvar ...................   Passed    0.00 sec
+        Start  41: coverage-shared-countsem
+ 41/117 Test  #41: coverage-shared-countsem ..................   Passed    0.00 sec
+        Start  42: coverage-shared-dir
+ 42/117 Test  #42: coverage-shared-dir .......................   Passed    0.00 sec
+        Start  43: coverage-shared-errors
+ 43/117 Test  #43: coverage-shared-errors ....................   Passed    0.00 sec
+        Start  44: coverage-shared-file
+ 44/117 Test  #44: coverage-shared-file ......................   Passed    0.00 sec
+        Start  45: coverage-shared-filesys
+ 45/117 Test  #45: coverage-shared-filesys ...................   Passed    0.00 sec
+        Start  46: coverage-shared-heap
+ 46/117 Test  #46: coverage-shared-heap ......................   Passed    0.00 sec
+        Start  47: coverage-shared-idmap
+ 47/117 Test  #47: coverage-shared-idmap .....................   Passed    0.04 sec
+        Start  48: coverage-shared-module
+ 48/117 Test  #48: coverage-shared-module ....................   Passed    0.00 sec
+        Start  49: coverage-shared-mutex
+ 49/117 Test  #49: coverage-shared-mutex .....................   Passed    0.00 sec
+        Start  50: coverage-shared-network
+ 50/117 Test  #50: coverage-shared-network ...................   Passed    0.00 sec
+        Start  51: coverage-shared-printf
+ 51/117 Test  #51: coverage-shared-printf ....................   Passed    0.00 sec
+        Start  52: coverage-shared-queue
+ 52/117 Test  #52: coverage-shared-queue .....................   Passed    0.00 sec
+        Start  53: coverage-shared-rwlock
+ 53/117 Test  #53: coverage-shared-rwlock ....................   Passed    0.00 sec
+        Start  54: coverage-shared-select
+ 54/117 Test  #54: coverage-shared-select ....................   Passed    0.00 sec
+        Start  55: coverage-shared-sockets
+ 55/117 Test  #55: coverage-shared-sockets ...................   Passed    0.00 sec
+        Start  56: coverage-shared-task
+ 56/117 Test  #56: coverage-shared-task ......................   Passed    0.00 sec
+        Start  57: coverage-shared-timebase
+ 57/117 Test  #57: coverage-shared-timebase ..................   Passed    0.00 sec
+        Start  58: coverage-shared-time
+ 58/117 Test  #58: coverage-shared-time ......................   Passed    0.00 sec
+        Start  59: coverage-shared-version
+ 59/117 Test  #59: coverage-shared-version ...................   Passed    0.00 sec
+        Start  60: bin-sem-test
+ 60/117 Test  #60: bin-sem-test ..............................   Passed    1.03 sec
+        Start  61: bin-sem-timeout-test
+ 61/117 Test  #61: bin-sem-timeout-test ......................   Passed   19.04 sec
+        Start  62: condvar-test
+ 62/117 Test  #62: condvar-test ..............................   Passed    0.57 sec
+        Start  63: count-sem-test
+ 63/117 Test  #63: count-sem-test ............................   Passed    1.23 sec
+        Start  64: count-sem-timeout-test
+ 64/117 Test  #64: count-sem-timeout-test ....................   Passed    8.63 sec
+        Start  65: file-api-test
+ 65/117 Test  #65: file-api-test .............................   Passed    0.02 sec
+        Start  66: file-sys-add-fixed-map-api-test
+ 66/117 Test  #66: file-sys-add-fixed-map-api-test ...........   Passed    0.02 sec
+        Start  67: idmap-api-test
+ 67/117 Test  #67: idmap-api-test ............................   Passed    0.05 sec
+        Start  68: mutex-test
+ 68/117 Test  #68: mutex-test ................................   Passed    5.63 sec
+        Start  69: network-api-test
+ 69/117 Test  #69: network-api-test ..........................   Passed   34.11 sec
+        Start  70: osal-core-test
+ 70/117 Test  #70: osal-core-test ............................   Passed    0.12 sec
+        Start  71: queue-test
+ 71/117 Test  #71: queue-test ................................   Passed   12.84 sec
+        Start  72: rwlock-test
+ 72/117 Test  #72: rwlock-test ...............................   Passed    5.07 sec
+        Start  73: select-test
+ 73/117 Test  #73: select-test ...............................   Passed    3.26 sec
+        Start  74: sem-speed-test
+ 74/117 Test  #74: sem-speed-test ............................   Passed    5.03 sec
+        Start  75: shell-test
+ 75/117 Test  #75: shell-test ................................   Passed    0.02 sec
+        Start  76: symbol-api-test
+ 76/117 Test  #76: symbol-api-test ...........................   Passed    0.02 sec
+        Start  77: time-base-api-test
+ 77/117 Test  #77: time-base-api-test ........................   Passed    0.04 sec
+        Start  78: timer-add-api-test
+ 78/117 Test  #78: timer-add-api-test ........................   Passed   30.02 sec
+        Start  79: timer-test
+ 79/117 Test  #79: timer-test ................................   Passed   30.01 sec
+        Start  80: osal_core_UT
+ 80/117 Test  #80: osal_core_UT ..............................   Passed   19.91 sec
+        Start  81: osal_loader_UT
+ 81/117 Test  #81: osal_loader_UT ............................   Passed    0.04 sec
+        Start  82: osal_filesys_UT
+ 82/117 Test  #82: osal_filesys_UT ...........................   Passed    0.02 sec
+        Start  83: osal_file_UT
+ 83/117 Test  #83: osal_file_UT ..............................   Passed    0.03 sec
+        Start  84: osal_network_UT
+ 84/117 Test  #84: osal_network_UT ...........................   Passed    0.02 sec
+        Start  85: osal_timer_UT
+ 85/117 Test  #85: osal_timer_UT .............................   Passed    5.13 sec
+        Start  86: coverage-es-ALL
+ 86/117 Test  #86: coverage-es-ALL ...........................   Passed    0.02 sec
+        Start  87: coverage-evs-ALL
+ 87/117 Test  #87: coverage-evs-ALL ..........................   Passed    0.01 sec
+        Start  88: coverage-fs-ALL
+ 88/117 Test  #88: coverage-fs-ALL ...........................   Passed    0.00 sec
+        Start  89: coverage-sb-ALL
+ 89/117 Test  #89: coverage-sb-ALL ...........................   Passed    0.02 sec
+        Start  90: coverage-tbl-ALL
+ 90/117 Test  #90: coverage-tbl-ALL ..........................   Passed    0.01 sec
+        Start  91: coverage-time-ALL
+ 91/117 Test  #91: coverage-time-ALL .........................   Passed    0.00 sec
+        Start  92: coverage-pspmod-timebase_vxworks
+ 92/117 Test  #92: coverage-pspmod-timebase_vxworks ..........   Passed    0.00 sec
+        Start  93: coverage-pspmod-vxworks_sysmon
+ 93/117 Test  #93: coverage-pspmod-vxworks_sysmon ............   Passed    0.00 sec
+        Start  94: coverage-pspmod-ram_notimpl
+ 94/117 Test  #94: coverage-pspmod-ram_notimpl ...............   Passed    0.00 sec
+        Start  95: coverage-pspmod-ram_direct
+ 95/117 Test  #95: coverage-pspmod-ram_direct ................   Passed    0.00 sec
+        Start  96: coverage-pspmod-port_notimpl
+ 96/117 Test  #96: coverage-pspmod-port_notimpl ..............   Passed    0.00 sec
+        Start  97: coverage-pspmod-port_direct
+ 97/117 Test  #97: coverage-pspmod-port_direct ...............   Passed    0.00 sec
+        Start  98: coverage-pspmod-eeprom_notimpl
+ 98/117 Test  #98: coverage-pspmod-eeprom_notimpl ............   Passed    0.00 sec
+        Start  99: coverage-pspmod-eeprom_mmap_file
+ 99/117 Test  #99: coverage-pspmod-eeprom_mmap_file ..........   Passed    0.00 sec
+        Start 100: coverage-pspmod-eeprom_direct
+100/117 Test #100: coverage-pspmod-eeprom_direct .............   Passed    0.00 sec
+        Start 101: coverage-pspmod-iodriver
+101/117 Test #101: coverage-pspmod-iodriver ..................   Passed    0.00 sec
+        Start 102: coverage-pspmod-soft_timebase
+102/117 Test #102: coverage-pspmod-soft_timebase .............   Passed    0.00 sec
+        Start 103: coverage-pspmod-network_pc686_rtems
+103/117 Test #103: coverage-pspmod-network_pc686_rtems .......   Passed    0.00 sec
+        Start 104: coverage-pspmod-endian_api
+104/117 Test #104: coverage-pspmod-endian_api ................   Passed    0.00 sec
+        Start 105: coverage-ut-mcp750-vxworks
+105/117 Test #105: coverage-ut-mcp750-vxworks ................   Passed    0.00 sec
+        Start 106: coverage-ut-pc-rtems
+106/117 Test #106: coverage-ut-pc-rtems ......................   Passed    0.00 sec
+        Start 107: coverage-msg-ALL
+107/117 Test #107: coverage-msg-ALL ..........................   Passed    0.00 sec
+        Start 108: sbr_map_direct_UT
+108/117 Test #108: sbr_map_direct_UT .........................   Passed    0.02 sec
+        Start 109: sbr_map_hash_UT
+109/117 Test #109: sbr_map_hash_UT ...........................   Passed    0.02 sec
+        Start 110: sbr_route_unsorted_UT
+110/117 Test #110: sbr_route_unsorted_UT .....................   Passed    0.00 sec
+        Start 111: resourceid_UT
+111/117 Test #111: resourceid_UT .............................   Passed    0.02 sec
+        Start 112: coverage-config-ALL
+112/117 Test #112: coverage-config-ALL .......................   Passed    0.00 sec
+        Start 113: coverage-sample_app-sample_app
+113/117 Test #113: coverage-sample_app-sample_app ............   Passed    0.00 sec
+        Start 114: coverage-sample_app-sample_app_cmds
+114/117 Test #114: coverage-sample_app-sample_app_cmds .......   Passed    0.00 sec
+        Start 115: coverage-sample_app-sample_app_utils
+115/117 Test #115: coverage-sample_app-sample_app_utils ......   Passed    0.00 sec
+        Start 116: coverage-sample_app-sample_app_dispatch
+116/117 Test #116: coverage-sample_app-sample_app_dispatch ...   Passed    0.00 sec
+        Start 117: coverage-sample_lib-ALL
+117/117 Test #117: coverage-sample_lib-ALL ...................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 117
+
+Total Test time (real) = 182.20 sec

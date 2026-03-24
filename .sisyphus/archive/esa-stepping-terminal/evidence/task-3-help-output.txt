@@ -1,0 +1,16 @@
+ESA Stepping Terminal v1.0
+默认 Socket: /tmp/cfe_sim_stepping.sock
+输入 'help' 查看可用命令
+
+est> 可用命令:
+  help     - 显示命令帮助
+  connect  - 显示或更新 Socket 路径
+  query    - 查询原始状态字段
+  status   - 查询并显示友好状态文本
+  begin    - 开始一次步进
+  wait     - 等待步进完成：wait <timeout_ms>
+  step     - 执行一步：step <timeout_ms>
+  repeat   - 重复步进：repeat <count> <timeout_ms> [interval_ms]
+  quit     - 退出终端
+  exit     - 退出终端
+est> 

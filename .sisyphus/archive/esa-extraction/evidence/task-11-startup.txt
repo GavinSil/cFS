@@ -1,0 +1,84 @@
+Script started on 2026-03-18 18:03:27+08:00 [<not executed on terminal>]
+CFE_PSP: Simulation stepping module initialized
+CFE_PSP: Default Reset SubType = 1
+CFE_PSP: Default CPU ID = 1
+CFE_PSP: Default Spacecraft ID = 66
+CFE_PSP: Default CPU Name: cpu1
+OS_Posix_GetSchedulerParams():203:Policy 1: available, min-max: 1-99
+OS_Posix_GetSchedulerParams():203:Policy 2: available, min-max: 1-99
+OS_Posix_TaskAPI_Impl_Init():389:Selected policy 2 for RT tasks, root task = 99
+CFE_PSP: initializing module 'soft_timebase' with ID 0110ff00
+CFE_PSP: Created software timebase 'cFS-Master' (stepping mode - wall-clock scheduling disabled)
+CFE_PSP: initializing module 'timebase_posix_clock' with ID 0110ff01
+CFE_PSP: Using POSIX monotonic clock as CFE timebase
+CFE_PSP: initializing module 'eeprom_mmap_file' with ID 0110ff02
+CFE_PSP: Using MMAP simulated EEPROM implementation
+CFE_PSP: initializing module 'ram_notimpl' with ID 0110ff03
+CFE_PSP: EEPROM Range (2) created: Start Address = 721D07F7F000, Size = 00080000 Status = 0
+CFE_PSP: Physical RAM access not implemented
+CFE_PSP: initializing module 'port_notimpl' with ID 0110ff04
+CFE_PSP: I/O Port access not implemented
+CFE_PSP: initializing module 'iodriver' with ID 0110ff05
+CFE_PSP: initializing module 'linux_sysmon' with ID 0110ff06
+CFE_PSP: initializing module 'endian_api' with ID 0110ff07
+CFE_PSP: Host CPU Endian=LITTLE
+CFE_PSP: Normal exit from previous cFE instance
+CFE_PSP: Starting the cFE with a PROCESSOR reset.
+1980-001-00:00:00.00000 CFE_ES_Main: CFE_ES_Main in EARLY_INIT state
+1980-001-00:00:00.00000 CFE_ES_InitializeFileSystems: Volatile Disk has 100 Percent free space.
+CFE_PSP: CFE_PSP_AttachExceptions called
+1980-001-00:00:00.00000 CFE_ES_Main: CFE_ES_Main entering CORE_STARTUP state
+1980-001-00:00:00.00000 CFE_ES_CreateObjects: Starting Object Creation calls.
+1980-001-00:00:00.00000 CFE_ES_CreateObjects: Calling CFE_Config_Init
+1980-001-00:00:00.00000 CFE_ES_CreateObjects: Calling CFE_ES_CDSEarlyInit
+1980-001-00:00:00.00000 CFE_ES_CreateObjects: Calling CFE_EVS_EarlyInit
+1980-001-00:00:00.00000 CFE_EVS_EarlyInit: Event Log restored, n=0, c=20, f=1, m=1, o=32
+1980-001-00:00:00.00000 CFE_ES_CreateObjects: Calling CFE_SB_EarlyInit
+1980-001-00:00:00.00000 CFE_ES_CreateObjects: Calling CFE_TIME_EarlyInit
+1980-012-14:03:20.00000 CFE_ES_CreateObjects: Calling CFE_TBL_EarlyInit
+1980-012-14:03:20.00000 CFE_ES_CreateObjects: Calling CFE_FS_EarlyInit
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_EVS 1: cFE EVS Initialized: CFE_EVS v7.0.0+dev0 (Draco) v7.0.0 Official Release, EDS disabled
+1980-012-14:03:20.00000 CFE_SB_AppInit: Registered 4 events for filtering
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_SB 1: cFE SB Initialized: CFE_SB v7.0.0+dev0 (Draco) v7.0.0 Official Release, EDS disabled
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_SB 14: No subscribers for MsgId 0x808,sender CFE_SB
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_ES 1: cFE ES Initialized: CFE_ES v7.0.0+dev0 (Draco) v7.0.0 Official Release, EDS disabled
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_SB 14: No subscribers for MsgId 0x808,sender CFE_ES
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_ES 2: cFS Versions: cfe v7.0.0+dev0, osal v7.0.0+dev0, psp v7.0.0+dev0. cFE chksm 18375
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_SB 14: No subscribers for MsgId 0x808,sender CFE_ES
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_ES 91: Version Info: Mission SampleMission, version git:v7.0.0-18-gd533e10-dirty
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_SB 14: No subscribers for MsgId 0x808,sender CFE_ES
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_ES 91: Version Info: Module CORE_API, version git:v7.0.0-2-gd45dbab9-dirty
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_ES 91: Version Info: Module ES, version git:v7.0.0-2-gd45dbab9-dirty
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_ES 91: Version Info: Module EVS, version git:v7.0.0-2-gd45dbab9-dirty
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_ES 91: Version Info: Module FS, version git:v7.0.0-2-gd45dbab9-dirty
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_ES 91: Version Info: Module SB, version git:v7.0.0-2-gd45dbab9-dirty
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_ES 91: Version Info: Module TBL, version git:v7.0.0-2-gd45dbab9-dirty
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_ES 91: Version Info: Module TIME, version git:v7.0.0-2-gd45dbab9-dirty
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_ES 91: Version Info: Module OSAL, version git:v7.0.0-2-gba75039b-dirty
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_ES 91: Version Info: Module ESA, version git:v7.0.0-18-gd533e10-dirty
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_ES 91: Version Info: Module PSP, version git:v7.0.0-3-g6b4da5f
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_ES 91: Version Info: Module MSG, version git:v7.0.0-2-gd45dbab9-dirty
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_ES 91: Version Info: Module SBR, version git:v7.0.0-2-gd45dbab9-dirty
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_ES 91: Version Info: Module RESOURCEID, version git:v7.0.0-2-gd45dbab9-dirty
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_ES 91: Version Info: Module CONFIG, version git:v7.0.0-2-gd45dbab9-dirty
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_ES 92: Build 202603181803 by root@LaptopGY, config sample
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_TIME 1: cFE TIME Initialized: CFE_TIME v7.0.0+dev0 (Draco) v7.0.0 Official Release, EDS disabled
+EVS Port1 1980-012-14:03:20.00000 66/1/CFE_TBL 1: cFE TBL Initialized: CFE_TBL v7.0.0+dev0 (Draco) v7.0.0 Official Release, EDS disabled
+1980-012-14:03:20.00000 CFE_ES_CreateObjects: Finished ES CreateObject table entries.
+1980-012-14:03:20.00000 CFE_ES_Main: CFE_ES_Main entering CORE_READY state
+OS_FileOpen_Impl():110:open(/dev/shm/osal:RAM/cfe_es_startup.scr): No such file or directory
+OS_FileOpen_Impl():110:open(./cf/cfe_es_startup.scr): No such file or directory
+1980-012-14:03:20.00000 CFE_ES_StartApplications: Cannot Open Volatile Startup file: /ram/cfe_es_startup.scr, Trying Nonvolatile.
+1980-012-14:03:20.00000 CFE_ES_StartApplications: Error, Can't Open ES App Startup file: /cf/cfe_es_startup.scr, EC = -1
+1980-012-14:03:20.00000 CFE_ES_Main: CFE_ES_Main entering APPS_INIT state
+1980-012-14:03:20.00000 CFE_ES_Main: CFE_ES_Main entering OPERATIONAL state
+1980-012-14:03:20.00000 CFE_ES_RunExceptionScan: ExceptionID 0x1110002 in TaskID 0: Caught Signal 15
+1980-012-14:03:20.00000 CFE_ES_RunExceptionScan: Maximum Processor Reset count reached (2)
+CFE_PSP: Exiting cFE with POWERON Reset status.
+CFE_PSP: Critical Data Store Shared memory segment removed
+Reset Area Shared memory segment removed
+User Reserved Area Shared memory segment removed
+
+CFE_PSP: Shutdown initiated - Exiting cFE
+
+Script done on 2026-03-18 18:03:37+08:00 [COMMAND_EXIT_CODE="124"]

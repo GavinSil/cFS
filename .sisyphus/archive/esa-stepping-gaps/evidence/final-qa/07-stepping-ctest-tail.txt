@@ -1,0 +1,100 @@
+ 28/121 Test  #28: coverage-vxworks-bsd-sockets-no-dns .......   Passed    0.00 sec
+        Start  29: coverage-vxworks-no-loader
+ 29/121 Test  #29: coverage-vxworks-no-loader ................   Passed    0.00 sec
+        Start  30: coverage-vxworks-no-shell
+ 30/121 Test  #30: coverage-vxworks-no-shell .................   Passed    0.00 sec
+        Start  31: coverage-vxworks-no-symtab
+ 31/121 Test  #31: coverage-vxworks-no-symtab ................   Passed    0.00 sec
+        Start  32: coverage-vxworks-no-network-gethostname
+ 32/121 Test  #32: coverage-vxworks-no-network-gethostname ...   Passed    0.00 sec
+        Start  33: coverage-vxworks-no-network-gethostid
+ 33/121 Test  #33: coverage-vxworks-no-network-gethostid .....   Passed    0.00 sec
+        Start  34: coverage-vxworks-no-sockets
+ 34/121 Test  #34: coverage-vxworks-no-sockets ...............   Passed    0.00 sec
+        Start  35: coverage-vxworks-no-condvar
+ 35/121 Test  #35: coverage-vxworks-no-condvar ...............   Passed    0.00 sec
+        Start  36: coverage-vxworks-no-file-allocate
+ 36/121 Test  #36: coverage-vxworks-no-file-allocate .........   Passed    0.00 sec
+        Start  37: coverage-shared-binsem
+ 37/121 Test  #37: coverage-shared-binsem ....................   Passed    0.00 sec
+        Start  38: coverage-shared-clock
+ 38/121 Test  #38: coverage-shared-clock .....................   Passed    0.00 sec
+        Start  39: coverage-shared-common
+ 39/121 Test  #39: coverage-shared-common ....................   Passed    0.00 sec
+        Start  40: coverage-shared-condvar
+ 40/121 Test  #40: coverage-shared-condvar ...................   Passed    0.00 sec
+        Start  41: coverage-shared-countsem
+ 41/121 Test  #41: coverage-shared-countsem ..................   Passed    0.00 sec
+        Start  42: coverage-shared-dir
+ 42/121 Test  #42: coverage-shared-dir .......................   Passed    0.00 sec
+        Start  43: coverage-shared-errors
+ 43/121 Test  #43: coverage-shared-errors ....................   Passed    0.00 sec
+        Start  44: coverage-shared-file
+ 44/121 Test  #44: coverage-shared-file ......................   Passed    0.00 sec
+        Start  45: coverage-shared-filesys
+ 45/121 Test  #45: coverage-shared-filesys ...................   Passed    0.00 sec
+        Start  46: coverage-shared-heap
+ 46/121 Test  #46: coverage-shared-heap ......................   Passed    0.00 sec
+        Start  47: coverage-shared-idmap
+ 47/121 Test  #47: coverage-shared-idmap .....................   Passed    0.04 sec
+        Start  48: coverage-shared-module
+ 48/121 Test  #48: coverage-shared-module ....................   Passed    0.00 sec
+        Start  49: coverage-shared-mutex
+ 49/121 Test  #49: coverage-shared-mutex .....................   Passed    0.00 sec
+        Start  50: coverage-shared-network
+ 50/121 Test  #50: coverage-shared-network ...................   Passed    0.00 sec
+        Start  51: coverage-shared-printf
+ 51/121 Test  #51: coverage-shared-printf ....................   Passed    0.00 sec
+        Start  52: coverage-shared-queue
+ 52/121 Test  #52: coverage-shared-queue .....................   Passed    0.00 sec
+        Start  53: coverage-shared-rwlock
+ 53/121 Test  #53: coverage-shared-rwlock ....................   Passed    0.00 sec
+        Start  54: coverage-shared-select
+ 54/121 Test  #54: coverage-shared-select ....................   Passed    0.00 sec
+        Start  55: coverage-shared-sockets
+ 55/121 Test  #55: coverage-shared-sockets ...................   Passed    0.00 sec
+        Start  56: coverage-shared-task
+ 56/121 Test  #56: coverage-shared-task ......................   Passed    0.00 sec
+        Start  57: coverage-shared-timebase
+ 57/121 Test  #57: coverage-shared-timebase ..................   Passed    0.00 sec
+        Start  58: coverage-shared-time
+ 58/121 Test  #58: coverage-shared-time ......................   Passed    0.00 sec
+        Start  59: coverage-shared-version
+ 59/121 Test  #59: coverage-shared-version ...................   Passed    0.00 sec
+        Start  60: bin-sem-test
+ 60/121 Test  #60: bin-sem-test ..............................   Passed    1.03 sec
+        Start  61: bin-sem-timeout-test
+ 61/121 Test  #61: bin-sem-timeout-test ......................   Passed   19.08 sec
+        Start  62: condvar-test
+ 62/121 Test  #62: condvar-test ..............................   Passed    0.57 sec
+        Start  63: count-sem-test
+ 63/121 Test  #63: count-sem-test ............................   Passed    1.23 sec
+        Start  64: count-sem-timeout-test
+ 64/121 Test  #64: count-sem-timeout-test ....................   Passed    8.63 sec
+        Start  65: file-api-test
+ 65/121 Test  #65: file-api-test .............................   Passed    0.02 sec
+        Start  66: file-sys-add-fixed-map-api-test
+ 66/121 Test  #66: file-sys-add-fixed-map-api-test ...........   Passed    0.02 sec
+        Start  67: idmap-api-test
+ 67/121 Test  #67: idmap-api-test ............................   Passed    0.05 sec
+        Start  68: mutex-test
+ 68/121 Test  #68: mutex-test ................................   Passed    5.64 sec
+        Start  69: network-api-test
+ 69/121 Test  #69: network-api-test ..........................   Passed   34.11 sec
+        Start  70: osal-core-test
+ 70/121 Test  #70: osal-core-test ............................   Passed    0.11 sec
+        Start  71: queue-test
+ 71/121 Test  #71: queue-test ................................   Passed   12.93 sec
+        Start  72: rwlock-test
+ 72/121 Test  #72: rwlock-test ...............................   Passed    5.07 sec
+        Start  73: select-test
+ 73/121 Test  #73: select-test ...............................   Passed    3.26 sec
+        Start  74: sem-speed-test
+ 74/121 Test  #74: sem-speed-test ............................   Passed    5.03 sec
+        Start  75: shell-test
+ 75/121 Test  #75: shell-test ................................   Passed    0.02 sec
+        Start  76: symbol-api-test
+ 76/121 Test  #76: symbol-api-test ...........................   Passed    0.02 sec
+        Start  77: time-base-api-test
+ 77/121 Test  #77: time-base-api-test ........................   Passed    0.04 sec
+        Start  78: timer-add-api-test

@@ -1,0 +1,41 @@
+T5 SB receive complete boundary verification (PASSED)
+Date: 2026-03-16
+
+Source of truth:
+- .sisyphus/plans/linux-global-sim-stepping.md (T5 QA scenario: SB receive重入形成complete边界)
+- .sisyphus/notepads/linux-global-sim-stepping/learnings.md (T7, T19-T22 sections)
+
+Implementation verification
+1) Receive fact emission (sample_app pattern):
+   - Location: apps/sample_app/fsw/src/sample_app.c (typical app pattern)
+   - Event: CFE_SB_ReceiveBuffer() returns with message
+   - Reports: QUEUE_RECEIVE fact via shim
+
+2) Complete fact emission:
+   - SB task: cfe/modules/sb/fsw/src/cfe_sb_task.c
+     * Added in T19: Completion fact after CFE_SB_ProcessCmdPipePkt()
+     * Event: CFE_PSP_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_COMPLETE
+     
+   - Similar patterns in:
+     * ES task (T21): Completion after CFE_ES_TaskPipe()
+     * TBL task (T20): Completion after CFE_TBL_TaskPipe()
+     * EVS task: Completion after CFE_EVS_ProcessCommandPacket()
+
+3) Fact boundary pair:
+   - Receive: marks entry to processing (READY→RUNNING)
+   - Complete: marks exit from processing (acks complete)
+   - Core tracks: acks_expected vs acks_received
+
+Runtime evidence (from T13-T14)
+- Log markers show receive/complete ordering:
+  * "CFE_PSP: SIM_STEPPING_DIAG class=receive" 
+  * "CFE_PSP: SIM_STEPPING_DIAG class=complete"
+- Step completion waits for all triggered tasks to report complete
+
+Interpretation vs T5 acceptance:
+- PASS: Receive→process→complete boundary established
+- PASS: Core services (SB, ES, TBL, EVS) emit paired facts
+- PASS: Step completion waits for complete facts
+
+Conclusion
+T5 queue complete boundary verification PASSED. SB receive provides clear completion semantics.

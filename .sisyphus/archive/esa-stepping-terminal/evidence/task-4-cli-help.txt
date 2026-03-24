@@ -1,0 +1,6 @@
+用法: ./build/esa_stepping_terminal [选项]
+
+选项:
+  -s, --socket PATH    指定 Unix Domain Socket 路径
+                       （默认: /tmp/cfe_sim_stepping.sock）
+  -h, --help           显示此帮助信息并退出

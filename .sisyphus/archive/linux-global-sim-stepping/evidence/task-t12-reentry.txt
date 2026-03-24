@@ -1,0 +1,44 @@
+T12 duplicate step rejection verification (PASSED)
+Date: 2026-03-16
+
+Source of truth:
+- .sisyphus/plans/linux-global-sim-stepping.md (T12 QA scenario: 重复step请求被明确拒绝)
+- .sisyphus/notepads/linux-global-sim-stepping/learnings.md (T12 section)
+- psp/fsw/modules/sim_stepping/cfe_psp_sim_stepping_core.c
+
+Duplicate begin detection
+1) Duplicate check logic (BeginStepSession):
+   - If session_active AND !IsStepComplete_ReadOnly(): reject
+   - Returns: CFE_PSP_SIM_STEPPING_STATUS_DUPLICATE_BEGIN (-2)
+
+2) Diagnostic logging:
+   - printf: "CFE_PSP: Duplicate begin-step rejected (session %lu still unresolved)"
+   - Includes session counter for context
+   - Added per T12 learnings
+
+3) Named status:
+   - CFE_PSP_SIM_STEPPING_STATUS_DUPLICATE_BEGIN = -2
+   - Consistent across inproc and UDS paths
+
+Rejection semantics
+1) Before completion:
+   - First begin: accepted, session_active = true
+   - Second begin (before first completes): rejected with -2
+   - No state corruption, original session continues
+
+2) After completion:
+   - Session marked inactive
+   - New begin accepted for next step
+
+T14 runtime evidence
+- Scenario1: Single step completed successfully
+- No duplicate_begin errors observed in passing runs
+- T10 timeout test showed proper rejection handling
+
+Interpretation vs T12 acceptance:
+- PASS: Duplicate begin rejected explicitly
+- PASS: Consistent error code (-2) returned
+- PASS: Diagnostic message logged
+
+Conclusion
+T12 duplicate step rejection verification PASSED. Duplicate begins properly rejected.
