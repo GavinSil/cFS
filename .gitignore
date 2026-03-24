@@ -10,3 +10,6 @@ build
 /.resetkeyfile
 /EEPROM.DAT
 /.sisyphus/boulder.json.sisyphus/
+
+# AI agent context files
+AGENTS.md
