@@ -119,6 +119,25 @@ bool ESA_Stepping_Hook_GetTime(uint64_t *sim_time_ns);
 bool ESA_Stepping_Hook_TaskDelayEligible(uint32_t task_id, uint32_t delay_ms);
 
 /**
+ * \brief Hook to query if a stepping session is currently active
+ *
+ * Called by OSAL synchronization primitives (BinSem, CondVar, etc.) to determine
+ * if they should use ESA wait paths (return true) or fall back to legacy POSIX
+ * waits (return false).
+ *
+ * Returns true only when the stepping core is initialized and a stepping session
+ * is active. Unit tests and non-stepping contexts return false, causing primitives
+ * to use legacy POSIX wait paths.
+ *
+ * \return  true if stepping session is active (use ESA waits)
+ * \return  false if no session active (use legacy POSIX waits)
+ *
+ * \note Implementations are provided only when CFE_SIM_STEPPING is defined.
+ *       When not defined, this becomes a no-op stub that returns false.
+ */
+bool ESA_Stepping_Hook_IsSessionActive(void);
+
+/**
  * \brief Block current task until simulated delay satisfied by explicit step quantums
  *
  * PSP-owned blocking wait for step-controlled TaskDelay. Thin wrapper forwarding to

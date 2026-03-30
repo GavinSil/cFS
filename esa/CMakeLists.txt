@@ -18,6 +18,7 @@ if (CFE_SIM_STEPPING)
     add_library(esa STATIC
         "${ESA_SIM_STEPPING_SRC_DIR}/esa_stepping.c"
         "${ESA_SIM_STEPPING_SRC_DIR}/esa_stepping_core.c"
+        "${ESA_SIM_STEPPING_SRC_DIR}/esa_wait.c"
     )
 
     target_include_directories(esa PRIVATE

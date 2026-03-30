@@ -35,6 +35,7 @@
  * This is the single authoritative stepping core for the mission.
  * All hooks report facts into this core; the core maintains state and semantics.
  * Initialized once at module startup with simulated time = 0.
+ * 系统 ready 生命周期事实由 ES 通过 shim event 上报，此处不在 ESA_Init 中直接置位。
  */
 static ESA_Stepping_Core_t stepping_core = {0};
 static bool core_initialized = false;
@@ -102,24 +103,13 @@ void ESA_Init(void)
     int32_t status;
     int pthread_status;
 
-    printf("CFE_PSP: Simulation stepping module initialized\n");
-
     status = ESA_Stepping_Core_Init(&stepping_core, 0, ESA_SIM_STEPPING_MAX_TRIGGERS);
     if (status == 0)
     {
         core_initialized = true;
-        
-        /**
-         * @brief 系统初始化完成，通知步进状态机可以进入步进就绪状态
-         * 
-         * ESA_Init 在 CFE_ES_Main 返回后被调用，此时 cFS 已进入 OPERATIONAL 状态，
-         * 直接标记系统就绪，无需通过 Shim 事件中转。
-         */
-        ESA_Stepping_Core_MarkSystemReadyForStepping(&stepping_core);
     }
     else
     {
-        printf("CFE_PSP: Failed to initialize stepping core (status=%ld)\n", (long)status);
         core_initialized = false;
         return;
     }
@@ -128,7 +118,7 @@ void ESA_Init(void)
     status = ESA_Stepping_UDS_Init();
     if (status != 0)
     {
-        printf("CFE_PSP: Failed to initialize UDS adapter (status=%ld)\n", (long)status);
+        ;
     }
     else
     {
@@ -139,7 +129,6 @@ void ESA_Init(void)
                                          &uds_service_loop);
         if (pthread_status != 0)
         {
-            printf("CFE_PSP: Failed to create UDS service loop thread (status=%d)\n", pthread_status);
             uds_service_loop.should_run = false;
         }
     }
@@ -171,9 +160,24 @@ bool ESA_Stepping_Hook_GetTime(uint64_t *sim_time_ns)
     return (status == 0);
 }
 
+bool ESA_Stepping_Hook_IsSessionActive(void)
+{
+    if (!core_initialized)
+    {
+        return false;
+    }
+
+    return stepping_core.session_active;
+}
+
 #else
 
 bool ESA_Stepping_Hook_GetTime(uint64_t *sim_time_ns)
+{
+    return false;
+}
+
+bool ESA_Stepping_Hook_IsSessionActive(void)
 {
     return false;
 }
