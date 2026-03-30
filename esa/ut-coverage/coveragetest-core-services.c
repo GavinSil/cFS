@@ -40,7 +40,7 @@ void CFE_TBL_TaskMain(void);
 
 typedef struct
 {
-    ESA_Stepping_ShimEvent_t Events[3];
+    ESA_Stepping_ShimEvent_t Events[2];
     uint32                   MatchCount;
     bool                     ProcessingInvoked;
 } ESA_CoreServiceCapture_t;
@@ -76,27 +76,6 @@ static int32 ESA_CaptureHook(void *UserObj, int32 StubRetcode, uint32 CallCount,
     return StubRetcode;
 }
 
-/**
- * @brief ES 专用捕获 hook：支持捕获 3 个事件
- * 
- * 与通用 hook 的区别：容量上限为 3（而非 2），用于 ES 测试捕获
- * SYSTEM_READY + RECEIVE + COMPLETE 三个事件。
- */
-static int32 ESA_CaptureHook_ES(void *UserObj, int32 StubRetcode, uint32 CallCount, const UT_StubContext_t *Context)
-{
-    const ESA_Stepping_ShimEvent_t *event   = UT_Hook_GetArgValueByName(Context, "event", const void *);
-    ESA_CoreServiceCapture_t *       capture = UserObj;
-
-    if (event != NULL && capture->MatchCount < 3)
-    {
-        capture->Events[capture->MatchCount] = *event;
-        ++capture->MatchCount;
-    }
-
-    (void)CallCount;
-    return StubRetcode;
-}
-
 static void ESA_AssertCoreEvents(const ESA_CoreServiceCapture_t *capture, uint32 expected_service_id)
 {
     UtAssert_UINT32_EQ(capture->MatchCount, 2);
@@ -104,24 +83,6 @@ static void ESA_AssertCoreEvents(const ESA_CoreServiceCapture_t *capture, uint32
     UtAssert_INT32_EQ(capture->Events[1].event_kind, ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_COMPLETE);
     UtAssert_UINT32_EQ(capture->Events[0].entity_id, expected_service_id);
     UtAssert_UINT32_EQ(capture->Events[1].entity_id, expected_service_id);
-    UtAssert_BOOL_TRUE(capture->ProcessingInvoked);
-}
-
-/**
- * @brief ES 专用事件断言：验证 SYSTEM_READY + RECEIVE + COMPLETE 三个事件
- * 
- * ES 在系统生命周期达到 CORE_READY 后，先上报 SYSTEM_READY_FOR_STEPPING 事件，
- * 然后才开始命令循环的 RECEIVE + COMPLETE，因此事件序列为 3 个。
- * 其他核心服务无此额外事件，仍为 2 个。
- */
-static void ESA_AssertES_Events(const ESA_CoreServiceCapture_t *capture, uint32 expected_service_id)
-{
-    UtAssert_UINT32_EQ(capture->MatchCount, 3);
-    UtAssert_INT32_EQ(capture->Events[0].event_kind, ESA_SIM_STEPPING_EVENT_SYSTEM_READY_FOR_STEPPING);
-    UtAssert_INT32_EQ(capture->Events[1].event_kind, ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_RECEIVE);
-    UtAssert_INT32_EQ(capture->Events[2].event_kind, ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_COMPLETE);
-    UtAssert_UINT32_EQ(capture->Events[1].entity_id, expected_service_id);
-    UtAssert_UINT32_EQ(capture->Events[2].entity_id, expected_service_id);
     UtAssert_BOOL_TRUE(capture->ProcessingInvoked);
 }
 
@@ -393,10 +354,10 @@ void Test_core_services_ES(void)
     ESA_CoreServiceCapture_t capture = {{{0}}, 0, false};
     ESA_ReceiveCallCount = 0;
     ESA_ActiveCapture = &capture;
-    UT_SetHookFunction(UT_KEY(ESA_Stepping_Shim_ReportEvent), ESA_CaptureHook_ES, &capture);
+    UT_SetHookFunction(UT_KEY(ESA_Stepping_Shim_ReportEvent), ESA_CaptureHook, &capture);
     CFE_ES_TaskMain();
     ESA_ActiveCapture = NULL;
-    ESA_AssertES_Events(&capture, 0);
+    ESA_AssertCoreEvents(&capture, 0);
 }
 
 void Test_core_services_EVS(void)
