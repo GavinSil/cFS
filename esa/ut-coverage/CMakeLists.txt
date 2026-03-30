@@ -300,3 +300,85 @@ add_test(${TEST_NAME} ${RUNNER_TARGET})
 foreach(TGT ${INSTALL_TARGET_LIST})
     install(TARGETS ${RUNNER_TARGET} DESTINATION ${TGT}/${UT_INSTALL_SUBDIR})
 endforeach()
+
+# Define test names
+set(TEST_NAME "coverage-esa-wait")
+set(OBJECT_TARGET "${TEST_NAME}-object")
+set(RUNNER_TARGET "${TEST_NAME}-testrunner")
+
+set(ESA_WAIT_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../fsw/src")
+add_library(${OBJECT_TARGET} OBJECT
+    "${ESA_WAIT_SRC_DIR}/esa_wait.c"
+)
+
+target_compile_options(${OBJECT_TARGET} PRIVATE
+    ${UT_COVERAGE_COMPILE_FLAGS}
+    -D_POSIX_C_SOURCE=200809L
+)
+
+target_compile_definitions(${OBJECT_TARGET} PRIVATE
+    CFE_SIM_STEPPING=1
+)
+
+target_include_directories(${OBJECT_TARGET} PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../fsw/inc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../cfe/cmake/target/inc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../osal/src/os/inc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../osal/src/ut-stubs"
+    $<TARGET_PROPERTY:osal,INTERFACE_INCLUDE_DIRECTORIES>
+)
+
+add_executable(${RUNNER_TARGET}
+    coveragetest-esa-wait.c
+    $<TARGET_OBJECTS:${OBJECT_TARGET}>
+)
+
+target_include_directories(${RUNNER_TARGET} PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../fsw/inc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../osal/src/ut-stubs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../cfe/cmake/target/inc"
+    $<TARGET_PROPERTY:osal,INTERFACE_INCLUDE_DIRECTORIES>
+)
+
+target_link_libraries(${RUNNER_TARGET}
+    ${UT_COVERAGE_LINK_FLAGS}
+    ut_osapi_stubs
+    ut_assert
+)
+
+add_test(${TEST_NAME} ${RUNNER_TARGET})
+foreach(TGT ${INSTALL_TARGET_LIST})
+    install(TARGETS ${RUNNER_TARGET} DESTINATION ${TGT}/${UT_INSTALL_SUBDIR})
+endforeach()
+
+# Integration test for wall-clock leakage elimination
+set(TEST_NAME "integration-esa-wall-clock-leakage")
+set(RUNNER_TARGET "${TEST_NAME}-testrunner")
+
+add_executable(${RUNNER_TARGET}
+    integrationtest-wall-clock-leakage.c
+)
+
+target_compile_definitions(${RUNNER_TARGET} PRIVATE
+    CFE_SIM_STEPPING=1
+    _POSIX_C_SOURCE=200809L
+)
+
+target_include_directories(${RUNNER_TARGET} PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../fsw/inc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../public_inc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../cfe/cmake/target/inc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../osal/src/os/inc"
+    $<TARGET_PROPERTY:osal,INTERFACE_INCLUDE_DIRECTORIES>
+)
+
+target_link_libraries(${RUNNER_TARGET}
+    esa
+    osal
+    ut_assert
+)
+
+add_test(${TEST_NAME} ${RUNNER_TARGET})
+foreach(TGT ${INSTALL_TARGET_LIST})
+    install(TARGETS ${RUNNER_TARGET} DESTINATION ${TGT}/${UT_INSTALL_SUBDIR})
+endforeach()
