@@ -1,24 +1,48 @@
+/**
+ * @file
+ * @ingroup esa
+ * @brief       时间服务步进钩子单元测试
+ * @author      gaoyuan
+ * @date        2026-03-23
+ *
+ * @details     本文件测试 ESA 时间服务的步进钩子函数。
+ */
 #include <string.h>
 
-#include "../../osal/src/os/inc/common_types.h"
-#include "../../osal/ut_assert/inc/utassert.h"
-#include "../../osal/ut_assert/inc/utstubs.h"
-#include "../../osal/ut_assert/inc/uttest.h"
+#include "utassert.h"
+#include "utstubs.h"
+#include "uttest.h"
 
-#include "../public_inc/esa_stepping_shim.h"
-#include "../fsw/inc/esa_stepping_core.h"
-#include "../../cfe/modules/time/fsw/src/cfe_time_stepping.h"
+#include "common_types.h"
+#include "esa_stepping_core.h"
+#include "esa_stepping_shim.h"
 
+/**
+ * @brief 钩子上下文:捕获传递给 ESA_Stepping_Shim_ReportEvent 的事件
+ */
 typedef struct
 {
-    ESA_Stepping_ShimEvent_t CapturedEvent;
-    uint32                   EventCount;
+    ESA_Stepping_ShimEvent_t CapturedEvent; /*!< 捕获的事件 */
+    uint32                   EventCount;    /*!< 事件计数 */
 } TestHookContext_t;
 
+/** 时间服务钩子测试共享上下文 */
 static TestHookContext_t GlobalHookContext;
 
-static int32 CaptureShimEvent_Hook(void *UserObj, int32 StubRetcode, uint32 CallCount,
-                                    const UT_StubContext_t *Context)
+void CFE_TIME_Stepping_Hook_TaskCycle(void);
+void CFE_TIME_Stepping_Hook_1HzBoundary(void);
+void CFE_TIME_Stepping_Hook_ToneSignal(void);
+
+/**
+ * @brief 捕获 Shim 事件的钩子函数
+ *
+ * @param[in,out] UserObj 用户对象（指向 TestHookContext_t 的指针）
+ * @param[in] StubRetcode 桩函数返回码
+ * @param[in] CallCount 调用计数（未使用）
+ * @param[in] Context 桩函数上下文
+ * @retval      StubRetcode 返回桩函数返回码
+ */
+static int32 CaptureShimEvent_Hook(void *UserObj, int32 StubRetcode, uint32 CallCount, const UT_StubContext_t *Context)
 {
     TestHookContext_t              *HookCtx = (TestHookContext_t *)UserObj;
     const void                     *EventPtr;
@@ -38,6 +62,9 @@ static int32 CaptureShimEvent_Hook(void *UserObj, int32 StubRetcode, uint32 Call
     return StubRetcode;
 }
 
+/**
+ * @brief 重置测试环境
+ */
 void ResetTest(void)
 {
     UT_ResetState(0);
@@ -45,6 +72,11 @@ void ResetTest(void)
     UT_SetHookFunction(UT_KEY(ESA_Stepping_Shim_ReportEvent), CaptureShimEvent_Hook, &GlobalHookContext);
 }
 
+/**
+ * @brief 测试 TIME 任务周期钩子
+ *
+ * @details 验证 CFE_TIME_Stepping_Hook_TaskCycle 是否正确报告 TIME_TASK_CYCLE 事件
+ */
 void Test_TIME_Hook_TaskCycle(void)
 {
     CFE_TIME_Stepping_Hook_TaskCycle();
@@ -54,6 +86,11 @@ void Test_TIME_Hook_TaskCycle(void)
     UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.entity_id, ESA_SIM_STEPPING_SERVICE_BIT_TIME);
 }
 
+/**
+ * @brief 测试 TIME 1Hz 边界钩子
+ *
+ * @details 验证 CFE_TIME_Stepping_Hook_1HzBoundary 是否正确报告 1HZ_BOUNDARY 事件
+ */
 void Test_TIME_Hook_1HzBoundary(void)
 {
     CFE_TIME_Stepping_Hook_1HzBoundary();
@@ -63,6 +100,11 @@ void Test_TIME_Hook_1HzBoundary(void)
     UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.entity_id, ESA_SIM_STEPPING_CHILDPATH_BIT_TIME_LOCAL_1HZ);
 }
 
+/**
+ * @brief 测试 TIME Tone 信号钩子
+ *
+ * @details 验证 CFE_TIME_Stepping_Hook_ToneSignal 是否正确报告 TONE_SIGNAL 事件
+ */
 void Test_TIME_Hook_ToneSignal(void)
 {
     CFE_TIME_Stepping_Hook_ToneSignal();
@@ -74,6 +116,9 @@ void Test_TIME_Hook_ToneSignal(void)
 
 #define ADD_TEST(test) UtTest_Add(test, ResetTest, NULL, #test)
 
+/**
+ * @brief 测试套件设置函数
+ */
 void UtTest_Setup(void)
 {
     ADD_TEST(Test_TIME_Hook_TaskCycle);
