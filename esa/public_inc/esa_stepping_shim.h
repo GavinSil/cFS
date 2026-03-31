@@ -1,118 +1,92 @@
-/************************************************************************
- * NASA Docket No. GSC-19,200-1, and identified as "cFS Draco"
- *
- * Copyright (c) 2023 United States Government as represented by the
- * Administrator of the National Aeronautics and Space Administration.
- * All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License. You may obtain
- * a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ************************************************************************/
-
 /**
- * \file
+ * @file
+ * @ingroup esa
+ * @brief       ESA 步进 Shim 公共 ABI 头文件
+ * @author      gaoyuan
+ * @date        2026-03-20
  *
- * Purpose: Mission-owned neutral native stepping fact-reporting ABI.
- *
- * This header declares a single thin fact-reporting entry point that OSAL/TIME/SCH
- * modules can call into. The shim forwards all event reports to the stepping core
- * state machine via a unified function, keeping hook layers thin and semantics
- * centralized.
- *
- * This is a mission-owned neutral location, separate from any PSP/OSAL/CFE-specific
- * dependencies. It declares only standard C types and plain ABI shapes.
+ * @details     本头文件声明轻量的事实报告入口点，供 OSAL/TIME/SCH 模块调用。保持钩子层轻量且语义集中。
  */
-
 #ifndef NATIVE_STEPPING_SHIM_H
 #define NATIVE_STEPPING_SHIM_H
 
 /****************************************************************************************
-                                        INCLUDE FILES
+                                         包含文件
  ***************************************************************************************/
 
 #include <stdint.h>
 #include <stdbool.h>
 
 /****************************************************************************************
-                            STEPPING SHIM EVENT ENUM & TYPES
+                             STEPPING SHIM 事件枚举与类型
  ***************************************************************************************/
 
 /**
- * \brief Enumeration of stepping event kinds
+ * @brief       步进事件类型枚举
  *
- * Each event type represents a distinct boundary condition that may trigger
- * a stepping pause or synchronization point. Event kind determines which core
- * report function is invoked.
+ * @details     每种事件类型代表一个独特的边界条件，可能触发步进暂停或同步点。
+ *              事件类型决定调用哪个核心报告函数。
  */
 typedef enum ESA_Stepping_EventKind
 {
-    ESA_SIM_STEPPING_EVENT_TASK_DELAY = 0,      /**< Task delay requested (OSAL) */
-    ESA_SIM_STEPPING_EVENT_TASK_DELAY_ACK,
-    ESA_SIM_STEPPING_EVENT_TASK_DELAY_COMPLETE,
-    ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE,       /**< Queue receive blocking (OSAL) - legacy single-event */
-    ESA_SIM_STEPPING_EVENT_BINSEM_TAKE,         /**< Binary semaphore take (OSAL) - legacy single-event */
-    ESA_SIM_STEPPING_EVENT_TIME_TASK_CYCLE,     /**< TIME module task cycle start */
-    ESA_SIM_STEPPING_EVENT_1HZ_BOUNDARY,        /**< 1Hz tick detected */
-    ESA_SIM_STEPPING_EVENT_TONE_SIGNAL,         /**< Tone signal raised (PSP/SCH) */
-    ESA_SIM_STEPPING_EVENT_SCH_SEMAPHORE_WAIT,  /**< SCH waiting on semaphore */
-    ESA_SIM_STEPPING_EVENT_SCH_MINOR_FRAME,     /**< SCH minor frame boundary */
-    ESA_SIM_STEPPING_EVENT_SCH_MAJOR_FRAME,     /**< SCH major frame boundary */
-    ESA_SIM_STEPPING_EVENT_SCH_SEND_TRIGGER,
-    ESA_SIM_STEPPING_EVENT_SCH_DISPATCH_COMPLETE,
-    ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_RECEIVE,
-    ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_ACK,   /**< Queue receive ack (pre-blocking, wait candidate) */
-    ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_COMPLETE, /**< Queue receive complete (post-blocking, operation done) */
-    ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_ACK,     /**< Binary semaphore take ack (pre-wait, candidate) */
-    ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_COMPLETE, /**< Binary semaphore take complete (post-wait, done) */
-    ESA_SIM_STEPPING_EVENT_TIME_TONE_SEM_CONSUME,
-    ESA_SIM_STEPPING_EVENT_TIME_LOCAL_1HZ_SEM_CONSUME,
-    ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_COMPLETE,
-    ESA_SIM_STEPPING_EVENT_SYSTEM_READY_FOR_STEPPING /**< System lifecycle readiness: core init complete and ready to enter stepping mode */
+    ESA_SIM_STEPPING_EVENT_TASK_DELAY = 0,      /*!< 任务延迟请求（OSAL）- 旧版单事件 */
+    ESA_SIM_STEPPING_EVENT_TASK_DELAY_ACK,      /*!< 任务延迟确认（阻塞前，等待候选） */
+    ESA_SIM_STEPPING_EVENT_TASK_DELAY_COMPLETE, /*!< 任务延迟完成（阻塞后，操作完成） */
+    ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE,       /*!< 队列接收阻塞（OSAL）- 旧版单事件 */
+    ESA_SIM_STEPPING_EVENT_BINSEM_TAKE,         /*!< 二值信号量获取（OSAL）- 旧版单事件 */
+    ESA_SIM_STEPPING_EVENT_TIME_TASK_CYCLE,     /*!< TIME 模块任务周期开始 */
+    ESA_SIM_STEPPING_EVENT_1HZ_BOUNDARY,        /*!< 1Hz 时钟检测 */
+    ESA_SIM_STEPPING_EVENT_TONE_SIGNAL,         /*!< 音调信号触发（PSP/SCH） */
+    ESA_SIM_STEPPING_EVENT_SCH_SEMAPHORE_WAIT,  /*!< SCH 等待信号量 */
+    ESA_SIM_STEPPING_EVENT_SCH_MINOR_FRAME,     /*!< SCH 小帧边界 */
+    ESA_SIM_STEPPING_EVENT_SCH_MAJOR_FRAME,     /*!< SCH 大帧边界 */
+    ESA_SIM_STEPPING_EVENT_SCH_SEND_TRIGGER,        /*!< SCH 发送触发器命令 */
+    ESA_SIM_STEPPING_EVENT_SCH_DISPATCH_COMPLETE,   /*!< SCH 任务分发完成 */
+    ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_RECEIVE, /*!< 核心服务命令管道接收 */
+    ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_ACK,   /*!< 队列接收确认（阻塞前，等待候选） */
+    ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_COMPLETE, /*!< 队列接收完成（阻塞后，操作完成） */
+    ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_ACK,     /*!< 二值信号量获取确认（等待前，候选） */
+    ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_COMPLETE, /*!< 二值信号量获取完成（等待后，完成） */
+    ESA_SIM_STEPPING_EVENT_TIME_TONE_SEM_CONSUME,   /*!< TIME 模块消费音调信号量 */
+    ESA_SIM_STEPPING_EVENT_TIME_LOCAL_1HZ_SEM_CONSUME, /*!< TIME 模块消费本地 1Hz 信号量 */
+    ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_COMPLETE, /*!< 核心服务命令管道处理完成 */
+    ESA_SIM_STEPPING_EVENT_SYSTEM_READY_FOR_STEPPING /*!< 系统生命周期就绪：核心初始化完成，准备进入步进模式 */
 } ESA_Stepping_EventKind_t;
 
 /**
- * \brief Shim event payload (compact fact descriptor)
+ * @brief       Shim 事件载荷（紧凑事实描述符）
  *
- * Carries event-specific fact data. Payload fields are context-dependent on event_kind.
- * Keep structure compact for efficient forwarding.
+ * @details     传递事件特定的事实数据。载荷字段依赖于 event_kind 的上下文。
+ *              保持结构紧凑以实现高效转发。
  */
 typedef struct ESA_Stepping_ShimEvent
 {
-    ESA_Stepping_EventKind_t event_kind;     /**< Event type (determines payload semantics) */
-    uint32_t entity_id;                             /**< Entity ID (waited-on queue/semaphore/etc.) */
-    uint32_t task_id;                               /**< Runtime task ID (current executing task) */
-    uint32_t optional_delay_ms;                     /**< Optional: delay/timeout value in ms */
+    ESA_Stepping_EventKind_t event_kind;     /*!< 事件类型（决定载荷语义） */
+    uint32_t entity_id;                             /*!< 实体 ID（等待的队列/信号量等） */
+    uint32_t task_id;                               /*!< 运行时任务 ID（当前执行任务） */
+    uint32_t optional_delay_ms;                     /*!< 可选：延迟/超时值（毫秒） */
 } ESA_Stepping_ShimEvent_t;
 
 /****************************************************************************************
-                               SHIM REPORT FUNCTION DECLARATION
+                                SHIM 报告函数声明
  ***************************************************************************************/
 
 /**
- * \brief Report a stepping event fact to the core
+ * @brief       向核心报告步进事件事实
  *
- * Unified entry point for all OSAL/TIME/SCH modules to report native stepping events.
- * Function determines which core report function to invoke based on event_kind.
- * 
- * This is a thin forwarding layer: it validates the event, extracts relevant
- * fact parameters, and calls the appropriate core Report function.
- * All state machine semantics remain in the core.
+ * @details     所有 OSAL/TIME/SCH 模块报告原生步进事件的统一入口点。
+ *              函数根据 event_kind 决定调用哪个核心报告函数。
  *
- * \param[in]  event  Pointer to stepping event descriptor
+ *              这是一个轻量转发层：验证事件、提取相关事实参数，
+ *              并调用适当的核心 Report 函数。所有状态机语义保留在核心中。
  *
- * \return 0 if event reported successfully; non-zero error code if report failed
- *         (e.g., core not initialized, invalid event_kind, core full)
+ * @param[in]   event           步进事件描述符指针
  *
- * \note
- * Shim is implementation-independent. Implementation may be guarded by build flag;
- * when disabled, function becomes a no-op that returns 0.
+ * @retval      0               事件报告成功
+ * @retval      非零            报告失败的错误码（如核心未初始化、无效 event_kind、核心已满）
+ *
+ * @note        Shim 是实现无关的。实现可能由构建标志保护；
+ *              当禁用时，函数变为返回 0 的空操作。
  */
 int32_t ESA_Stepping_Shim_ReportEvent(const ESA_Stepping_ShimEvent_t *event);
 
