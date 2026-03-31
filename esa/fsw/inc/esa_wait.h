@@ -1,33 +1,12 @@
-/************************************************************************
- * NASA Docket No. GSC-19,200-1, and identified as "cFS Draco"
- *
- * Copyright (c) 2023 United States Government as represented by the
- * Administrator of the National Aeronautics and Space Administration.
- * All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License. You may obtain
- * a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ************************************************************************/
-
 /**
- * \file
- * \ingroup  esa
+ * @file
+ * @ingroup esa
+ * @brief       ESA 步进管理的任务等待状态定义
+ * @author      gaoyuan
+ * @date        2026-03-30
  *
- * Purpose: ESA stepping-managed task wait state definitions.
- *
- * This header defines wait result codes, wait type enumeration, task wait state
- * structure, and configuration constants used by ESA stepping to manage deterministic
- * waits on queues, semaphores, condition variables, and delays. These structures
- * decouple wait mechanisms from wall-clock time.
+ * @details     本头文件定义等待结果码、等待类型枚举、任务等待状态结构体，以及 ESA 用于管理确定性等待的配置常量。
  */
-
 #ifndef ESA_WAIT_H
 #define ESA_WAIT_H
 
@@ -47,16 +26,16 @@
  ***************************************************************************************/
 
 /**
- * \brief Enumeration of wait result codes
+ * @brief       等待结果码枚举
  *
- * Classifies the outcome of an ESA-managed wait operation, indicating whether the wait
- * was satisfied by resource availability, timeout, or flush operation.
+ * @details     对 ESA 管理的等待操作结果进行分类，指示等待是由资源可用、
+ *              超时还是刷新操作满足。
  */
 typedef enum ESA_WakeReason
 {
-    ESA_WOKE_BY_RESOURCE = 0,  /**< Wait ended by resource becoming available */
-    ESA_WOKE_BY_TIMEOUT,       /**< Wait ended by timeout expiration */
-    ESA_WOKE_BY_FLUSH          /**< Wait ended by semaphore flush operation */
+    ESA_WOKE_BY_RESOURCE = 0,  /*!< 等待因资源可用而结束 */
+    ESA_WOKE_BY_TIMEOUT,       /*!< 等待因超时而结束 */
+    ESA_WOKE_BY_FLUSH          /*!< 等待因信号量刷新操作而结束 */
 } ESA_WakeReason_t;
 
 /****************************************************************************************
@@ -64,20 +43,20 @@ typedef enum ESA_WakeReason
  ***************************************************************************************/
 
 /**
- * \brief Enumeration of task wait types
+ * @brief       任务等待类型枚举
  *
- * Classifies the type of synchronization mechanism that a task is waiting on.
- * Used by ESA stepping to determine which wait handler to invoke and how to
- * manage the transition from stepping control to normal execution.
+ * @details     对任务等待的同步机制类型进行分类。
+ *              由 ESA 步进用于确定调用哪个等待处理程序以及如何管理
+ *              从步进控制到正常执行的转换。
  */
 typedef enum ESA_WaitType
 {
-    ESA_WAIT_NONE = 0,      /**< No active wait (initial/idle state) */
-    ESA_WAIT_QUEUE,         /**< Waiting on message queue receive */
-    ESA_WAIT_BINSEM,        /**< Waiting on binary semaphore */
-    ESA_WAIT_COUNTSEM,      /**< Waiting on counting semaphore */
-    ESA_WAIT_CONDVAR,       /**< Waiting on condition variable */
-    ESA_WAIT_DELAY          /**< Waiting on task delay */
+    ESA_WAIT_NONE = 0,      /*!< 无活动等待（初始/空闲状态） */
+    ESA_WAIT_QUEUE,         /*!< 等待消息队列接收 */
+    ESA_WAIT_BINSEM,        /*!< 等待二值信号量 */
+    ESA_WAIT_COUNTSEM,      /*!< 等待计数信号量 */
+    ESA_WAIT_CONDVAR,       /*!< 等待条件变量 */
+    ESA_WAIT_DELAY          /*!< 等待任务延迟 */
 } ESA_WaitType_t;
 
 /****************************************************************************************
@@ -85,34 +64,34 @@ typedef enum ESA_WaitType
  ***************************************************************************************/
 
 /**
- * \brief Maximum number of tracked tasks
+ * @brief       最大跟踪任务数
  *
- * Sized to match OS_MAX_TASKS from OSAL configuration.
- * Used for ESA wait state per-task registry.
+ * @details     大小与 OSAL 配置中的 OS_MAX_TASKS 匹配。
+ *              用于 ESA 等待状态的每任务注册表。
  */
 #define ESA_MAX_TRACKED_TASKS       OS_MAX_TASKS
 
 /**
- * \brief Maximum number of tracked queues
+ * @brief       最大跟踪队列数
  *
- * Sized to match OS_MAX_QUEUES from OSAL configuration.
- * Used for ESA wait state queue notification registry.
+ * @details     大小与 OSAL 配置中的 OS_MAX_QUEUES 匹配。
+ *              用于 ESA 等待状态的队列通知注册表。
  */
 #define ESA_MAX_TRACKED_QUEUES      OS_MAX_QUEUES
 
 /**
- * \brief Maximum number of tracked semaphores
+ * @brief       最大跟踪信号量数
  *
- * Sized to accommodate both binary and counting semaphores.
- * Equals OS_MAX_BIN_SEMAPHORES + OS_MAX_COUNT_SEMAPHORES.
+ * @details     大小用于容纳二值和计数信号量。
+ *              等于 OS_MAX_BIN_SEMAPHORES + OS_MAX_COUNT_SEMAPHORES。
  */
 #define ESA_MAX_TRACKED_SEMS        (OS_MAX_BIN_SEMAPHORES + OS_MAX_COUNT_SEMAPHORES)
 
 /**
- * \brief Maximum number of tracked condition variables
+ * @brief       最大跟踪条件变量数
  *
- * Sized to match OS_MAX_CONDVARS from OSAL configuration.
- * Used for ESA wait state condition variable notification registry.
+ * @details     大小与 OSAL 配置中的 OS_MAX_CONDVARS 匹配。
+ *              用于 ESA 等待状态的条件变量通知注册表。
  */
 #define ESA_MAX_TRACKED_CONDVARS    OS_MAX_CONDVARS
 
@@ -121,23 +100,23 @@ typedef enum ESA_WaitType
  ***************************************************************************************/
 
 /**
- * \brief Task wait state for ESA stepping
+ * @brief       ESA 步进的任务等待状态
  *
- * Encapsulates the current wait state of a task, including the wait type,
- * OSAL resource ID, simulated time deadline, and pthread synchronization primitives
- * (mutex and condition variable) used by ESA for deterministic wait management.
+ * @details     封装任务的当前等待状态，包括等待类型、OSAL 资源 ID、
+ *              仿真时间截止时间，以及 ESA 用于确定性等待管理的 pthread 同步原语
+ *              （互斥锁和条件变量）。
  *
- * This structure is embedded in per-task state or maintained in a global
- * task wait registry to enable ESA stepping to correctly manage wait transitions.
+ *              此结构嵌入在每任务状态中或维护在全局任务等待注册表中，
+ *              以便 ESA 步进正确管理等待转换。
  */
 typedef struct ESA_TaskWaitState
 {
-    ESA_WaitType_t  wait_type;       /**< Type of wait (QUEUE, BINSEM, COUNTSEM, CONDVAR, DELAY) */
-    osal_id_t       resource_id;     /**< OSAL resource ID (queue_id, sem_id, condvar_id) */
-    uint64          sim_deadline_ns; /**< Simulated time deadline in nanoseconds */
-    pthread_cond_t  cond;            /**< Condition variable for ESA-controlled wakeup */
-    pthread_mutex_t mutex;           /**< Mutex protecting wait state transitions */
-    bool            is_active;       /**< True if this wait slot is in use */
+    ESA_WaitType_t  wait_type;       /*!< 等待类型（QUEUE、BINSEM、COUNTSEM、CONDVAR、DELAY） */
+    osal_id_t       resource_id;     /*!< OSAL 资源 ID（queue_id、sem_id、condvar_id） */
+    uint64          sim_deadline_ns; /*!< 仿真时间截止时间（纳秒） */
+    pthread_cond_t  cond;            /*!< ESA 控制唤醒的条件变量 */
+    pthread_mutex_t mutex;           /*!< 保护等待状态转换的互斥锁 */
+    bool            is_active;       /*!< 此等待槽位是否在使用 */
 } ESA_TaskWaitState_t;
 
 /****************************************************************************************
@@ -145,65 +124,66 @@ typedef struct ESA_TaskWaitState
  ***************************************************************************************/
 
 /**
- * \brief ESA-managed wait on message queue receive
+ * @brief       ESA 管理的消息队列接收等待
  *
- * Weak-symbol function for stepping-managed queue receive waits.
- * When ESA stepping is enabled, this function may be overridden to provide
- * deterministic wait semantics. When ESA stepping is disabled, this function
- * is a no-op that returns success.
+ * @details     步进管理的队列接收等待的弱符号函数。
+ *              当启用 ESA 步进时，此函数可能被覆盖以提供确定性等待语义。
+ *              当禁用 ESA 步进时，此函数是返回成功的空操作。
  *
- * \param[in]  queue_id   OSAL queue ID being waited on
- * \param[in]  timeout_ms Timeout in milliseconds
+ * @param[in]   queue_id                等待的 OSAL 队列 ID
+ * @param[in]   timeout_ms              超时时间（毫秒）
  *
- * \return ESA_WOKE_BY_RESOURCE on successful receive; ESA_WOKE_BY_TIMEOUT on timeout;
- *         negative error code if wait failed
+ * @retval      ESA_WOKE_BY_RESOURCE    成功接收
+ * @retval      ESA_WOKE_BY_TIMEOUT     超时
+ * @retval      负数                    等待失败的错误码
  */
 int32 ESA_WaitForMessage(osal_id_t queue_id, uint32 timeout_ms);
 
 /**
- * \brief ESA-managed wait on semaphore (binary or counting)
+ * @brief       ESA 管理的信号量等待（二值或计数）
  *
- * Weak-symbol function for stepping-managed semaphore waits.
- * When ESA stepping is enabled, this function may be overridden to provide
- * deterministic wait semantics. When ESA stepping is disabled, this function
- * is a no-op that returns success.
+ * @details     步进管理的信号量等待的弱符号函数。
+ *              当启用 ESA 步进时，此函数可能被覆盖以提供确定性等待语义。
+ *              当禁用 ESA 步进时，此函数是返回成功的空操作。
  *
- * \param[in]  sem_id     OSAL semaphore ID (binary or counting) being waited on
- * \param[in]  timeout_ms Timeout in milliseconds
+ * @param[in]   sem_id                  等待的 OSAL 信号量 ID（二值或计数）
+ * @param[in]   timeout_ms              超时时间（毫秒）
  *
- * \return ESA_WOKE_BY_RESOURCE on successful give; ESA_WOKE_BY_TIMEOUT on timeout;
- *         ESA_WOKE_BY_FLUSH on flush; negative error code if wait failed
+ * @retval      ESA_WOKE_BY_RESOURCE    成功释放
+ * @retval      ESA_WOKE_BY_TIMEOUT     超时
+ * @retval      ESA_WOKE_BY_FLUSH       刷新
+ * @retval      负数                    等待失败的错误码
  */
 int32 ESA_WaitForSem(osal_id_t sem_id, uint32 timeout_ms);
 
 /**
- * \brief ESA-managed wait on condition variable
+ * @brief       ESA 管理的条件变量等待
  *
- * Weak-symbol function for stepping-managed condition variable waits.
- * Semantically equivalent to ESA_WaitForSem but operates on condition variables.
- * When ESA stepping is enabled, this function may be overridden to provide
- * deterministic wait semantics. When ESA stepping is disabled, this function
- * is a no-op that returns success.
+ * @details     步进管理的条件变量等待的弱符号函数。
+ *              语义上等同于 ESA_WaitForSem，但操作于条件变量。
+ *              当启用 ESA 步进时，此函数可能被覆盖以提供确定性等待语义。
+ *              当禁用 ESA 步进时，此函数是返回成功的空操作。
  *
- * \param[in]  condvar_id OSAL condition variable ID being waited on
- * \param[in]  timeout_ms Timeout in milliseconds
+ * @param[in]   condvar_id              等待的 OSAL 条件变量 ID
+ * @param[in]   timeout_ms              超时时间（毫秒）
  *
- * \return ESA_WOKE_BY_RESOURCE on signal; ESA_WOKE_BY_TIMEOUT on timeout;
- *         negative error code if wait failed
+ * @retval      ESA_WOKE_BY_RESOURCE    信号到达
+ * @retval      ESA_WOKE_BY_TIMEOUT     超时
+ * @retval      负数                    等待失败的错误码
  */
 int32 ESA_WaitForCondVar(osal_id_t condvar_id, uint32 timeout_ms);
 
 /**
- * \brief ESA-managed task delay wait
+ * @brief       ESA 管理的任务延迟等待
  *
- * Weak-symbol function for stepping-managed task delays.
- * When ESA stepping is enabled, this function may be overridden to provide
- * deterministic delay semantics controlled by step quantums. When ESA stepping
- * is disabled, this function is a no-op that returns success.
+ * @details     步进管理的任务延迟的弱符号函数。
+ *              当启用 ESA 步进时，此函数可能被覆盖以提供由步进量子控制的确定性延迟语义。
+ *              当禁用 ESA 步进时，此函数是返回成功的空操作。
  *
- * \param[in]  timeout_ms Requested delay in milliseconds
+ * @param[in]   timeout_ms              请求的延迟时间（毫秒）
  *
- * \return ESA_WOKE_BY_TIMEOUT on successful delay completion; negative error code if delay failed
+ * @retval      ESA_WOKE_BY_TIMEOUT     延迟成功完成
+ * @retval      负数                    延迟失败的错误码
  */
 int32 ESA_WaitForDelay(uint32 timeout_ms);
 
@@ -212,47 +192,44 @@ int32 ESA_WaitForDelay(uint32 timeout_ms);
  ***************************************************************************************/
 
 /**
- * \brief Notify ESA waiters that a message was put on a queue
+ * @brief       通知 ESA 等待者队列已放入消息
  *
- * Called when a message is placed on a queue to wake any ESA-managed waiters
- * blocked on that queue. Weak-symbol implementation allows ESA to override
- * and register notifications.
+ * @details     当消息放入队列时调用，唤醒任何阻塞在该队列上的 ESA 管理的等待者。
+ *              弱符号实现允许 ESA 覆盖并注册通知。
  *
- * \param[in]  queue_id  OSAL queue ID that received a message
+ * @param[in]   queue_id        收到消息的 OSAL 队列 ID
  */
 void ESA_NotifyQueuePut(osal_id_t queue_id);
 
 /**
- * \brief Notify ESA waiters that a semaphore was given
+ * @brief       通知 ESA 等待者信号量已释放
  *
- * Called when a semaphore is given (posted) to wake any ESA-managed waiters
- * blocked on that semaphore. Weak-symbol implementation allows ESA to override
- * and register notifications.
+ * @details     当信号量被释放（posted）时调用，唤醒任何阻塞在该信号量上的 ESA 管理的等待者。
+ *              弱符号实现允许 ESA 覆盖并注册通知。
  *
- * \param[in]  sem_id  OSAL semaphore ID (binary or counting) that was given
+ * @param[in]   sem_id          被释放的 OSAL 信号量 ID（二值或计数）
  */
 void ESA_NotifySemGive(osal_id_t sem_id);
 
 /**
- * \brief Notify ESA waiters that a semaphore was flushed
+ * @brief       通知 ESA 等待者信号量已刷新
  *
- * Called when a semaphore is flushed (all pending waiters released) to wake any
- * ESA-managed waiters blocked on that semaphore with flush result code.
- * Weak-symbol implementation allows ESA to override and register notifications.
+ * @details     当信号量被刷新（所有等待者被释放）时调用，唤醒任何阻塞在该信号量上的
+ *              ESA 管理的等待者并返回刷新结果码。
+ *              弱符号实现允许 ESA 覆盖并注册通知。
  *
- * \param[in]  sem_id  OSAL semaphore ID (binary or counting) that was flushed
+ * @param[in]   sem_id          被刷新的 OSAL 信号量 ID（二值或计数）
  */
 void ESA_NotifySemFlush(osal_id_t sem_id);
 
 /**
- * \brief Notify ESA waiters waiting on a condition variable
+ * @brief       通知 ESA 等待者条件变量已信号化
  *
- * Called when a condition variable is signaled or broadcast to wake any
- * ESA-managed waiters blocked on that condition variable. Both Signal and
- * Broadcast operations invoke this notification.
+ * @details     当条件变量被信号化或广播时调用，唤醒任何阻塞在该条件变量上的 ESA 管理的等待者。
+ *              Signal 和 Broadcast 操作都会调用此通知。
  *
- * \param[in]  condvar_id  OSAL condition variable ID that was signaled/broadcast
- * \param[in]  broadcast   false=Signal (wake one), true=Broadcast (wake all)
+ * @param[in]   condvar_id      被信号化/广播的 OSAL 条件变量 ID
+ * @param[in]   broadcast       false=Signal（唤醒一个），true=Broadcast（唤醒所有）
  */
 void ESA_NotifyCondVar(osal_id_t condvar_id, bool broadcast);
 
@@ -261,24 +238,24 @@ void ESA_NotifyCondVar(osal_id_t condvar_id, bool broadcast);
  ***************************************************************************************/
 
 /**
- * \brief Register a task for ESA wait state management
+ * @brief       注册任务到 ESA 等待状态管理
  *
- * Called when a task is created to register it with ESA wait state registry.
- * Allocates per-task wait state storage and initializes synchronization primitives.
- * Weak-symbol implementation allows ESA to override and manage lifecycle.
+ * @details     当任务创建时调用，将其注册到 ESA 等待状态注册表。
+ *              分配每任务等待状态存储并初始化同步原语。
+ *              弱符号实现允许 ESA 覆盖并管理生命周期。
  *
- * \param[in]  task_id  OSAL task ID to register
+ * @param[in]   task_id         要注册的 OSAL 任务 ID
  */
 void ESA_RegisterTask(osal_id_t task_id);
 
 /**
- * \brief Deregister a task from ESA wait state management
+ * @brief       从 ESA 等待状态管理注销任务
  *
- * Called when a task is deleted to deregister it from ESA wait state registry.
- * Releases per-task wait state storage and cleans up synchronization primitives.
- * Weak-symbol implementation allows ESA to override and manage lifecycle.
+ * @details     当任务删除时调用，将其从 ESA 等待状态注册表注销。
+ *              释放每任务等待状态存储并清理同步原语。
+ *              弱符号实现允许 ESA 覆盖并管理生命周期。
  *
- * \param[in]  task_id  OSAL task ID to deregister
+ * @param[in]   task_id         要注销的 OSAL 任务 ID
  */
 void ESA_DeregisterTask(osal_id_t task_id);
 

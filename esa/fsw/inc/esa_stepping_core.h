@@ -1,41 +1,12 @@
-/************************************************************************
- * NASA Docket No. GSC-19,200-1, and identified as "cFS Draco"
- *
- * Copyright (c) 2023 United States Government as represented by the
- * Administrator of the National Aeronautics and Space Administration.
- * All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License. You may obtain
- * a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ************************************************************************/
-
 /**
- * \file
- * \ingroup  psp
+ * @file
+ * @ingroup esa
+ * @brief       仿真步进核心状态机内部头文件
+ * @author      gaoyuan
+ * @date        2026-03-20
  *
- * Purpose: Private internal header for the simulation stepping core state machine.
- *
- * This header defines the ownership boundary for stepping state and core event-reporting
- * entry points. It is NOT exposed outside the PSP sim_stepping module.
- *
- * The core maintains:
- * - Single state machine for one native-only stepping core
- * - Trigger tracking (dynamic set of pending triggers)
- * - Ack tracking (which triggers have been acknowledged)
- * - Completion tracking (when stepping cycle is complete)
- * - Simulated time storage
- *
- * All stepping hooks (OSAL/PSP task delay, queue receive, etc.) report facts into the core;
- * the core maintains state and semantics. This separation keeps hook/shim layers thin.
+ * @details     本头文件定义步进状态的所有权边界和核心事件报告入口点。包含状态机结构、触发器跟踪和诊断计数器定义。
  */
-
 #ifndef ESA_SIM_STEPPING_CORE_H
 #define ESA_SIM_STEPPING_CORE_H
 
@@ -52,156 +23,155 @@
  ***************************************************************************************/
 
 /**
- * \brief Maximum number of concurrent stepping triggers
+ * @brief       最大并发步进触发器数量
  *
- * Fixed compile-time capacity for the skeleton stepping core.
- * Suitable for native-only simulation stepping with typical workloads.
+ * @details     骨架步进核心的固定编译时容量。适用于仅原生仿真步进的典型工作负载。
  */
 #define ESA_SIM_STEPPING_MAX_TRIGGERS 32
 
 /**
- * \brief Core-service membership-intent bitmask constants
+ * @brief       核心服务成员意图位掩码常量
  *
- * Bit positions for the five core services (ES, EVS, SB, TBL, TIME).
- * Used to track which services have reported command-pipe receive facts
- * in the current step.
+ * @details     五个核心服务（ES、EVS、SB、TBL、TIME）的位位置。
+ *              用于跟踪当前步进中哪些服务已报告命令管道接收事实。
  */
-#define ESA_SIM_STEPPING_SERVICE_BIT_ES   (1U << 0)   /**< Executive Services */
-#define ESA_SIM_STEPPING_SERVICE_BIT_EVS  (1U << 1)   /**< Event Services */
-#define ESA_SIM_STEPPING_SERVICE_BIT_SB   (1U << 2)   /**< Software Bus */
-#define ESA_SIM_STEPPING_SERVICE_BIT_TBL  (1U << 3)   /**< Table Services */
-#define ESA_SIM_STEPPING_SERVICE_BIT_TIME (1U << 4)   /**< Time Services */
+#define ESA_SIM_STEPPING_SERVICE_BIT_ES   (1U << 0) /*!< 执行服务 */
+#define ESA_SIM_STEPPING_SERVICE_BIT_EVS  (1U << 1) /*!< 事件服务 */
+#define ESA_SIM_STEPPING_SERVICE_BIT_SB   (1U << 2) /*!< 软件总线 */
+#define ESA_SIM_STEPPING_SERVICE_BIT_TBL  (1U << 3) /*!< 表服务 */
+#define ESA_SIM_STEPPING_SERVICE_BIT_TIME (1U << 4) /*!< 时间服务 */
 
 /**
- * \brief TIME child-path participation-intent bitmask constants
+ * @brief       TIME 子路径参与意图位掩码常量
  *
- * Bit positions for TIME child-path facts (distinct from main-task command-pipe receive).
- * Used to track which TIME child paths have reported participation facts in the current step.
- * These allow explicitness about TIME subsystem structure (tone semaphore, local 1Hz semaphore).
+ * @details     TIME 子路径事实的位位置（与主任务命令管道接收不同）。
+ *              用于跟踪当前步进中哪些 TIME 子路径已报告参与事实。
+ *              这些允许明确 TIME 子系统结构（音调信号量、本地 1Hz 信号量）。
  */
-#define ESA_SIM_STEPPING_CHILDPATH_BIT_TIME_TONE      (1U << 5)   /**< TIME tone child path */
-#define ESA_SIM_STEPPING_CHILDPATH_BIT_TIME_LOCAL_1HZ (1U << 6)   /**< TIME local-1Hz child path */
+#define ESA_SIM_STEPPING_CHILDPATH_BIT_TIME_TONE      (1U << 5) /*!< TIME 音调信号子路径 */
+#define ESA_SIM_STEPPING_CHILDPATH_BIT_TIME_LOCAL_1HZ (1U << 6) /*!< TIME 本地 1Hz 子路径 */
 
 /****************************************************************************************
                               CORE STATE MACHINE DEFINITIONS
  ***************************************************************************************/
 
 /**
- * \brief Stepping core state machine states
+ * @brief       步进核心状态机状态
  *
- * Represents the lifecycle of a single stepping cycle:
- * - INIT: Core not yet initialized
- * - READY: Waiting for step command or trigger
- * - RUNNING: Currently executing a step (advancing time)
- * - WAITING: Step in progress, waiting for acknowledgments/completions
- * - COMPLETE: All triggers acknowledged, all events reported, ready for next step
+ * @details     表示单个步进周期的生命周期：
+ *              - INIT：核心尚未初始化
+ *              - READY：等待步进命令或触发器
+ *              - RUNNING：当前正在执行步进（推进时间）
+ *              - WAITING：步进进行中，等待确认/完成
+ *              - COMPLETE：所有触发器已确认，所有事件已报告，准备下一步
  */
 typedef enum ESA_Stepping_CoreState
 {
-    ESA_SIM_STEPPING_STATE_INIT,      /**< Core not initialized */
-    ESA_SIM_STEPPING_STATE_READY,     /**< Waiting for step command */
-    ESA_SIM_STEPPING_STATE_RUNNING,   /**< Actively executing step */
-    ESA_SIM_STEPPING_STATE_WAITING,   /**< Waiting for acks/completions */
-    ESA_SIM_STEPPING_STATE_COMPLETE   /**< Step complete, ready for next */
+    ESA_SIM_STEPPING_STATE_INIT,    /*!< 核心未初始化 */
+    ESA_SIM_STEPPING_STATE_READY,   /*!< 等待步进命令 */
+    ESA_SIM_STEPPING_STATE_RUNNING, /*!< 正在执行步进 */
+    ESA_SIM_STEPPING_STATE_WAITING, /*!< 等待确认/完成 */
+    ESA_SIM_STEPPING_STATE_COMPLETE /*!< 步进完成，准备下一步 */
 } ESA_Stepping_CoreState_t;
 
 /**
- * \brief Dynamic trigger descriptor
+ * @brief       动态触发器描述符
  *
- * Represents one pending trigger event (e.g., a task delay boundary hit, queue receive,
- * 1Hz signal, etc.). Tracks whether this trigger has been acknowledged.
+ * @details     表示一个待处理的触发器事件（例如，任务延迟边界到达、队列接收、1Hz 信号等）。
+ *              跟踪此触发器是否已被确认。
  */
 typedef struct ESA_Stepping_Trigger
 {
-    uint32_t trigger_id;          /**< Unique trigger identifier */
-    uint32_t source_mask;         /**< Source classification (task delay, queue, etc.) */
-    uint32_t entity_id;
-    bool     is_acknowledged;     /**< Has this trigger been acknowledged? */
+    uint32_t trigger_id;      /*!< 唯一触发器标识符 */
+    uint32_t source_mask;     /*!< 源分类（任务延迟、队列等） */
+    uint32_t entity_id;       /*!< 与触发器关联的实体标识符 */
+    bool     is_acknowledged; /*!< 是否已被确认 */
 } ESA_Stepping_Trigger_t;
 
 /**
- * \brief Diagnostic failure classes for normalized sim-stepping observability
+ * @brief       诊断失败类别枚举
+ * @details     对步进控制面暴露的主要失败类型进行归类，用于统一记录诊断计数。
  */
 typedef enum ESA_Stepping_DiagnosticClass
 {
-    ESA_SIM_STEPPING_DIAG_TIMEOUT = 0,
-    ESA_SIM_STEPPING_DIAG_DUPLICATE_BEGIN,
-    ESA_SIM_STEPPING_DIAG_ILLEGAL_COMPLETE,
-    ESA_SIM_STEPPING_DIAG_ILLEGAL_STATE,
-    ESA_SIM_STEPPING_DIAG_TRANSPORT_ERROR,
-    ESA_SIM_STEPPING_DIAG_PROTOCOL_ERROR
+    ESA_SIM_STEPPING_DIAG_TIMEOUT = 0,      /*!< 步进等待或完成超时 */
+    ESA_SIM_STEPPING_DIAG_DUPLICATE_BEGIN,  /*!< 重复发起开始步进 */
+    ESA_SIM_STEPPING_DIAG_ILLEGAL_COMPLETE, /*!< 出现无匹配触发器的完成上报 */
+    ESA_SIM_STEPPING_DIAG_ILLEGAL_STATE,    /*!< 当前状态下执行了非法操作 */
+    ESA_SIM_STEPPING_DIAG_TRANSPORT_ERROR,  /*!< 传输层读写或连接失败 */
+    ESA_SIM_STEPPING_DIAG_PROTOCOL_ERROR    /*!< 协议帧或操作码非法 */
 } ESA_Stepping_DiagnosticClass_t;
 
 /**
- * \brief Core-owned diagnostic counters for stepping failure classes
+ * @brief       核心拥有的诊断计数器，用于步进失败类别
  */
 typedef struct ESA_Stepping_Diagnostics
 {
-    uint32_t timeout_count;
-    uint32_t duplicate_begin_count;
-    uint32_t illegal_complete_count;
-    uint32_t illegal_state_count;
-    uint32_t transport_error_count;
-    uint32_t protocol_error_count;
+    uint32_t timeout_count;          /*!< 超时类诊断次数 */
+    uint32_t duplicate_begin_count;  /*!< 重复开始类诊断次数 */
+    uint32_t illegal_complete_count; /*!< 非法完成类诊断次数 */
+    uint32_t illegal_state_count;    /*!< 非法状态类诊断次数 */
+    uint32_t transport_error_count;  /*!< 传输错误类诊断次数 */
+    uint32_t protocol_error_count;   /*!< 协议错误类诊断次数 */
 } ESA_Stepping_Diagnostics_t;
 
 /**
- * \brief Stepping core state structure
+ * @brief       步进核心状态结构
  *
- * Single owner of stepping state. All state transitions and trigger/ack tracking
- * happen here. Hooks report facts; core maintains semantics.
- * 
- * Trigger storage is fixed-capacity compile-time array (not heap-backed).
+ * @details     步进状态的唯一所有者。所有状态转换和触发器/确认跟踪在此发生。
+ *              钩子报告事实；核心维护语义。
+ *
+ *              触发器存储为固定容量的编译时数组（非堆分配）。
  */
 typedef struct ESA_Stepping_Core
 {
-    /* State machine */
-    ESA_Stepping_CoreState_t current_state;  /**< Current state */
+    /* 状态机 */
+    ESA_Stepping_CoreState_t current_state; /*!< 当前状态 */
 
-    /* Simulated time storage */
-    uint64_t sim_time_ns;                          /**< Current simulated time in nanoseconds */
-    uint64_t next_sim_time_ns;                     /**< Next target simulated time */
+    /* 仿真时间存储 */
+    uint64_t sim_time_ns;      /*!< 当前仿真时间（纳秒） */
+    uint64_t next_sim_time_ns; /*!< 下一个目标仿真时间 */
 
-    /* Stepping quantum configuration */
-    uint64_t step_quantum_ns;                      /**< Quantum size for one simulation step in nanoseconds */
+    /* 步进量子配置 */
+    uint64_t step_quantum_ns; /*!< 一个仿真步进的量子大小（纳秒） */
 
-    /* Trigger tracking (fixed compile-time capacity) */
-    ESA_Stepping_Trigger_t triggers[ESA_SIM_STEPPING_MAX_TRIGGERS];  /**< Array of pending triggers */
-    uint32_t trigger_count;                        /**< Current number of triggers */
-    uint32_t next_trigger_id;                      /**< Counter for unique trigger IDs */
+    /* 触发器跟踪（固定编译时容量） */
+    ESA_Stepping_Trigger_t triggers[ESA_SIM_STEPPING_MAX_TRIGGERS]; /*!< 待处理触发器数组 */
+    uint32_t               trigger_count;                           /*!< 当前触发器数量 */
+    uint32_t               next_trigger_id;                         /*!< 唯一触发器 ID 计数器 */
 
-    /* Ack/completion tracking */
-    uint32_t acks_received;                        /**< Count of acknowledged triggers */
-    uint32_t acks_expected;                        /**< Count of triggers expecting ack */
+    /* 确认/完成跟踪 */
+    uint32_t acks_received; /*!< 已确认触发器计数 */
+    uint32_t acks_expected; /*!< 预期确认触发器计数 */
 
-    bool completion_requested;                     /**< Has completion been requested? */
-    bool completion_ready;                         /**< All events reported and ready? */
+    bool completion_requested; /*!< 是否已请求完成？ */
+    bool completion_ready;     /*!< 所有事件已报告且就绪？ */
 
-    /* Core-owned diagnostic counters */
-    ESA_Stepping_Diagnostics_t diagnostics; /**< Accumulated failure-class diagnostics */
+    /* 核心拥有的诊断计数器 */
+    ESA_Stepping_Diagnostics_t diagnostics; /*!< 累积失败类别诊断 */
 
-    /* Timeout configuration */
-    uint32_t step_timeout_ms;                      /**< Timeout for step completion (ms) */
+    /* 超时配置 */
+    uint32_t step_timeout_ms; /*!< 步进完成超时（毫秒） */
 
-    /* TaskDelay takeover control */
-    bool taskdelay_takeover_enabled;               /**< Enable TaskDelay takeover (default: OFF) */
+    /* 任务延迟接管控制 */
+    bool taskdelay_takeover_enabled; /*!< 启用 TaskDelay 接管（默认：关闭） */
 
-    /* Per-task TaskDelay opt-in set (fixed compile-time capacity) */
-    uint32_t taskdelay_optin_set[8];               /**< Task IDs opted-in for TaskDelay takeover */
-    uint32_t taskdelay_optin_count;                /**< Number of tasks in opt-in set */
-    uint64_t taskdelay_expiry_ns[8];
-    bool     taskdelay_pending[8];
-    bool     taskdelay_owed[8];
+    /* 每任务任务延迟注册集合（固定编译时容量） */
+    uint32_t taskdelay_optin_set[8]; /*!< 注册参与 TaskDelay 接管的任务 ID */
+    uint32_t taskdelay_optin_count;  /*!< 注册集合中的任务数量 */
+    uint64_t taskdelay_expiry_ns[8]; /*!< 已登记任务延迟的目标到期时间 */
+    bool     taskdelay_pending[8];   /*!< 任务延迟是否处于待完成状态 */
+    bool     taskdelay_owed[8];      /*!< 任务延迟是否仍欠缺显式步进推进 */
 
-    /* Current-step core-service membership-intent set */
-    uint32_t core_service_membership_mask;         /**< Bitmask of core services (ES/EVS/SB/TBL/TIME) that participated in current step */
+    /* 当前步进核心服务成员意图集合 */
+    uint32_t core_service_membership_mask; /*!< 参与当前步进的核心服务位掩码（ES/EVS/SB/TBL/TIME） */
 
-    /* Explicit step-session bookkeeping */
-    bool     session_active;                       /**< True if a step session is currently active */
-    uint64_t session_counter;                      /**< Monotonic session counter, incremented at step session begin */
+    /* 显式步进会话记账 */
+    bool     session_active;  /*!< 步进会话当前是否活动 */
+    uint64_t session_counter; /*!< 单调会话计数器，在步进会话开始时递增 */
 
-    /* Persistent lifecycle readiness state (distinct from per-step completion_ready) */
-    bool     system_ready_for_stepping;            /**< Persistent flag: true after system has signaled lifecycle readiness; survives step resets and session transitions */
+    /* 持久生命周期就绪状态（与每步 completion_ready 不同） */
+    bool system_ready_for_stepping; /*!< 持久标志：系统已声明生命周期就绪后为 true；在步进重置和会话转换后保留 */
 
 } ESA_Stepping_Core_t;
 
@@ -210,429 +180,481 @@ typedef struct ESA_Stepping_Core
  ***************************************************************************************/
 
 /**
- * \brief Initialize the stepping core
+ * @brief       初始化步进核心
  *
- * Sets up state machine and prepares for operation.
- * Trigger storage is pre-allocated as a fixed compile-time array.
+ * @details     设置状态机并准备运行。触发器存储为预分配的固定编译时数组。
  *
- * \param[in]  core              Pointer to core structure to initialize
- * \param[in]  initial_time_ns   Initial simulated time in nanoseconds
- * \param[in]  trigger_capacity  Unused (kept for API compatibility); max is ESA_SIM_STEPPING_MAX_TRIGGERS
+ * @param[in]   core                    要初始化的核心结构指针
+ * @param[in]   initial_time_ns         初始仿真时间（纳秒）
+ * @param[in]   trigger_capacity        未使用（保留用于 API 兼容性）；最大值为 ESA_SIM_STEPPING_MAX_TRIGGERS
  *
- * \return 0 if initialization successful; non-zero error code if initialization failed
+ * @retval      0                       初始化成功
+ * @retval      非零                    初始化失败的错误码
  */
-int32_t ESA_Stepping_Core_Init(ESA_Stepping_Core_t *core,
-                                      uint64_t                   initial_time_ns,
-                                      uint32_t                   trigger_capacity);
+int32_t ESA_Stepping_Core_Init(ESA_Stepping_Core_t *core, uint64_t initial_time_ns, uint32_t trigger_capacity);
 
 /**
- * \brief Reset the stepping core for a new step cycle
+ * @brief       重置步进核心以开始新的步进周期
  *
- * Clears triggers and ack counters, transitions to READY state.
+ * @details     清除触发器和确认计数器，转换为 READY 状态。
  *
- * \param[in]  core  Pointer to core structure to reset
+ * @param[in]   core                    要重置的核心结构指针
  *
- * \return 0 on success
+ * @retval      0                       成功
  */
 int32_t ESA_Stepping_Core_Reset(ESA_Stepping_Core_t *core);
 
 /**
- * \brief Report a task delay boundary event
+ * @brief       报告任务延迟边界事件
  *
- * Called when a task requests delay via OSAL TaskDelay hook.
- * Reports the fact; core decides if stepping should trigger.
+ * @details     当任务通过 OSAL TaskDelay 钩子请求延迟时调用。
+ *              报告事实；核心决定是否应触发步进。
  *
- * \param[in]  core           Pointer to core structure
- * \param[in]  task_id        Identifier of task requesting delay
- * \param[in]  delay_ms       Requested delay in milliseconds
+ * @param[in]   core                    核心结构指针
+ * @param[in]   task_id                 请求延迟的任务标识符
+ * @param[in]   delay_ms                请求的延迟时间（毫秒）
  *
- * \return 0 on success
+ * @retval      0                       成功
  */
-int32_t ESA_Stepping_Core_ReportTaskDelay(ESA_Stepping_Core_t *core,
-                                                   uint32_t                   task_id,
-                                                   uint32_t                   delay_ms);
-
-int32_t ESA_Stepping_Core_ReportTaskDelayAck(ESA_Stepping_Core_t *core,
-                                                     uint32_t                   task_id,
-                                                     uint32_t                   delay_ms);
-
-int32_t ESA_Stepping_Core_ReportTaskDelayComplete(ESA_Stepping_Core_t *core,
-                                                          uint32_t                   task_id,
-                                                          uint32_t                   delay_ms);
-
-int32_t ESA_Stepping_Core_ReportTaskDelayReturn(ESA_Stepping_Core_t *core,
-                                                         uint32_t                   task_id);
+int32_t ESA_Stepping_Core_ReportTaskDelay(ESA_Stepping_Core_t *core, uint32_t task_id, uint32_t delay_ms);
 
 /**
- * \brief Report a queue receive boundary event
+ * @brief       报告 TaskDelay 确认边界事件
  *
- * Called when a task blocks on queue receive via OSAL hook.
- * Reports the fact; core decides if stepping should trigger.
+ * @details     在任务真正进入 TaskDelay 阻塞前调用，登记等待候选事实。
  *
- * \param[in]  core       Pointer to core structure
- * \param[in]  queue_id   Identifier of queue being received from
- * \param[in]  timeout_ms Timeout for receive operation (PEND_FOREVER = ~0U)
+ * @param[in]   core                    核心结构指针
+ * @param[in]   task_id                 任务运行时 ID
+ * @param[in]   delay_ms                请求的延迟时间（毫秒）
  *
- * \return 0 on success
+ * @retval      0                       成功
  */
-int32_t ESA_Stepping_Core_ReportQueueReceive(ESA_Stepping_Core_t *core,
-                                                    uint32_t                   queue_id,
-                                                    uint32_t                   timeout_ms);
+int32_t ESA_Stepping_Core_ReportTaskDelayAck(ESA_Stepping_Core_t *core, uint32_t task_id, uint32_t delay_ms);
 
 /**
- * \brief Report a binary semaphore take boundary event
+ * @brief       报告 TaskDelay 完成边界事件
  *
- * Called when a task blocks on binary semaphore via OSAL hook.
- * Reports the fact; core decides if stepping should trigger.
+ * @details     在任务从 TaskDelay 返回后调用，确认对应等待事实已完成。
  *
- * \param[in]  core       Pointer to core structure
- * \param[in]  sem_id     Identifier of semaphore being taken
- * \param[in]  timeout_ms Timeout for take operation
+ * @param[in]   core                    核心结构指针
+ * @param[in]   task_id                 任务运行时 ID
+ * @param[in]   delay_ms                请求的延迟时间（毫秒）
  *
- * \return 0 on success
+ * @retval      0                       成功
  */
-int32_t ESA_Stepping_Core_ReportBinSemTake(ESA_Stepping_Core_t *core,
-                                                  uint32_t                   sem_id,
-                                                  uint32_t                   timeout_ms);
+int32_t ESA_Stepping_Core_ReportTaskDelayComplete(ESA_Stepping_Core_t *core, uint32_t task_id, uint32_t delay_ms);
 
 /**
- * \brief Report a time task cycle boundary event
+ * @brief       报告任务已从 TaskDelay 返回
  *
- * Called by TIME module when starting a time synchronization/update cycle.
- * Reports the fact; core decides if stepping should trigger.
+ * @details     清理给定任务在 TaskDelay 接管簿记中的挂起、欠账和到期状态。
  *
- * \param[in]  core  Pointer to core structure
+ * @param[in]   core                    核心结构指针
+ * @param[in]   task_id                 任务运行时 ID
  *
- * \return 0 on success
+ * @retval      0                       成功
+ */
+int32_t ESA_Stepping_Core_ReportTaskDelayReturn(ESA_Stepping_Core_t *core, uint32_t task_id);
+
+/**
+ * @brief       报告队列接收边界事件
+ *
+ * @details     当任务通过 OSAL 钩子阻塞于队列接收时调用。
+ *              报告事实；核心决定是否应触发步进。
+ *
+ * @param[in]   core                    核心结构指针
+ * @param[in]   queue_id                接收队列的标识符
+ * @param[in]   timeout_ms              接收操作超时（PEND_FOREVER = ~0U）
+ *
+ * @retval      0                       成功
+ */
+int32_t ESA_Stepping_Core_ReportQueueReceive(ESA_Stepping_Core_t *core, uint32_t queue_id, uint32_t timeout_ms);
+
+/**
+ * @brief       报告二值信号量获取边界事件
+ *
+ * @details     当任务通过 OSAL 钩子阻塞于二值信号量时调用。
+ *              报告事实；核心决定是否应触发步进。
+ *
+ * @param[in]   core                    核心结构指针
+ * @param[in]   sem_id                  获取信号量的标识符
+ * @param[in]   timeout_ms              获取操作超时
+ *
+ * @retval      0                       成功
+ */
+int32_t ESA_Stepping_Core_ReportBinSemTake(ESA_Stepping_Core_t *core, uint32_t sem_id, uint32_t timeout_ms);
+
+/**
+ * @brief       报告时间任务周期边界事件
+ *
+ * @details     当 TIME 模块开始时间同步/更新周期时调用。
+ *              报告事实；核心决定是否应触发步进。
+ *
+ * @param[in]   core                    核心结构指针
+ *
+ * @retval      0                       成功
  */
 int32_t ESA_Stepping_Core_ReportTimeTaskCycle(ESA_Stepping_Core_t *core);
 
 /**
- * \brief Report a 1Hz boundary event
+ * @brief       报告 1Hz 边界事件
  *
- * Called when a 1Hz tick is detected or raised.
- * Reports the fact; core decides if stepping should trigger.
+ * @details     当检测到或触发 1Hz 滴答时调用。
+ *              报告事实；核心决定是否应触发步进。
  *
- * \param[in]  core  Pointer to core structure
+ * @param[in]   core                    核心结构指针
  *
- * \return 0 on success
+ * @retval      0                       成功
  */
 int32_t ESA_Stepping_Core_Report1HzBoundary(ESA_Stepping_Core_t *core);
 
 /**
- * \brief Report a tone signal event
+ * @brief       报告音调信号事件
  *
- * Called when a tone signal (e.g., from PSP or scheduler) is raised.
- * Reports the fact; core decides if stepping should trigger.
+ * @details     当音调信号（例如来自 PSP 或调度器）触发时调用。
+ *              报告事实；核心决定是否应触发步进。
  *
- * \param[in]  core  Pointer to core structure
+ * @param[in]   core                    核心结构指针
  *
- * \return 0 on success
+ * @retval      0                       成功
  */
 int32_t ESA_Stepping_Core_ReportToneSignal(ESA_Stepping_Core_t *core);
 
 /**
- * \brief Report a scheduler semaphore wait boundary event
+ * @brief       报告调度器信号量等待边界事件
  *
- * Called when the scheduler (SCH) blocks on a semaphore waiting for a trigger
- * (e.g., tone signal, 1Hz tick, or software trigger).
- * Reports the fact as a distinct scheduler event; core decides if stepping should trigger.
+ * @details     当调度器（SCH）阻塞于信号量等待触发器（例如音调信号、1Hz 滴答或软件触发器）时调用。
+ *              将事实作为独立的调度器事件报告；核心决定是否应触发步进。
  *
- * \param[in]  core       Pointer to core structure
- * \param[in]  sem_id     Identifier of semaphore being waited on
- * \param[in]  timeout_ms Timeout for semaphore wait operation
+ * @param[in]   core                    核心结构指针
+ * @param[in]   sem_id                  等待的信号量标识符
+ * @param[in]   timeout_ms              信号量等待操作超时
  *
- * \return 0 on success
+ * @retval      0                       成功
  */
-int32_t ESA_Stepping_Core_ReportSchSemaphoreWait(ESA_Stepping_Core_t *core,
-                                                        uint32_t                   sem_id,
-                                                        uint32_t                   timeout_ms);
+int32_t ESA_Stepping_Core_ReportSchSemaphoreWait(ESA_Stepping_Core_t *core, uint32_t sem_id, uint32_t timeout_ms);
 
 /**
- * \brief Report a scheduler minor frame boundary event
+ * @brief       报告调度器小帧边界事件
  *
- * Called when the scheduler reaches a minor frame boundary (step granularity).
- * Minor frames are the fundamental scheduling unit and define stepping trigger granularity.
- * Reports the fact as a distinct scheduler event; core decides if stepping should trigger.
+ * @details     当调度器到达小帧边界（步进粒度）时调用。
+ *              小帧是基本调度单位并定义步进触发粒度。
+ *              将事实作为独立的调度器事件报告；核心决定是否应触发步进。
  *
- * \param[in]  core  Pointer to core structure
+ * @param[in]   core                    核心结构指针
  *
- * \return 0 on success
+ * @retval      0                       成功
  */
 int32_t ESA_Stepping_Core_ReportSchMinorFrame(ESA_Stepping_Core_t *core);
 
 /**
- * \brief Report a scheduler major frame boundary event
+ * @brief       报告调度器大帧边界事件
  *
- * Called when the scheduler reaches a major frame boundary (frame 0 of each cycle).
- * Major frames mark the beginning of a complete scheduling cycle.
- * Reports the fact as a distinct scheduler event; core decides if stepping should trigger.
+ * @details     当调度器到达大帧边界（每个周期的帧 0）时调用。
+ *              大帧标记完整调度周期的开始。
+ *              将事实作为独立的调度器事件报告；核心决定是否应触发步进。
  *
- * \param[in]  core  Pointer to core structure
+ * @param[in]   core                    核心结构指针
  *
- * \return 0 on success
+ * @retval      0                       成功
  */
 int32_t ESA_Stepping_Core_ReportSchMajorFrame(ESA_Stepping_Core_t *core);
 
-int32_t ESA_Stepping_Core_ReportSchSendTrigger(ESA_Stepping_Core_t *core,
-                                                         uint32_t                   target_id);
+/**
+ * @brief       报告调度器发送触发器事件
+ *
+ * @details     当 SCH 向目标任务分发触发信号时调用，登记对应的调度器发送事实。
+ *
+ * @param[in]   core                    核心结构指针
+ * @param[in]   target_id               被触发目标的标识符
+ *
+ * @retval      0                       成功
+ */
+int32_t ESA_Stepping_Core_ReportSchSendTrigger(ESA_Stepping_Core_t *core, uint32_t target_id);
 
+/**
+ * @brief       报告调度器分发完成事件
+ *
+ * @details     当当前小帧内的调度分发结束时调用，用于确认此前的调度发送触发器。
+ *
+ * @param[in]   core                    核心结构指针
+ *
+ * @retval      0                       成功
+ */
 int32_t ESA_Stepping_Core_ReportSchDispatchComplete(ESA_Stepping_Core_t *core);
 
- int32_t ESA_Stepping_Core_ReportCoreServiceCmdPipeReceive(ESA_Stepping_Core_t *core,
-                                                                   uint32_t                   service_id);
-
- int32_t ESA_Stepping_Core_ReportCoreServiceCmdPipeComplete(ESA_Stepping_Core_t *core,
-                                                                    uint32_t                   service_id);
-
- int32_t ESA_Stepping_Core_ReportTimeToneSemConsume(ESA_Stepping_Core_t *core,
-                                                            uint32_t                   sem_id);
-
-int32_t ESA_Stepping_Core_ReportTimeLocal1HzSemConsume(ESA_Stepping_Core_t *core,
-                                                               uint32_t                   sem_id);
-
 /**
- * \brief Query the current simulated time
+ * @brief       报告核心服务命令管道接收事件
  *
- * Returns the simulated time as stored in the core.
- * Called by timebase modules to get deterministic time.
+ * @details     当 ES、EVS、SB、TBL 或 TIME 进入命令管道接收路径时调用，用于登记服务参与事实。
  *
- * \param[in]  core           Pointer to core structure
- * \param[out] sim_time_ns    Pointer to store current simulated time in nanoseconds
+ * @param[in]   core                    核心结构指针
+ * @param[in]   service_id              核心服务标识符
  *
- * \return 0 if time retrieved successfully; non-zero error code if query failed
+ * @retval      0                       成功
  */
-int32_t ESA_Stepping_Core_QuerySimTime(ESA_Stepping_Core_t *core,
-                                                uint64_t                   *sim_time_ns);
+int32_t ESA_Stepping_Core_ReportCoreServiceCmdPipeReceive(ESA_Stepping_Core_t *core, uint32_t service_id);
 
 /**
- * \brief Query if a requested TaskDelay can be handled by stepping
+ * @brief       报告核心服务命令管道处理完成事件
  *
- * Checks whether the PSP stepping core can handle (take over) a specific task delay
- * request. Uses conservative eligibility logic:
- * - Core must be initialized
- * - TaskDelay takeover gate must be ON
- * - Task must be explicitly opted-in to TaskDelay takeover
- * - Requested delay must be an exact whole-number multiple of step_quantum_ns
+ * @details     当指定核心服务完成命令管道处理后调用，用于确认先前登记的服务接收事实。
  *
- * Used by OSAL TaskDelay hooks to determine whether to return handled (skip wall-clock
- * sleep) or not-handled (proceed with normal sleep). With gate OFF (default) or task not
- * opted-in, always returns false (not-handled).
+ * @param[in]   core                    核心结构指针
+ * @param[in]   service_id              核心服务标识符
  *
- * \param[in]  core       Pointer to core structure
- * \param[in]  task_id    Runtime task ID requesting delay
- * \param[in]  delay_ms   Requested delay in milliseconds
- *
- * \return true if delay can be handled (core initialized, gate ON, task opted-in, delay is exact quantum multiple);
- *         false if delay cannot be handled or core not initialized
+ * @retval      0                       成功
+ * @retval      非零                    非法完成等诊断状态码
  */
-bool ESA_Stepping_Core_QueryTaskDelayEligible(ESA_Stepping_Core_t *core,
-                                                      uint32_t                   task_id,
-                                                      uint32_t                   delay_ms);
+int32_t ESA_Stepping_Core_ReportCoreServiceCmdPipeComplete(ESA_Stepping_Core_t *core, uint32_t service_id);
 
 /**
- * \brief Block current task until simulated delay budget satisfied by explicit step quantums
+ * @brief       报告 TIME 音调信号量消费事件
  *
- * PSP-owned blocking wait mechanism for step-controlled TaskDelay. Calculates target expiry
- * time in simulated nanoseconds, then polls sim_time_ns until enough explicit step quantums
- * have been advanced to satisfy the delay. Uses brief wall-clock nanosleep intervals to avoid
- * spin-wait, but release is controlled solely by sim_time_ns advancement via AdvanceOneQuantum.
- * This prevents delay-driven tasks from self-advancing when no steps are issued.
+ * @details     当 TIME 子路径消费 tone 信号量时调用，登记该子路径已参与当前步进。
  *
- * \param[in]  core       Pointer to core structure
- * \param[in]  task_id    Runtime task ID requesting delay
- * \param[in]  delay_ms   Requested delay in milliseconds
+ * @param[in]   core                    核心结构指针
+ * @param[in]   sem_id                  音调信号量标识符
  *
- * \return 0 on success (delay satisfied); negative on error
+ * @retval      0                       成功
  */
-int32_t ESA_Stepping_Core_WaitForDelayExpiry(ESA_Stepping_Core_t *core,
-                                                     uint32_t                   task_id,
-                                                     uint32_t                   delay_ms);
+int32_t ESA_Stepping_Core_ReportTimeToneSemConsume(ESA_Stepping_Core_t *core, uint32_t sem_id);
 
 /**
- * \brief Report a queue receive ack boundary event (pre-blocking)
+ * @brief       报告 TIME 本地 1Hz 信号量消费事件
  *
- * Called immediately before a task blocks on queue receive (pre-mq_receive/mq_timedreceive).
- * Reports the ack-candidate fact: task is about to wait on queue.
- * Distinct from completion fact: this signals intent to wait, not operation success.
+ * @details     当 TIME 子路径消费 local-1Hz 信号量时调用，登记该子路径已参与当前步进。
  *
- * \param[in]  core       Pointer to core structure
- * \param[in]  task_id    Runtime task ID (current executing task)
- * \param[in]  queue_id   Identifier of queue being received from
- * \param[in]  timeout_ms Timeout for receive operation (PEND_FOREVER = ~0U)
+ * @param[in]   core                    核心结构指针
+ * @param[in]   sem_id                  本地 1Hz 信号量标识符
  *
- * \return 0 on success
+ * @retval      0                       成功
  */
-int32_t ESA_Stepping_Core_ReportQueueReceiveAck(ESA_Stepping_Core_t *core,
-                                                        uint32_t                   task_id,
-                                                        uint32_t                   queue_id,
-                                                        uint32_t                   timeout_ms);
+int32_t ESA_Stepping_Core_ReportTimeLocal1HzSemConsume(ESA_Stepping_Core_t *core, uint32_t sem_id);
 
 /**
- * \brief Report a queue receive complete boundary event (post-blocking)
+ * @brief       查询当前仿真时间
  *
- * Called immediately after mq_receive/mq_timedreceive returns (regardless of success/failure).
- * Reports the complete-candidate fact: task has returned from queue wait.
- * Distinct from ack fact: this signals operation completion, not intent.
+ * @details     返回存储在核心中的仿真时间。由时间基准模块调用以获取确定性时间。
  *
- * \param[in]  core       Pointer to core structure
- * \param[in]  task_id    Runtime task ID (current executing task)
- * \param[in]  queue_id   Identifier of queue being received from
- * \param[in]  timeout_ms Timeout for receive operation (PEND_FOREVER = ~0U)
+ * @param[in]   core                    核心结构指针
+ * @param[out]  sim_time_ns             存储当前仿真时间（纳秒）的指针
  *
- * \return 0 on success
+ * @retval      0                       时间成功获取
+ * @retval      非零                    查询失败的错误码
  */
-int32_t ESA_Stepping_Core_ReportQueueReceiveComplete(ESA_Stepping_Core_t *core,
-                                                             uint32_t                   task_id,
-                                                             uint32_t                   queue_id,
-                                                             uint32_t                   timeout_ms);
+int32_t ESA_Stepping_Core_QuerySimTime(ESA_Stepping_Core_t *core, uint64_t *sim_time_ns);
 
 /**
- * \brief Advance simulated time by one quantum (private internal API)
+ * @brief       查询请求的 TaskDelay 是否可由步进处理
  *
- * Internal-only function for the PSP stepping core to advance simulated time
- * by exactly one configured quantum. Increments both current and next simulated
- * time by the step quantum value.
+ * @details     检查 PSP 步进核心是否可以处理（接管）特定任务延迟请求。
+ *              使用保守的资格判定逻辑：
+ *              - 核心必须已初始化
+ *              - TaskDelay 接管门控必须为 ON
+ *              - 任务必须明确注册参与 TaskDelay 接管
+ *              - 请求的延迟必须是 step_quantum_ns 的整数倍
  *
- * This is the sole write-path for sim_time_ns and next_sim_time_ns; all other
- * read-side queries use ESA_Stepping_Core_QuerySimTime().
+ *              由 OSAL TaskDelay 钩子使用，用于判断是否返回已处理（跳过墙钟睡眠）
+ *              或未处理（继续正常睡眠）。当门控为 OFF（默认）或任务未注册参与时，
+ *              始终返回 false（未处理）。
  *
- * \param[in]  core  Pointer to core structure
+ * @param[in]   core                    核心结构指针
+ * @param[in]   task_id                 请求延迟的任务运行时 ID
+ * @param[in]   delay_ms                请求的延迟时间（毫秒）
  *
- * \return 0 on successful time advance; non-zero error code if advance failed
- *         (e.g., core null, quantum zero or not configured)
+ * @retval      true                    延迟可处理（核心已初始化、门控 ON、任务已注册、延迟为量子整数倍）
+ * @retval      false                   延迟无法处理或核心未初始化
+ */
+bool ESA_Stepping_Core_QueryTaskDelayEligible(ESA_Stepping_Core_t *core, uint32_t task_id, uint32_t delay_ms);
+
+/**
+ * @brief       阻塞当前任务直到仿真延迟预算由显式步进量子满足
  *
- * \note This function is PRIVATE to the PSP stepping core and is not exposed
- *       to external callers. It is intended for future control-channel integration.
+ * @details     PSP 拥有的步进控制 TaskDelay 阻塞等待机制。计算目标到期时间（仿真纳秒），
+ *              然后轮询 sim_time_ns 直到足够的显式步进量子已推进以满足延迟。
+ *              使用简短的墙钟 nanosleep 间隔避免自旋等待，但释放仅由 sim_time_ns 推进
+ *              （通过 AdvanceOneQuantum）控制。这防止延迟驱动任务在无步进发出时自行推进。
+ *
+ * @param[in]   core                    核心结构指针
+ * @param[in]   task_id                 请求延迟的任务运行时 ID
+ * @param[in]   delay_ms                请求的延迟时间（毫秒）
+ *
+ * @retval      0                       成功（延迟已满足）
+ * @retval      负数                    错误
+ */
+int32_t ESA_Stepping_Core_WaitForDelayExpiry(ESA_Stepping_Core_t *core, uint32_t task_id, uint32_t delay_ms);
+
+/**
+ * @brief       报告队列接收确认边界事件（阻塞前）
+ *
+ * @details     在任务阻塞于队列接收前立即调用（mq_receive/mq_timedreceive 前）。
+ *              报告确认候选事实：任务即将等待队列。
+ *              与完成事实不同：这表示等待意图，而非操作成功。
+ *
+ * @param[in]   core                    核心结构指针
+ * @param[in]   task_id                 任务运行时 ID（当前执行任务）
+ * @param[in]   queue_id                接收队列的标识符
+ * @param[in]   timeout_ms              接收操作超时（PEND_FOREVER = ~0U）
+ *
+ * @retval      0                       成功
+ */
+int32_t ESA_Stepping_Core_ReportQueueReceiveAck(ESA_Stepping_Core_t *core, uint32_t task_id, uint32_t queue_id,
+                                                uint32_t timeout_ms);
+
+/**
+ * @brief       报告队列接收完成边界事件（阻塞后）
+ *
+ * @details     在 mq_receive/mq_timedreceive 返回后立即调用（无论成功或失败）。
+ *              报告完成候选事实：任务已从队列等待返回。
+ *              与确认事实不同：这表示操作完成，而非意图。
+ *
+ * @param[in]   core                    核心结构指针
+ * @param[in]   task_id                 任务运行时 ID（当前执行任务）
+ * @param[in]   queue_id                接收队列的标识符
+ * @param[in]   timeout_ms              接收操作超时（PEND_FOREVER = ~0U）
+ *
+ * @retval      0                       成功
+ */
+int32_t ESA_Stepping_Core_ReportQueueReceiveComplete(ESA_Stepping_Core_t *core, uint32_t task_id, uint32_t queue_id,
+                                                     uint32_t timeout_ms);
+
+/**
+ * @brief       将仿真时间推进一个量子（私有内部 API）
+ *
+ * @details     PSP 步进核心的仅内部函数，用于将仿真时间精确推进一个配置的量子。
+ *              将当前和下一个仿真时间都增加步进量子值。
+ *
+ *              这是 sim_time_ns 和 next_sim_time_ns 的唯一写路径；
+ *              所有其他读端查询使用 ESA_Stepping_Core_QuerySimTime()。
+ *
+ * @param[in]   core                    核心结构指针
+ *
+ * @retval      0                       时间推进成功
+ * @retval      非零                    推进失败的错误码（例如核心为空、量子为零或未配置）
+ *
+ * @note        此函数是 PSP 步进核心的私有函数，不对外部调用者暴露。
+ *              旨在用于未来的控制通道集成。
  */
 int32_t ESA_Stepping_Core_AdvanceOneQuantum(ESA_Stepping_Core_t *core);
 
 /**
- * \brief Report a binary semaphore take ack boundary event (pre-wait)
+ * @brief       报告二值信号量获取确认边界事件（等待前）
  *
- * Called immediately before a task blocks on binary semaphore wait (pre-pthread_cond_wait).
- * Reports the ack-candidate fact: task is about to wait on semaphore.
- * Distinct from completion fact: this signals intent to wait, not operation success.
+ * @details     在任务阻塞于二值信号量等待前立即调用（pthread_cond_wait 前）。
+ *              报告确认候选事实：任务即将等待信号量。
+ *              与完成事实不同：这表示等待意图，而非操作成功。
  *
- * \param[in]  core       Pointer to core structure
- * \param[in]  task_id    Runtime task ID (current executing task)
- * \param[in]  sem_id     Identifier of semaphore being taken
- * \param[in]  timeout_ms Timeout for take operation (0 = PEND_FOREVER)
+ * @param[in]   core                    核心结构指针
+ * @param[in]   task_id                 任务运行时 ID（当前执行任务）
+ * @param[in]   sem_id                  获取信号量的标识符
+ * @param[in]   timeout_ms              获取操作超时（0 = PEND_FOREVER）
  *
- * \return 0 on success
+ * @retval      0                       成功
  */
-int32_t ESA_Stepping_Core_ReportBinSemTakeAck(ESA_Stepping_Core_t *core,
-                                                     uint32_t                   task_id,
-                                                     uint32_t                   sem_id,
-                                                     uint32_t                   timeout_ms);
+int32_t ESA_Stepping_Core_ReportBinSemTakeAck(ESA_Stepping_Core_t *core, uint32_t task_id, uint32_t sem_id,
+                                              uint32_t timeout_ms);
 
 /**
- * \brief Report a binary semaphore take complete boundary event (post-wait)
+ * @brief       报告二值信号量获取完成边界事件（等待后）
  *
- * Called immediately after pthread_cond_wait/pthread_cond_timedwait returns (regardless of success/failure).
- * Reports the complete-candidate fact: task has returned from semaphore wait.
- * Distinct from ack fact: this signals operation completion, not intent.
+ * @details     在 pthread_cond_wait/pthread_cond_timedwait 返回后立即调用（无论成功或失败）。
+ *              报告完成候选事实：任务已从信号量等待返回。
+ *              与确认事实不同：这表示操作完成，而非意图。
  *
- * \param[in]  core       Pointer to core structure
- * \param[in]  task_id    Runtime task ID (current executing task)
- * \param[in]  sem_id     Identifier of semaphore being taken
- * \param[in]  timeout_ms Timeout for take operation (0 = PEND_FOREVER)
+ * @param[in]   core                    核心结构指针
+ * @param[in]   task_id                 任务运行时 ID（当前执行任务）
+ * @param[in]   sem_id                  获取信号量的标识符
+ * @param[in]   timeout_ms              获取操作超时（0 = PEND_FOREVER）
  *
- * \return 0 on success
+ * @retval      0                       成功
  */
-int32_t ESA_Stepping_Core_ReportBinSemTakeComplete(ESA_Stepping_Core_t *core,
-                                                           uint32_t                   task_id,
-                                                           uint32_t                   sem_id,
-                                                           uint32_t                   timeout_ms);
+int32_t ESA_Stepping_Core_ReportBinSemTakeComplete(ESA_Stepping_Core_t *core, uint32_t task_id, uint32_t sem_id,
+                                                   uint32_t timeout_ms);
 
 /**
- * \brief Query the current state of the stepping core (internal API for in-process adapter)
+ * @brief       查询步进核心的当前状态（进程内适配器的内部 API）
  *
- * Returns the current state machine state and optionally the trigger count.
- * Used by in-process control adapters to determine stepping readiness.
- * This is an internal PSP API, not exposed outside the module.
+ * @details     返回当前状态机状态，可选返回触发器计数。
+ *              由进程内控制适配器用于确定步进就绪状态。
+ *              这是内部 PSP API，不在模块外暴露。
  *
- * \param[in]  core       Pointer to core structure
- * \param[out] state_out  Pointer to store current state enum (if not NULL)
+ * @param[in]   core                    核心结构指针
+ * @param[out]  state_out               存储当前状态枚举的指针（可为 NULL）
  *
- * \return 0 on success; -1 if core null or state query failed
+ * @retval      0                       成功
+ * @retval      -1                      核心为空或状态查询失败
  *
- * \note This is an internal API for the PSP stepping module's in-process adapter.
- *       External callers should use the public adapter API (ESA_Stepping_InProc_*).
+ * @note        这是 PSP 步进模块进程内适配器的内部 API。
+ *              外部调用者应使用公共适配器 API（ESA_Stepping_InProc_*）。
  */
-int32_t ESA_Stepping_Core_QueryState(ESA_Stepping_Core_t *core,
-                                            ESA_Stepping_CoreState_t *state_out);
+int32_t ESA_Stepping_Core_QueryState(ESA_Stepping_Core_t *core, ESA_Stepping_CoreState_t *state_out);
 
 /**
- * \brief Check if the current step cycle is complete (internal API for in-process adapter)
+ * @brief       检查当前步进周期是否完成（进程内适配器的内部 API）
  *
- * Returns true if the stepping core has transitioned to COMPLETE state, indicating
- * that all expected triggers have been reported and all acks received.
- * Used by in-process control adapters to poll for step completion.
- * This is an internal PSP API, not exposed outside the module.
+ * @details     当步进核心转换为 COMPLETE 状态时返回 true，表示所有预期触发器已报告
+ *              且所有确认已接收。
+ *              由进程内控制适配器用于轮询步进完成。
+ *              这是内部 PSP API，不在模块外暴露。
  *
- * \param[in]  core  Pointer to core structure
+ * @param[in]   core                    核心结构指针
  *
- * \return true if step is complete; false if still running, waiting, or core null
+ * @retval      true                    步进已完成
+ * @retval      false                   仍在运行、等待中或核心为空
  *
- * \note This is an internal API for the PSP stepping module's in-process adapter.
- *       External callers should use the public adapter API (ESA_Stepping_InProc_*).
+ * @note        这是 PSP 步进模块进程内适配器的内部 API。
+ *              外部调用者应使用公共适配器 API（ESA_Stepping_InProc_*）。
  */
 bool ESA_Stepping_Core_IsStepComplete(ESA_Stepping_Core_t *core);
 
 /**
- * \brief Begin a new step session with explicit bookkeeping
+ * @brief       开始带有显式记账的新步进会话
  *
- * Initiates a new step session by clearing triggers, resetting ack counters,
- * marking the session as active, and incrementing the session counter.
- * This is the primary entry point for beginning a clean stepping cycle.
- * Replaces the previous blind Core_Reset() pattern with explicit session semantics.
+ * @details     通过清除触发器、重置确认计数器、标记会话为活动状态并递增会话计数器
+ *              来启动新步进会话。这是开始清洁步进周期的主要入口点。
+ *              用显式会话语义替换之前的盲目 Core_Reset() 模式。
  *
- * \param[in]  core  Pointer to core structure
+ * @param[in]   core                                    核心结构指针
  *
- * \return ESA_SIM_STEPPING_STATUS_SUCCESS on success
- * \return ESA_SIM_STEPPING_STATUS_FAILURE if core is null
- * \return ESA_SIM_STEPPING_STATUS_NOT_READY if lifecycle readiness not reached
- * \return ESA_SIM_STEPPING_STATUS_DUPLICATE_BEGIN if prior session is unresolved
+ * @retval      ESA_SIM_STEPPING_STATUS_SUCCESS         成功
+ * @retval      ESA_SIM_STEPPING_STATUS_FAILURE         核心为空
+ * @retval      ESA_SIM_STEPPING_STATUS_NOT_READY       生命周期就绪未达成
+ * @retval      ESA_SIM_STEPPING_STATUS_DUPLICATE_BEGIN 前一个会话未解决
  */
 int32_t ESA_Stepping_Core_BeginStepSession(ESA_Stepping_Core_t *core);
 
 /**
- * \brief Mark the system as ready for simulation stepping
+ * @brief       标记系统已准备好进行仿真步进
  *
- * Sets the persistent lifecycle readiness flag, indicating that the system has
- * completed initialization and is prepared to enter stepping mode.
- * This flag survives step session resets and step cycle completions.
+ * @details     设置持久生命周期就绪标志，表示系统已完成初始化并准备进入步进模式。
+ *              此标志在步进会话重置和步进周期完成后保留。
  *
- * Distinct from per-step completion semantics: this represents persistent
- * system-level readiness, not transient per-step completion state.
+ *              与每步完成语义不同：这表示持久的系统级就绪状态，
+ *              而非瞬态的每步完成状态。
  *
- * \param[in]  core  Pointer to core structure
+ * @param[in]   core                    核心结构指针
  *
- * \return 0 on success; -1 if core null
+ * @retval      0                       成功
+ * @retval      -1                      核心为空
  */
 int32_t ESA_Stepping_Core_MarkSystemReadyForStepping(ESA_Stepping_Core_t *core);
 
 /**
- * \brief Record one diagnostic event with normalized class/status logging
+ * @brief       记录一个带有规范化类别/状态日志的诊断事件
  *
- * Increments a core-owned diagnostic counter bucket and emits a normalized,
- * searchable log line for the supplied class and site.
+ * @details     递增核心拥有的诊断计数器桶并发出规范化、可搜索的日志行。
  *
- * \param[in] core        Pointer to stepping core
- * \param[in] diag_class  Failure class bucket to increment
- * \param[in] status      Shared status taxonomy code for this event
- * \param[in] site        Static site tag (e.g. "BeginStepSession")
- * \param[in] detail_a    Optional numeric detail A
- * \param[in] detail_b    Optional numeric detail B
+ * @param[in]   core                    步进核心指针
+ * @param[in]   diag_class              失败类别桶
+ * @param[in]   status                  此事件的共享状态分类码
+ * @param[in]   site                    静态站点标签（例如 "BeginStepSession"）
+ * @param[in]   detail_a                可选数值详情 A
+ * @param[in]   detail_b                可选数值详情 B
  *
- * \return status value passed in, or ESA_SIM_STEPPING_STATUS_FAILURE if core/site invalid
+ * @retval      传入的状态值，或 ESA_SIM_STEPPING_STATUS_FAILURE（如果核心/站点无效）
  */
-int32_t ESA_Stepping_Core_RecordDiagnostic(ESA_Stepping_Core_t *core,
-                                                   ESA_Stepping_DiagnosticClass_t diag_class,
-                                                   int32_t status,
-                                                   const char *site,
-                                                   uint32_t detail_a,
-                                                   uint32_t detail_b);
+int32_t ESA_Stepping_Core_RecordDiagnostic(ESA_Stepping_Core_t *core, ESA_Stepping_DiagnosticClass_t diag_class,
+                                           int32_t status, const char *site, uint32_t detail_a, uint32_t detail_b);
 
 #endif /* ESA_SIM_STEPPING_CORE_H */
