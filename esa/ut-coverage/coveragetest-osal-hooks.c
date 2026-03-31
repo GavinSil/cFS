@@ -1,39 +1,12 @@
-/************************************************************************
- * NASA Docket No. GSC-19,200-1, and identified as "cFS Draco"
- *
- * Copyright (c) 2023 United States Government as represented by the
- * Administrator of the National Aeronautics and Space Administration.
- * All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License. You may obtain
- * a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ************************************************************************/
-
 /**
- * \file
- * \ingroup esa
+ * @file
+ * @ingroup esa
+ * @brief       OSAL 步进钩子单元测试
+ * @author      gaoyuan
+ * @date        2026-03-20
  *
- * Purpose: OSAL stepping hook unit tests
- *
- * This test suite verifies that all 6 OSAL stepping hooks (3 pre-blocking + 3 complete)
- * correctly construct and report events to the ESA stepping shim.
- *
- * Test coverage:
- * - OS_PosixStepping_Hook_TaskDelay() reports TASK_DELAY_ACK
- * - OS_PosixStepping_Hook_TaskDelay_Complete() reports TASK_DELAY_COMPLETE
- * - OS_PosixStepping_Hook_QueueReceive() reports QUEUE_RECEIVE_ACK
- * - OS_PosixStepping_Hook_QueueReceive_Complete() reports QUEUE_RECEIVE_COMPLETE
- * - OS_PosixStepping_Hook_BinSemTake() reports BINSEM_TAKE_ACK
- * - OS_PosixStepping_Hook_BinSemTake_Complete() reports BINSEM_TAKE_COMPLETE
+ * @details     本测试套件验证所有 OSAL 步进钩子是否正确报告事件。
  */
-
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
@@ -49,28 +22,34 @@
 #include "osapi-idmap.h"
 #include "osapi-task.h"
 
-/*
- * Hook context: captures the event passed to ESA_Stepping_Shim_ReportEvent
+/**
+ * @brief 钩子上下文:捕获传递给 ESA_Stepping_Shim_ReportEvent 的事件
  */
 typedef struct
 {
-    ESA_Stepping_ShimEvent_t CapturedEvent;
-    uint32                   EventCount;
+    ESA_Stepping_ShimEvent_t CapturedEvent; /*!< 捕获的事件 */
+    uint32                   EventCount;    /*!< 事件计数 */
 } TestHookContext_t;
 
+/** OSAL 钩子测试共享上下文 */
 static TestHookContext_t GlobalHookContext;
 
 /**
- * \brief Hook to capture ESA_Stepping_Shim_ReportEvent calls
+ * @brief 捕获 ESA_Stepping_Shim_ReportEvent 调用的钩子函数
  *
- * This hook intercepts calls to ESA_Stepping_Shim_ReportEvent and captures
- * the event structure for validation.
+ * @details 此钩子拦截对 ESA_Stepping_Shim_ReportEvent 的调用并捕获事件结构以供验证。
+ *
+ * @param[in,out] UserObj 用户对象（指向 TestHookContext_t 的指针）
+ * @param[in] StubRetcode 桩函数返回码
+ * @param[in] CallCount 调用计数（未使用）
+ * @param[in] Context 桩函数上下文
+ * @retval      StubRetcode 返回桩函数返回码
  */
-static int32 CaptureShimEvent_Hook(void *UserObj, int32 StubRetcode, uint32 CallCount,
-                                    const UT_StubContext_t *Context)
+static int32 CaptureShimEvent_Hook(void *UserObj, int32 StubRetcode, uint32 CallCount, const UT_StubContext_t *Context)
 {
-    TestHookContext_t *HookCtx = (TestHookContext_t *)UserObj;
-    const ESA_Stepping_ShimEvent_t *Event = UT_Hook_GetArgValueByName(Context, "event", const ESA_Stepping_ShimEvent_t *);
+    TestHookContext_t              *HookCtx = (TestHookContext_t *)UserObj;
+    const ESA_Stepping_ShimEvent_t *Event =
+        UT_Hook_GetArgValueByName(Context, "event", const ESA_Stepping_ShimEvent_t *);
 
     if (Event != NULL)
     {
@@ -82,7 +61,7 @@ static int32 CaptureShimEvent_Hook(void *UserObj, int32 StubRetcode, uint32 Call
 }
 
 /**
- * \brief Setup: Reset context and hook for each test
+ * @brief 设置:为每个测试重置上下文和钩子
  */
 void ResetTest(void)
 {
@@ -92,22 +71,22 @@ void ResetTest(void)
 }
 
 /* ============================================================================
-   TASKDELAY HOOK TESTS
+   TASKDELAY 钩子测试
    ============================================================================ */
 
 /**
- * \brief Test: OS_PosixStepping_Hook_TaskDelay reports TASK_DELAY_ACK event
+ * @brief 测试:OS_PosixStepping_Hook_TaskDelay 报告 TASK_DELAY_ACK 事件
  *
- * Verifies that the pre-blocking TaskDelay hook:
- * - Calls ESA_Stepping_Shim_ReportEvent
- * - Sets event_kind to TASK_DELAY_ACK
- * - Passes task_id correctly
- * - Passes delay_ms correctly
+ * @details 验证阻塞前 TaskDelay 钩子:
+ * - 调用 ESA_Stepping_Shim_ReportEvent
+ * - 将 event_kind 设置为 TASK_DELAY_ACK
+ * - 正确传递 task_id
+ * - 正确传递 delay_ms
  */
 void Test_OSAL_Hook_TaskDelay_ACK(void)
 {
-    uint32_t TestDelayMs = 500;
-    osal_id_t TestTaskId = OS_ObjectIdFromInteger(0x12345678);
+    uint32_t  TestDelayMs = 500;
+    osal_id_t TestTaskId  = OS_ObjectIdFromInteger(0x12345678);
 
     OS_PosixStepping_Hook_TaskDelay(TestDelayMs, TestTaskId);
 
@@ -118,18 +97,18 @@ void Test_OSAL_Hook_TaskDelay_ACK(void)
 }
 
 /**
- * \brief Test: OS_PosixStepping_Hook_TaskDelay_Complete reports TASK_DELAY_COMPLETE event
+ * @brief 测试:OS_PosixStepping_Hook_TaskDelay_Complete 报告 TASK_DELAY_COMPLETE 事件
  *
- * Verifies that the post-blocking TaskDelay hook:
- * - Calls ESA_Stepping_Shim_ReportEvent
- * - Sets event_kind to TASK_DELAY_COMPLETE
- * - Passes task_id correctly
- * - Passes delay_ms correctly
+ * @details 验证阻塞后 TaskDelay 钩子:
+ * - 调用 ESA_Stepping_Shim_ReportEvent
+ * - 将 event_kind 设置为 TASK_DELAY_COMPLETE
+ * - 正确传递 task_id
+ * - 正确传递 delay_ms
  */
 void Test_OSAL_Hook_TaskDelay_Complete(void)
 {
-    uint32_t TestDelayMs = 250;
-    osal_id_t TestTaskId = OS_ObjectIdFromInteger(0xABCDEF00);
+    uint32_t  TestDelayMs = 250;
+    osal_id_t TestTaskId  = OS_ObjectIdFromInteger(0xABCDEF00);
 
     OS_PosixStepping_Hook_TaskDelay_Complete(TestDelayMs, TestTaskId);
 
@@ -140,46 +119,46 @@ void Test_OSAL_Hook_TaskDelay_Complete(void)
 }
 
 /**
- * \brief Test: TaskDelay ACK and COMPLETE are sequential
+ * @brief 测试:TaskDelay ACK 和 COMPLETE 是连续的
  *
- * Verifies that both pre and post hooks can be called and produce expected events
+ * @details 验证阻塞前和阻塞后钩子可以被调用并产生预期事件
  */
 void Test_OSAL_Hook_TaskDelay_Sequence(void)
 {
-    uint32_t TestDelayMs = 1000;
-    osal_id_t TestTaskId = OS_ObjectIdFromInteger(0x11223344);
+    uint32_t  TestDelayMs = 1000;
+    osal_id_t TestTaskId  = OS_ObjectIdFromInteger(0x11223344);
 
-    /* First call: pre-blocking */
+    /* 第一次调用:阻塞前 */
     OS_PosixStepping_Hook_TaskDelay(TestDelayMs, TestTaskId);
     UtAssert_UINT32_EQ(GlobalHookContext.EventCount, 1);
     UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.event_kind, ESA_SIM_STEPPING_EVENT_TASK_DELAY_ACK);
 
-    /* Second call: post-blocking */
+    /* 第二次调用:阻塞后 */
     OS_PosixStepping_Hook_TaskDelay_Complete(TestDelayMs, TestTaskId);
     UtAssert_UINT32_EQ(GlobalHookContext.EventCount, 2);
     UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.event_kind, ESA_SIM_STEPPING_EVENT_TASK_DELAY_COMPLETE);
 }
 
 /* ============================================================================
-   QUEUERECEIVE HOOK TESTS
+   QUEUERECEIVE 钩子测试
    ============================================================================ */
 
 /**
- * \brief Test: OS_PosixStepping_Hook_QueueReceive reports QUEUE_RECEIVE_ACK event
+ * @brief 测试:OS_PosixStepping_Hook_QueueReceive 报告 QUEUE_RECEIVE_ACK 事件
  *
- * Verifies that the pre-blocking QueueReceive hook:
- * - Calls ESA_Stepping_Shim_ReportEvent
- * - Sets event_kind to QUEUE_RECEIVE_ACK
- * - Extracts entity_id from token
- * - Extracts task_id from current task
- * - Passes timeout correctly
+ * @details 验证阻塞前 QueueReceive 钩子:
+ * - 调用 ESA_Stepping_Shim_ReportEvent
+ * - 将 event_kind 设置为 QUEUE_RECEIVE_ACK
+ * - 从 token 中提取 entity_id
+ * - 从当前任务中提取 task_id
+ * - 正确传递超时值
  */
 void Test_OSAL_Hook_QueueReceive_ACK(void)
 {
     OS_object_token_t TestToken;
-    osal_id_t TestQueueId = OS_ObjectIdFromInteger(0x00020033UL);
-    int32 TestTimeout = 1000;
-    uint32 ExpectedTaskId;
+    osal_id_t         TestQueueId = OS_ObjectIdFromInteger(0x00020033UL);
+    int32             TestTimeout = 1000;
+    uint32            ExpectedTaskId;
 
     memset(&TestToken, 0, sizeof(TestToken));
     TestToken.obj_id = TestQueueId;
@@ -197,20 +176,20 @@ void Test_OSAL_Hook_QueueReceive_ACK(void)
 }
 
 /**
- * \brief Test: OS_PosixStepping_Hook_QueueReceive_Complete reports QUEUE_RECEIVE_COMPLETE event
+ * @brief 测试:OS_PosixStepping_Hook_QueueReceive_Complete 报告 QUEUE_RECEIVE_COMPLETE 事件
  *
- * Verifies that the post-blocking QueueReceive hook:
- * - Calls ESA_Stepping_Shim_ReportEvent
- * - Sets event_kind to QUEUE_RECEIVE_COMPLETE
- * - Passes same entity_id, task_id, and timeout as ACK
- * - Does NOT condition on return_code (always reports)
+ * @details 验证阻塞后 QueueReceive 钩子:
+ * - 调用 ESA_Stepping_Shim_ReportEvent
+ * - 将 event_kind 设置为 QUEUE_RECEIVE_COMPLETE
+ * - 传递与 ACK 相同的 entity_id、task_id 和超时值
+ * - 不依赖 return_code 的值（总是报告）
  */
 void Test_OSAL_Hook_QueueReceive_Complete(void)
 {
     OS_object_token_t TestToken;
-    osal_id_t TestQueueId = OS_ObjectIdFromInteger(0x00020044UL);
-    int32 TestTimeout = 500;
-    uint32 ExpectedTaskId;
+    osal_id_t         TestQueueId = OS_ObjectIdFromInteger(0x00020044UL);
+    int32             TestTimeout = 500;
+    uint32            ExpectedTaskId;
 
     memset(&TestToken, 0, sizeof(TestToken));
     TestToken.obj_id = TestQueueId;
@@ -228,17 +207,17 @@ void Test_OSAL_Hook_QueueReceive_Complete(void)
 }
 
 /**
- * \brief Test: QueueReceive Complete is reported even on error return
+ * @brief 测试:即使返回错误,QueueReceive Complete 也会报告
  *
- * Verifies that the COMPLETE hook reports regardless of return_code value
+ * @details 验证 COMPLETE 钩子无论 return_code 值如何都会报告
  */
 void Test_OSAL_Hook_QueueReceive_Complete_OnError(void)
 {
     OS_object_token_t TestToken;
-    osal_id_t TestQueueId = OS_ObjectIdFromInteger(0x00020055UL);
-    int32 TestTimeout = 100;
-    int32 TestReturnCode = -1;  /* Error code */
-    uint32 ExpectedTaskId;
+    osal_id_t         TestQueueId    = OS_ObjectIdFromInteger(0x00020055UL);
+    int32             TestTimeout    = 100;
+    int32             TestReturnCode = -1; /* 错误码 */
+    uint32            ExpectedTaskId;
 
     memset(&TestToken, 0, sizeof(TestToken));
     TestToken.obj_id = TestQueueId;
@@ -256,14 +235,14 @@ void Test_OSAL_Hook_QueueReceive_Complete_OnError(void)
 }
 
 /**
- * \brief Test: QueueReceive ACK and COMPLETE sequence
+ * @brief 测试:QueueReceive ACK 和 COMPLETE 序列
  */
 void Test_OSAL_Hook_QueueReceive_Sequence(void)
 {
     OS_object_token_t TestToken;
-    osal_id_t TestQueueId = OS_ObjectIdFromInteger(0x00020066UL);
-    int32 TestTimeout = 2000;
-    uint32 ExpectedTaskId;
+    osal_id_t         TestQueueId = OS_ObjectIdFromInteger(0x00020066UL);
+    int32             TestTimeout = 2000;
+    uint32            ExpectedTaskId;
 
     memset(&TestToken, 0, sizeof(TestToken));
     TestToken.obj_id = TestQueueId;
@@ -287,28 +266,28 @@ void Test_OSAL_Hook_QueueReceive_Sequence(void)
 }
 
 /* ============================================================================
-   BINSEMTAKE HOOK TESTS
+   BINSEMTAKE 钩子测试
    ============================================================================ */
 
 /**
- * \brief Test: OS_PosixStepping_Hook_BinSemTake reports BINSEM_TAKE_ACK event
+ * @brief 测试:OS_PosixStepping_Hook_BinSemTake 报告 BINSEM_TAKE_ACK 事件
  *
- * Verifies that the pre-blocking BinSemTake hook:
- * - Calls ESA_Stepping_Shim_ReportEvent
- * - Sets event_kind to BINSEM_TAKE_ACK
- * - Extracts entity_id from token
- * - Extracts task_id from current task
+ * @details 验证阻塞前 BinSemTake 钩子:
+ * - 调用 ESA_Stepping_Shim_ReportEvent
+ * - 将 event_kind 设置为 BINSEM_TAKE_ACK
+ * - 从 token 中提取 entity_id
+ * - 从当前任务中提取 task_id
  */
 void Test_OSAL_Hook_BinSemTake_ACK(void)
 {
     OS_object_token_t TestToken;
-    osal_id_t TestBinSemId = OS_ObjectIdFromInteger(0x00040044UL);
-    struct timespec TestTimeout;
-    uint32 ExpectedTaskId;
+    osal_id_t         TestBinSemId = OS_ObjectIdFromInteger(0x00040044UL);
+    struct timespec   TestTimeout;
+    uint32            ExpectedTaskId;
 
     memset(&TestToken, 0, sizeof(TestToken));
-    TestToken.obj_id = TestBinSemId;
-    TestTimeout.tv_sec = 1;
+    TestToken.obj_id    = TestBinSemId;
+    TestTimeout.tv_sec  = 1;
     TestTimeout.tv_nsec = 500000000;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_TaskGetId), 0x100BA);
@@ -323,24 +302,24 @@ void Test_OSAL_Hook_BinSemTake_ACK(void)
 }
 
 /**
- * \brief Test: OS_PosixStepping_Hook_BinSemTake_Complete reports BINSEM_TAKE_COMPLETE event
+ * @brief 测试:OS_PosixStepping_Hook_BinSemTake_Complete 报告 BINSEM_TAKE_COMPLETE 事件
  *
- * Verifies that the post-blocking BinSemTake hook:
- * - Calls ESA_Stepping_Shim_ReportEvent
- * - Sets event_kind to BINSEM_TAKE_COMPLETE
- * - Passes same entity_id and task_id as ACK
- * - Does NOT condition on return_code (always reports)
+ * @details 验证阻塞后 BinSemTake 钩子:
+ * - 调用 ESA_Stepping_Shim_ReportEvent
+ * - 将 event_kind 设置为 BINSEM_TAKE_COMPLETE
+ * - 传递与 ACK 相同的 entity_id 和 task_id
+ * - 不依赖 return_code 的值（总是报告）
  */
 void Test_OSAL_Hook_BinSemTake_Complete(void)
 {
     OS_object_token_t TestToken;
-    osal_id_t TestBinSemId = OS_ObjectIdFromInteger(0x00040055UL);
-    struct timespec TestTimeout;
-    uint32 ExpectedTaskId;
+    osal_id_t         TestBinSemId = OS_ObjectIdFromInteger(0x00040055UL);
+    struct timespec   TestTimeout;
+    uint32            ExpectedTaskId;
 
     memset(&TestToken, 0, sizeof(TestToken));
-    TestToken.obj_id = TestBinSemId;
-    TestTimeout.tv_sec = 0;
+    TestToken.obj_id    = TestBinSemId;
+    TestTimeout.tv_sec  = 0;
     TestTimeout.tv_nsec = 0;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_TaskGetId), 0x100BB);
@@ -355,18 +334,17 @@ void Test_OSAL_Hook_BinSemTake_Complete(void)
 }
 
 /**
- * \brief Test: BinSemTake Complete is reported even on timeout
+ * @brief 测试:即使超时,BinSemTake Complete 也会报告
  *
- * Verifies that the COMPLETE hook reports regardless of return_code value
- * (e.g., OS_SEM_TIMEOUT)
+ * @details 验证 COMPLETE 钩子无论 return_code 值如何都会报告（例如 OS_SEM_TIMEOUT）
  */
 void Test_OSAL_Hook_BinSemTake_Complete_OnTimeout(void)
 {
     OS_object_token_t TestToken;
-    osal_id_t TestBinSemId = OS_ObjectIdFromInteger(0x00040066UL);
-    struct timespec TestTimeout;
-    int32 TestReturnCode = -3;  /* OS_SEM_TIMEOUT analog */
-    uint32 ExpectedTaskId;
+    osal_id_t         TestBinSemId = OS_ObjectIdFromInteger(0x00040066UL);
+    struct timespec   TestTimeout;
+    int32             TestReturnCode = -3; /* OS_SEM_TIMEOUT 类似值 */
+    uint32            ExpectedTaskId;
 
     memset(&TestToken, 0, sizeof(TestToken));
     TestToken.obj_id = TestBinSemId;
@@ -384,19 +362,19 @@ void Test_OSAL_Hook_BinSemTake_Complete_OnTimeout(void)
 }
 
 /**
- * \brief Test: BinSemTake ACK and COMPLETE sequence
+ * @brief 测试:BinSemTake ACK 和 COMPLETE 序列
  */
 void Test_OSAL_Hook_BinSemTake_Sequence(void)
 {
     OS_object_token_t TestToken;
-    osal_id_t TestBinSemId = OS_ObjectIdFromInteger(0x00040077UL);
-    struct timespec TestTimeout;
-    uint32 ExpectedTaskId;
+    osal_id_t         TestBinSemId = OS_ObjectIdFromInteger(0x00040077UL);
+    struct timespec   TestTimeout;
+    uint32            ExpectedTaskId;
 
     memset(&TestToken, 0, sizeof(TestToken));
     TestToken.obj_id = TestBinSemId;
     memset(&TestTimeout, 0, sizeof(TestTimeout));
-    TestTimeout.tv_sec = 0;
+    TestTimeout.tv_sec  = 0;
     TestTimeout.tv_nsec = 100000000;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_TaskGetId), 0x100BD);
@@ -416,25 +394,28 @@ void Test_OSAL_Hook_BinSemTake_Sequence(void)
 }
 
 /* ============================================================================
-   TEST REGISTRATION
+   测试注册
    ============================================================================ */
 
 #define ADD_TEST(test) UtTest_Add(test, ResetTest, NULL, #test)
 
+/**
+ * @brief 测试套件设置函数
+ */
 void UtTest_Setup(void)
 {
-    /* TaskDelay tests */
+    /* TaskDelay 测试 */
     ADD_TEST(Test_OSAL_Hook_TaskDelay_ACK);
     ADD_TEST(Test_OSAL_Hook_TaskDelay_Complete);
     ADD_TEST(Test_OSAL_Hook_TaskDelay_Sequence);
 
-    /* QueueReceive tests */
+    /* QueueReceive 测试 */
     ADD_TEST(Test_OSAL_Hook_QueueReceive_ACK);
     ADD_TEST(Test_OSAL_Hook_QueueReceive_Complete);
     ADD_TEST(Test_OSAL_Hook_QueueReceive_Complete_OnError);
     ADD_TEST(Test_OSAL_Hook_QueueReceive_Sequence);
 
-    /* BinSemTake tests */
+    /* BinSemTake 测试 */
     ADD_TEST(Test_OSAL_Hook_BinSemTake_ACK);
     ADD_TEST(Test_OSAL_Hook_BinSemTake_Complete);
     ADD_TEST(Test_OSAL_Hook_BinSemTake_Complete_OnTimeout);
