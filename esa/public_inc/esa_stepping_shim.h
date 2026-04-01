@@ -33,13 +33,9 @@ typedef enum ESA_Stepping_EventKind
     ESA_SIM_STEPPING_EVENT_TASK_DELAY_ACK,      /*!< 任务延迟确认（阻塞前，等待候选） */
     ESA_SIM_STEPPING_EVENT_TASK_DELAY_COMPLETE, /*!< 任务延迟完成（阻塞后，操作完成） */
     ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE,       /*!< 队列接收阻塞（OSAL）- 旧版单事件 */
-    ESA_SIM_STEPPING_EVENT_BINSEM_TAKE,         /*!< 二值信号量获取（OSAL）- 旧版单事件 */
-    ESA_SIM_STEPPING_EVENT_TIME_TASK_CYCLE,     /*!< TIME 模块任务周期开始 */
     ESA_SIM_STEPPING_EVENT_1HZ_BOUNDARY,        /*!< 1Hz 时钟检测 */
     ESA_SIM_STEPPING_EVENT_TONE_SIGNAL,         /*!< 音调信号触发（PSP/SCH） */
-    ESA_SIM_STEPPING_EVENT_SCH_SEMAPHORE_WAIT,  /*!< SCH 等待信号量 */
     ESA_SIM_STEPPING_EVENT_SCH_MINOR_FRAME,     /*!< SCH 小帧边界 */
-    ESA_SIM_STEPPING_EVENT_SCH_MAJOR_FRAME,     /*!< SCH 大帧边界 */
     ESA_SIM_STEPPING_EVENT_SCH_SEND_TRIGGER,        /*!< SCH 发送触发器命令 */
     ESA_SIM_STEPPING_EVENT_SCH_DISPATCH_COMPLETE,   /*!< SCH 任务分发完成 */
     ESA_SIM_STEPPING_EVENT_CORE_SERVICE_CMD_PIPE_RECEIVE, /*!< 核心服务命令管道接收 */

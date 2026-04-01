@@ -270,31 +270,7 @@ int32_t ESA_Stepping_Core_ReportTaskDelayReturn(ESA_Stepping_Core_t *core, uint3
  */
 int32_t ESA_Stepping_Core_ReportQueueReceive(ESA_Stepping_Core_t *core, uint32_t queue_id, uint32_t timeout_ms);
 
-/**
- * @brief       报告二值信号量获取边界事件
- *
- * @details     当任务通过 OSAL 钩子阻塞于二值信号量时调用。
- *              报告事实；核心决定是否应触发步进。
- *
- * @param[in]   core                    核心结构指针
- * @param[in]   sem_id                  获取信号量的标识符
- * @param[in]   timeout_ms              获取操作超时
- *
- * @retval      0                       成功
- */
-int32_t ESA_Stepping_Core_ReportBinSemTake(ESA_Stepping_Core_t *core, uint32_t sem_id, uint32_t timeout_ms);
 
-/**
- * @brief       报告时间任务周期边界事件
- *
- * @details     当 TIME 模块开始时间同步/更新周期时调用。
- *              报告事实；核心决定是否应触发步进。
- *
- * @param[in]   core                    核心结构指针
- *
- * @retval      0                       成功
- */
-int32_t ESA_Stepping_Core_ReportTimeTaskCycle(ESA_Stepping_Core_t *core);
 
 /**
  * @brief       报告 1Hz 边界事件
@@ -320,19 +296,6 @@ int32_t ESA_Stepping_Core_Report1HzBoundary(ESA_Stepping_Core_t *core);
  */
 int32_t ESA_Stepping_Core_ReportToneSignal(ESA_Stepping_Core_t *core);
 
-/**
- * @brief       报告调度器信号量等待边界事件
- *
- * @details     当调度器（SCH）阻塞于信号量等待触发器（例如音调信号、1Hz 滴答或软件触发器）时调用。
- *              将事实作为独立的调度器事件报告；核心决定是否应触发步进。
- *
- * @param[in]   core                    核心结构指针
- * @param[in]   sem_id                  等待的信号量标识符
- * @param[in]   timeout_ms              信号量等待操作超时
- *
- * @retval      0                       成功
- */
-int32_t ESA_Stepping_Core_ReportSchSemaphoreWait(ESA_Stepping_Core_t *core, uint32_t sem_id, uint32_t timeout_ms);
 
 /**
  * @brief       报告调度器小帧边界事件
@@ -347,18 +310,6 @@ int32_t ESA_Stepping_Core_ReportSchSemaphoreWait(ESA_Stepping_Core_t *core, uint
  */
 int32_t ESA_Stepping_Core_ReportSchMinorFrame(ESA_Stepping_Core_t *core);
 
-/**
- * @brief       报告调度器大帧边界事件
- *
- * @details     当调度器到达大帧边界（每个周期的帧 0）时调用。
- *              大帧标记完整调度周期的开始。
- *              将事实作为独立的调度器事件报告；核心决定是否应触发步进。
- *
- * @param[in]   core                    核心结构指针
- *
- * @retval      0                       成功
- */
-int32_t ESA_Stepping_Core_ReportSchMajorFrame(ESA_Stepping_Core_t *core);
 
 /**
  * @brief       报告调度器发送触发器事件

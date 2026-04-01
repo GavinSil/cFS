@@ -484,44 +484,7 @@ int32_t ESA_Stepping_Core_ReportQueueReceive(ESA_Stepping_Core_t *core, uint32_t
     return 0;
 }
 
-/**
- * @brief       报告二值信号量获取边界事件
- * @details     当前实现保留该事实入口，供未来将二值信号量等待纳入步进簿记时扩展。
- * @param[in,out] core       核心结构指针
- * @param[in]     sem_id     信号量标识符
- * @param[in]     timeout_ms 获取超时（毫秒）
- * @retval        0          报告已处理
- * @retval        -1         输入核心指针无效
- */
-int32_t ESA_Stepping_Core_ReportBinSemTake(ESA_Stepping_Core_t *core, uint32_t sem_id, uint32_t timeout_ms)
-{
-    (void)sem_id;
-    (void)timeout_ms;
 
-    if (core == NULL)
-    {
-        return -1;
-    }
-
-    return 0;
-}
-
-/**
- * @brief       报告时间任务周期边界事件
- * @details     TIME 主任务周期当前只作为信息性事实保留，不直接创建阻塞触发器。
- * @param[in]   core 核心结构指针
- * @retval      0    报告已处理
- * @retval      -1   输入核心指针无效
- */
-int32_t ESA_Stepping_Core_ReportTimeTaskCycle(ESA_Stepping_Core_t *core)
-{
-    if (core == NULL)
-    {
-        return -1;
-    }
-
-    return 0;
-}
 
 /**
  * @brief       报告 1Hz 边界事件
@@ -615,27 +578,6 @@ int32_t ESA_Stepping_Core_ReportToneSignal(ESA_Stepping_Core_t *core)
     return 0;
 }
 
-/**
- * @brief       报告调度器信号量等待边界事件
- * @details     当前实现保留该入口，供未来将调度器信号量等待纳入步进簿记时扩展。
- * @param[in,out] core       核心结构指针
- * @param[in]     sem_id     信号量标识符
- * @param[in]     timeout_ms 等待超时（毫秒）
- * @retval        0          报告已处理
- * @retval        -1         输入核心指针无效
- */
-int32_t ESA_Stepping_Core_ReportSchSemaphoreWait(ESA_Stepping_Core_t *core, uint32_t sem_id, uint32_t timeout_ms)
-{
-    (void)sem_id;
-    (void)timeout_ms;
-
-    if (core == NULL)
-    {
-        return -1;
-    }
-
-    return 0;
-}
 
 /**
  * @brief       报告调度器小帧边界事件
@@ -677,22 +619,6 @@ int32_t ESA_Stepping_Core_ReportSchMinorFrame(ESA_Stepping_Core_t *core)
     return 0;
 }
 
-/**
- * @brief       报告调度器大帧边界事件
- * @details     当前实现将大帧事实作为保留入口，便于未来扩展调度周期级簿记。
- * @param[in]   core 核心结构指针
- * @retval      0    报告已处理
- * @retval      -1   输入核心指针无效
- */
-int32_t ESA_Stepping_Core_ReportSchMajorFrame(ESA_Stepping_Core_t *core)
-{
-    if (core == NULL)
-    {
-        return -1;
-    }
-
-    return 0;
-}
 
 /**
  * @brief       报告调度器发送触发器事件

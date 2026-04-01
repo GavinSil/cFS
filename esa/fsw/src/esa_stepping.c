@@ -248,9 +248,6 @@ int32_t ESA_Stepping_Shim_ReportEvent(const ESA_Stepping_ShimEvent_t *event)
                                                                   event->optional_delay_ms);
             break;
 
-        case ESA_SIM_STEPPING_EVENT_BINSEM_TAKE:
-            status = ESA_Stepping_Core_ReportBinSemTake(&stepping_core, event->entity_id, event->optional_delay_ms);
-            break;
 
         case ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_ACK:
             status = ESA_Stepping_Core_ReportBinSemTakeAck(&stepping_core, event->task_id, event->entity_id,
@@ -262,9 +259,6 @@ int32_t ESA_Stepping_Shim_ReportEvent(const ESA_Stepping_ShimEvent_t *event)
                                                                 event->optional_delay_ms);
             break;
 
-        case ESA_SIM_STEPPING_EVENT_TIME_TASK_CYCLE:
-            status = ESA_Stepping_Core_ReportTimeTaskCycle(&stepping_core);
-            break;
 
         case ESA_SIM_STEPPING_EVENT_1HZ_BOUNDARY:
             status = ESA_Stepping_Core_Report1HzBoundary(&stepping_core);
@@ -274,18 +268,11 @@ int32_t ESA_Stepping_Shim_ReportEvent(const ESA_Stepping_ShimEvent_t *event)
             status = ESA_Stepping_Core_ReportToneSignal(&stepping_core);
             break;
 
-        case ESA_SIM_STEPPING_EVENT_SCH_SEMAPHORE_WAIT:
-            status =
-                ESA_Stepping_Core_ReportSchSemaphoreWait(&stepping_core, event->entity_id, event->optional_delay_ms);
-            break;
 
         case ESA_SIM_STEPPING_EVENT_SCH_MINOR_FRAME:
             status = ESA_Stepping_Core_ReportSchMinorFrame(&stepping_core);
             break;
 
-        case ESA_SIM_STEPPING_EVENT_SCH_MAJOR_FRAME:
-            status = ESA_Stepping_Core_ReportSchMajorFrame(&stepping_core);
-            break;
 
         case ESA_SIM_STEPPING_EVENT_SCH_SEND_TRIGGER:
             status = ESA_Stepping_Core_ReportSchSendTrigger(&stepping_core, event->entity_id);
