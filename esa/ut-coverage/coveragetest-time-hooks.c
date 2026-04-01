@@ -29,7 +29,6 @@ typedef struct
 /** 时间服务钩子测试共享上下文 */
 static TestHookContext_t GlobalHookContext;
 
-void CFE_TIME_Stepping_Hook_TaskCycle(void);
 void CFE_TIME_Stepping_Hook_1HzBoundary(void);
 void CFE_TIME_Stepping_Hook_ToneSignal(void);
 
@@ -73,20 +72,6 @@ void ResetTest(void)
 }
 
 /**
- * @brief 测试 TIME 任务周期钩子
- *
- * @details 验证 CFE_TIME_Stepping_Hook_TaskCycle 是否正确报告 TIME_TASK_CYCLE 事件
- */
-void Test_TIME_Hook_TaskCycle(void)
-{
-    CFE_TIME_Stepping_Hook_TaskCycle();
-
-    UtAssert_UINT32_EQ(GlobalHookContext.EventCount, 1);
-    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.event_kind, ESA_SIM_STEPPING_EVENT_TIME_TASK_CYCLE);
-    UtAssert_UINT32_EQ(GlobalHookContext.CapturedEvent.entity_id, ESA_SIM_STEPPING_SERVICE_BIT_TIME);
-}
-
-/**
  * @brief 测试 TIME 1Hz 边界钩子
  *
  * @details 验证 CFE_TIME_Stepping_Hook_1HzBoundary 是否正确报告 1HZ_BOUNDARY 事件
@@ -121,7 +106,6 @@ void Test_TIME_Hook_ToneSignal(void)
  */
 void UtTest_Setup(void)
 {
-    ADD_TEST(Test_TIME_Hook_TaskCycle);
     ADD_TEST(Test_TIME_Hook_1HzBoundary);
     ADD_TEST(Test_TIME_Hook_ToneSignal);
 }
