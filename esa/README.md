@@ -27,8 +27,7 @@
 |  +----------------+  +----------------+  +----------------+                 |
 |  +----------------+  +----------------+  +----------------+                 |
 |  |  TBL 任务循环   |  | TIME 任务循环   |  |  SCH 调度器     |                 |
-|  | RECEIVE+COMPLETE|  | Hook_TaskCycle  |  | SemWait+Frame   |                 |
-|  |                 |  | 1HzBoundary     |  |                 |                 |
+|  | RECEIVE+COMPLETE|  | 1HzBoundary     |  | MinorFrame      |                 |
 |  |                 |  | ToneSignal      |  |                 |                 |
 |  +----------------+  +----------------+  +----------------+                 |
 +-----------------------------------+-----------------------------------------+
@@ -175,7 +174,7 @@ void OS_PosixStepping_Hook_TaskDelay_Complete(uint32_t ms, osal_id_t task_id)
 
 ## 事件类型清单
 
-共支持 22 种事件类型：
+共支持 18 种事件类型：
 
 ### OSAL 事件
 
@@ -187,7 +186,6 @@ void OS_PosixStepping_Hook_TaskDelay_Complete(uint32_t ms, osal_id_t task_id)
 | `ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE` | QueueReceive 请求（兼容旧版单事件） | OSAL QueueGet |
 | `ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_ACK` | QueueReceive 确认（阻塞前） | OSAL QueueGet |
 | `ESA_SIM_STEPPING_EVENT_QUEUE_RECEIVE_COMPLETE` | QueueReceive 完成（阻塞后） | OSAL QueueGet |
-| `ESA_SIM_STEPPING_EVENT_BINSEM_TAKE` | BinSemTake 请求（兼容旧版单事件） | OSAL BinSemTake |
 | `ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_ACK` | BinSemTake 确认（阻塞前） | OSAL BinSemTake |
 | `ESA_SIM_STEPPING_EVENT_BINSEM_TAKE_COMPLETE` | BinSemTake 完成（阻塞后） | OSAL BinSemTake |
 
@@ -195,7 +193,6 @@ void OS_PosixStepping_Hook_TaskDelay_Complete(uint32_t ms, osal_id_t task_id)
 
 | 事件类型 | 说明 | 触发源 |
 |----------|------|--------|
-| `ESA_SIM_STEPPING_EVENT_TIME_TASK_CYCLE` | TIME 任务周期开始 | TIME 主循环 |
 | `ESA_SIM_STEPPING_EVENT_1HZ_BOUNDARY` | 1Hz 时钟边界 | TIME 1Hz 处理 |
 | `ESA_SIM_STEPPING_EVENT_TONE_SIGNAL` | Tone 信号 | TIME 信号处理 |
 
@@ -210,9 +207,7 @@ void OS_PosixStepping_Hook_TaskDelay_Complete(uint32_t ms, osal_id_t task_id)
 
 | 事件类型 | 说明 | 触发源 |
 |----------|------|--------|
-| `ESA_SIM_STEPPING_EVENT_SCH_SEMAPHORE_WAIT` | SCH 信号量等待 | SCH |
 | `ESA_SIM_STEPPING_EVENT_SCH_MINOR_FRAME` | 次要帧边界 | SCH |
-| `ESA_SIM_STEPPING_EVENT_SCH_MAJOR_FRAME` | 主要帧边界 | SCH |
 | `ESA_SIM_STEPPING_EVENT_SCH_SEND_TRIGGER` | 发送触发器 | SCH |
 | `ESA_SIM_STEPPING_EVENT_SCH_DISPATCH_COMPLETE` | 分发完成 | SCH |
 
